@@ -197,7 +197,7 @@ function populateFilters() {
 // ── Core filter: slice monthly_detail by studio, source, date ─────────────
 function filterRows(fromDate, toDate, studio, source) {
   return RAW.monthly_detail.filter(r => {
-    const d = new Date(r.month);
+    const d = new Date(r.month + 'T00:00:00Z');
     if (fromDate && d < fromDate) return false;
     if (toDate   && d > toDate)   return false;
     if (studio   && r.studio !== studio) return false;
@@ -252,8 +252,8 @@ function applyFilters() {
   const fromStr = document.getElementById('fFrom').value;
   const toStr   = document.getElementById('fTo').value;
 
-  const from = fromStr ? new Date(fromStr + 'T00:00:00') : new Date(RAW.monthly_detail[0].month);
-  const to   = toStr   ? new Date(toStr   + 'T23:59:59') : new Date();
+  const from = fromStr ? new Date(fromStr + 'T00:00:00Z') : new Date(RAW.monthly_detail[0].month);
+  const to   = toStr   ? new Date(toStr + 'T23:59:59Z') : new Date();
 
   const { ppFrom, ppTo, pyFrom, pyTo } = computeWindows(from, to);
 
@@ -324,7 +324,7 @@ function buildTrend(monthly) {
 
   const labels = monthly.map((m, i) => {
     if (i % step !== 0 && i !== monthly.length - 1) return '';
-    const d = new Date(m.month);
+    const d = new Date(m.month + 'T00:00:00Z');
     return d.toLocaleString('en-US', { month: 'short', year: '2-digit' });
   });
 
