@@ -54,6 +54,26 @@
   .placeholder-content{display:flex;align-items:center;justify-content:center;min-height:340px;color:#5a7a8a;font-size:14px;font-weight:600;flex-direction:column;gap:10px;border:1.5px dashed #c0d4df;border-radius:12px}
   .placeholder-content .coming{font-size:12px;font-weight:400;color:#8aaabb}
 
+  /* Multi-select */
+  .multi-select{position:relative;min-width:160px}
+  .ms-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 10px;border-radius:6px;border:0.5px solid #c0d4df;background:#fff;color:#1a1a2e;font-size:12px;cursor:pointer;white-space:nowrap}
+  .ms-trigger:hover{border-color:#00A3E0}
+  .ms-arrow{font-size:10px;color:#5a7a8a;transition:transform .15s}
+  .ms-menu{display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:220px;max-height:260px;overflow-y:auto;background:#fff;border:0.5px solid #c0d4df;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:300;padding:6px 0}
+  .ms-menu.open{display:block}
+  .ms-item{display:flex;align-items:center;gap:8px;padding:6px 14px;font-size:12px;cursor:pointer;color:#1a1a2e;transition:background .1s}
+  .ms-item:hover{background:#f0f6fa}
+  .ms-item input[type=checkbox]{accent-color:#00A3E0;width:14px;height:14px;flex-shrink:0;cursor:pointer}
+  .ms-divider{height:1px;background:#eef3f7;margin:4px 0}
+  .ms-select-all{font-weight:600;color:#0084B5}
+
+  /* Granularity toggle */
+  .gran-group{display:flex;gap:0;margin-bottom:16px;border:0.5px solid #c0d4df;border-radius:6px;overflow:hidden;width:fit-content}
+  .gran-btn{background:#fff;border:none;padding:5px 14px;font-size:12px;font-weight:600;color:#5a7a8a;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:.5px}
+  .gran-btn:not(:last-child){border-right:0.5px solid #c0d4df}
+  .gran-btn.active{background:#00A3E0;color:#fff}
+  .gran-btn:disabled{opacity:.35;cursor:not-allowed;background:#f4f9fd}
+
   @media(max-width:768px){
     .nav-tabs{display:none;position:absolute;top:60px;left:0;right:0;background:var(--s-deep);flex-direction:column;padding:8px 0;z-index:199;box-shadow:0 4px 12px rgba(0,0,0,.2)}
     .nav-tabs.open{display:flex}
@@ -93,10 +113,20 @@
   <button class="controls-toggle" id="ctrlToggle" onclick="toggleControls()">Filters ▾</button>
   <div class="controls-inner" id="ctrlInner">
     <span class="ctrl-label">Studio</span>
-    <select id="fStudio" onchange="applyFilters()"><option value="">All Studios</option></select>
+    <div class="multi-select" id="studioDropdown">
+      <button class="ms-trigger" onclick="toggleDropdown('studioDropdown')">
+        <span id="studioLabel">All Studios</span><span class="ms-arrow">▾</span>
+      </button>
+      <div class="ms-menu" id="studioMenu"></div>
+    </div>
     <div class="ctrl-sep"></div>
     <span class="ctrl-label">Source</span>
-    <select id="fSource" onchange="applyFilters()"><option value="">All Sources</option></select>
+    <div class="multi-select" id="sourceDropdown">
+      <button class="ms-trigger" onclick="toggleDropdown('sourceDropdown')">
+        <span id="sourceLabel">All Sources</span><span class="ms-arrow">▾</span>
+      </button>
+      <div class="ms-menu" id="sourceMenu"></div>
+    </div>
     <div class="ctrl-sep"></div>
     <span class="ctrl-label">Date range</span>
     <div class="ctrl-date">
@@ -115,10 +145,17 @@
     </div>
     <div class="chart-card">
       <div class="chart-card-title">Funnel over time</div>
-      <div class="toggle-group">
-        <button class="tog-btn on" data-ds="0" onclick="toggleDs(this,0)" style="border-color:#00A3E0;background:#00A3E0;color:#fff"><span class="dot" style="background:#fff"></span>Leads</button>
-        <button class="tog-btn on" data-ds="1" onclick="toggleDs(this,1)" style="border-color:#00C9A7;background:#00C9A7;color:#fff"><span class="dot" style="background:#fff"></span>First Timers</button>
-        <button class="tog-btn on" data-ds="2" onclick="toggleDs(this,2)" style="border-color:#9aab00;background:#9aab00;color:#fff"><span class="dot" style="background:#fff"></span>New Members</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+        <div class="toggle-group" style="margin-bottom:0">
+          <button class="tog-btn on" data-ds="0" onclick="toggleDs(this,0)" style="border-color:#00A3E0;background:#00A3E0;color:#fff"><span class="dot" style="background:#fff"></span>Leads</button>
+          <button class="tog-btn on" data-ds="1" onclick="toggleDs(this,1)" style="border-color:#00C9A7;background:#00C9A7;color:#fff"><span class="dot" style="background:#fff"></span>First Timers</button>
+          <button class="tog-btn on" data-ds="2" onclick="toggleDs(this,2)" style="border-color:#9aab00;background:#9aab00;color:#fff"><span class="dot" style="background:#fff"></span>New Members</button>
+        </div>
+        <div class="gran-group">
+          <button class="gran-btn" id="granDaily"   onclick="setGran('daily')">Daily</button>
+          <button class="gran-btn" id="granWeekly"  onclick="setGran('weekly')">Weekly</button>
+          <button class="gran-btn active" id="granMonthly" onclick="setGran('monthly')">Monthly</button>
+        </div>
       </div>
       <div style="position:relative;width:100%;height:260px">
         <canvas id="trendChart" role="img" aria-label="Line chart of leads, first timers and new members over time">Monthly funnel trend data.</canvas>
@@ -147,9 +184,15 @@
 <script>
 let RAW = null;
 let trendChart = null;
+let GRAN = 'daily';
 const COLORS = ['#00A3E0','#00C9A7','#9aab00'];
 
-// ── Nav ────────────────────────────────────────────────────────────────────
+const DEFAULT_EXCL_SOURCES = ['ClassPass / Platforms','Grassroots'];
+const DEFAULT_EXCL_STUDIOS = [
+  'SWEAT440 Dallas - Prestonwood','SWEAT440 Herriman','SWEAT440 Naples - Mercato',
+  'SWEAT440 Nashville - Capitol View','SWEAT440 Pinecrest - Palmetto Bay','SWEAT440 Reston'
+];
+
 function switchTab(id, btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
@@ -164,200 +207,252 @@ function toggleControls() {
   document.getElementById('ctrlToggle').textContent = el.classList.contains('open') ? 'Filters ▴' : 'Filters ▾';
 }
 
-// ── Date defaults (YTD) ────────────────────────────────────────────────────
+// Default: last complete month
 const TODAY = new Date();
-const YTD   = new Date(TODAY.getFullYear(), 0, 1);
-document.getElementById('fFrom').value = YTD.toISOString().slice(0,10);
-document.getElementById('fTo').value   = TODAY.toISOString().slice(0,10);
+const firstOfThisMonth = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
+const lastOfPrevMonth  = new Date(firstOfThisMonth - 1);
+const firstOfPrevMonth = new Date(lastOfPrevMonth.getFullYear(), lastOfPrevMonth.getMonth(), 1);
+document.getElementById('fFrom').value = firstOfPrevMonth.toISOString().slice(0,10);
+document.getElementById('fTo').value   = lastOfPrevMonth.toISOString().slice(0,10);
 
-// ── Load ───────────────────────────────────────────────────────────────────
+// Multi-select
+function toggleDropdown(id) {
+  document.querySelectorAll('.ms-menu').forEach(m => { if (m.id !== id+'Menu') m.classList.remove('open'); });
+  document.getElementById(id+'Menu').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.multi-select')) document.querySelectorAll('.ms-menu').forEach(m => m.classList.remove('open'));
+});
+
+function buildMultiSelect(menuId, labelId, items, defaultExcluded) {
+  const menu = document.getElementById(menuId);
+  const allDiv = document.createElement('div');
+  allDiv.className = 'ms-item ms-select-all';
+  allDiv.innerHTML = `<input type="checkbox" id="${menuId}_all"> <label for="${menuId}_all" style="cursor:pointer">Select all</label>`;
+  menu.appendChild(allDiv);
+  const div0 = document.createElement('div'); div0.className = 'ms-divider'; menu.appendChild(div0);
+
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'ms-item';
+    const checked = !defaultExcluded.includes(item);
+    const safeId = `ms_${menuId}_${item.replace(/[^a-z0-9]/gi,'_')}`;
+    div.innerHTML = `<input type="checkbox" id="${safeId}" value="${item}" ${checked?'checked':''}> <label for="${safeId}" style="cursor:pointer">${item}</label>`;
+    div.querySelector('input').addEventListener('change', () => { syncSelectAll(menuId); updateLabel(menuId, labelId, items); applyFilters(); });
+    menu.appendChild(div);
+  });
+
+  const allChk = document.getElementById(menuId+'_all');
+  syncSelectAll(menuId);
+  allChk.addEventListener('change', () => {
+    menu.querySelectorAll('input[value]').forEach(c => c.checked = allChk.checked);
+    updateLabel(menuId, labelId, items); applyFilters();
+  });
+  updateLabel(menuId, labelId, items);
+}
+
+function syncSelectAll(menuId) {
+  const menu = document.getElementById(menuId);
+  const all  = [...menu.querySelectorAll('input[value]')];
+  const allChk = document.getElementById(menuId+'_all');
+  const n = all.filter(c=>c.checked).length;
+  allChk.checked = n === all.length;
+  allChk.indeterminate = n > 0 && n < all.length;
+}
+
+function updateLabel(menuId, labelId, items) {
+  const checked = [...document.getElementById(menuId).querySelectorAll('input[value]:checked')].map(c=>c.value);
+  const label = document.getElementById(labelId);
+  if      (checked.length === 0)            label.textContent = 'None selected';
+  else if (checked.length === items.length) label.textContent = 'All';
+  else if (checked.length <= 2)             label.textContent = checked.join(', ');
+  else                                      label.textContent = checked.length + ' selected';
+}
+
+function getSelected(menuId) {
+  const menu = document.getElementById(menuId);
+  if (!menu) return null;
+  return [...menu.querySelectorAll('input[value]:checked')].map(c=>c.value);
+}
+
+// Granularity
+function getQuarterBounds() {
+  const now = new Date();
+  const qStart = new Date(now.getFullYear(), Math.floor(now.getMonth()/3)*3, 1);
+  const prevQStart = new Date(qStart); prevQStart.setMonth(prevQStart.getMonth()-3);
+  return { dailyFrom: prevQStart, dailyTo: now };
+}
+
+function setGran(gran) {
+  GRAN = gran;
+  ['daily','weekly','monthly'].forEach(g => {
+    const btn = document.getElementById('gran'+g.charAt(0).toUpperCase()+g.slice(1));
+    if (btn) btn.classList.toggle('active', g === gran);
+  });
+  applyFilters();
+}
+
+function updateGranButtons(from, to) {
+  const { dailyFrom } = getQuarterBounds();
+  const withinDaily = from >= dailyFrom;
+  const daysDiff = (to - from) / 86400000;
+  const btnD = document.getElementById('granDaily');
+  const btnW = document.getElementById('granWeekly');
+  if (btnD) btnD.disabled = !withinDaily;
+  if (btnW) btnW.disabled = daysDiff > 366;
+  if (GRAN === 'daily'  && btnD && btnD.disabled) { GRAN = 'weekly';  setGran('weekly'); }
+  if (GRAN === 'weekly' && btnW && btnW.disabled) { GRAN = 'monthly'; setGran('monthly'); }
+}
+
 async function loadData() {
   try {
     const res = await fetch('data.json?_=' + Date.now());
     RAW = await res.json();
-    populateFilters();
   } catch(e) {
-    console.warn('Using mock data:', e);
-    RAW = getMock();
-    populateFilters();
+    console.warn('Using mock data:', e); RAW = getMock();
   }
+  buildMultiSelect('studioMenu', 'studioLabel', RAW.studios, DEFAULT_EXCL_STUDIOS);
+  buildMultiSelect('sourceMenu', 'sourceLabel', RAW.sources, DEFAULT_EXCL_SOURCES);
+  setGran('daily');
   applyFilters();
 }
 
-function populateFilters() {
-  const fSt = document.getElementById('fStudio');
-  const fSr = document.getElementById('fSource');
-  // Use dedicated lists if available, otherwise derive from monthly_detail
-  const studios = RAW.studios || [...new Set(RAW.monthly_detail.map(r => r.studio).filter(Boolean))].sort();
-  const sources  = RAW.sources  || [...new Set(RAW.monthly_detail.map(r => r.source).filter(Boolean))].sort();
-  studios.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; fSt.appendChild(o); });
-  sources.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; fSr.appendChild(o); });
-}
+function getRowDate(r) { return new Date((r.date||r.month)+'T00:00:00Z'); }
 
-// ── Core filter: slice monthly_detail by studio, source, date ─────────────
-function filterRows(fromDate, toDate, studio, source) {
-  return RAW.monthly_detail.filter(r => {
-    const d = new Date(r.month + 'T00:00:00Z');
+function filterRows(arr, fromDate, toDate, studios, sources) {
+  return arr.filter(r => {
+    const d = getRowDate(r);
     if (fromDate && d < fromDate) return false;
     if (toDate   && d > toDate)   return false;
-    if (studio   && r.studio !== studio) return false;
-    if (source   && r.source !== source) return false;
+    if (studios  && !studios.includes(r.studio)) return false;
+    if (sources  && !sources.includes(r.source)) return false;
     return true;
   });
 }
 
-// ── Aggregate rows into totals ─────────────────────────────────────────────
 function sumRows(rows) {
-  return rows.reduce((acc, r) => {
-    acc.leads += r.signups           || 0;
-    acc.ft    += r.first_visits      || 0;
-    acc.mem   += r.first_activations || 0;
+  return rows.reduce((acc,r) => {
+    acc.leads += r.signups||0; acc.ft += r.first_visits||0; acc.mem += r.first_activations||0;
     return acc;
-  }, { leads: 0, ft: 0, mem: 0 });
+  }, {leads:0,ft:0,mem:0});
 }
 
-// ── Aggregate rows into monthly series (collapse studio/source dimension) ──
-function toMonthlySeries(rows) {
-  const map = {};
-  rows.forEach(r => {
-    if (!map[r.month]) map[r.month] = { month: r.month, signups: 0, first_visits: 0, first_activations: 0 };
-    map[r.month].signups           += r.signups           || 0;
-    map[r.month].first_visits      += r.first_visits      || 0;
-    map[r.month].first_activations += r.first_activations || 0;
-  });
-  return Object.values(map).sort((a, b) => a.month.localeCompare(b.month));
-}
-
-// ── Period windows ─────────────────────────────────────────────────────────
 function computeWindows(from, to) {
-  const ms       = to - from;
-  const oneDayMs = 86400000;
-  const ppTo     = new Date(from.getTime() - oneDayMs);
-  const ppFrom   = new Date(ppTo.getTime() - ms);
-  const pyFrom   = new Date(from); pyFrom.setFullYear(pyFrom.getFullYear() - 1);
-  const pyTo     = new Date(to);   pyTo.setFullYear(pyTo.getFullYear()   - 1);
-  return { ppFrom, ppTo, pyFrom, pyTo };
+  const ms = to - from;
+  const ppTo   = new Date(from.getTime()-86400000);
+  const ppFrom = new Date(ppTo.getTime()-ms);
+  const pyFrom = new Date(from); pyFrom.setFullYear(pyFrom.getFullYear()-1);
+  const pyTo   = new Date(to);   pyTo.setFullYear(pyTo.getFullYear()-1);
+  return {ppFrom,ppTo,pyFrom,pyTo};
+}
+function fmtDate(d) { return d.toLocaleString('en-US',{month:'short',year:'numeric'}); }
+function fmtMonthLabel(iso) { return new Date(iso+'T00:00:00Z').toLocaleString('en-US',{month:'short',year:'2-digit'}); }
+function fmtDayLabel(iso)   { return new Date(iso+'T00:00:00Z').toLocaleString('en-US',{month:'short',day:'numeric'}); }
+
+function toTimeSeries(dailyRows, monthlyRows) {
+  if (GRAN === 'daily') {
+    const map = {};
+    dailyRows.forEach(r => {
+      if (!map[r.date]) map[r.date]={key:r.date,label:fmtDayLabel(r.date),signups:0,first_visits:0,first_activations:0};
+      map[r.date].signups+=r.signups||0; map[r.date].first_visits+=r.first_visits||0; map[r.date].first_activations+=r.first_activations||0;
+    });
+    return Object.values(map).sort((a,b)=>a.key.localeCompare(b.key));
+  }
+  if (GRAN === 'weekly') {
+    const map = {};
+    [...dailyRows,...monthlyRows].forEach(r => {
+      const d = new Date((r.date||r.month)+'T00:00:00Z');
+      const day = d.getUTCDay()||7;
+      const ws = new Date(d); ws.setUTCDate(d.getUTCDate()-day+1);
+      const key = ws.toISOString().slice(0,10);
+      if (!map[key]) map[key]={key,label:fmtDayLabel(key),signups:0,first_visits:0,first_activations:0};
+      map[key].signups+=r.signups||0; map[key].first_visits+=r.first_visits||0; map[key].first_activations+=r.first_activations||0;
+    });
+    return Object.values(map).sort((a,b)=>a.key.localeCompare(b.key));
+  }
+  // monthly
+  const map = {};
+  [...dailyRows,...monthlyRows].forEach(r => {
+    const key=(r.date||r.month).slice(0,7)+'-01';
+    if (!map[key]) map[key]={key,label:fmtMonthLabel(key),signups:0,first_visits:0,first_activations:0};
+    map[key].signups+=r.signups||0; map[key].first_visits+=r.first_visits||0; map[key].first_activations+=r.first_activations||0;
+  });
+  return Object.values(map).sort((a,b)=>a.key.localeCompare(b.key));
 }
 
-function fmtDate(d) {
-  return d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
-}
-
-// ── Apply all filters ──────────────────────────────────────────────────────
 function applyFilters() {
   if (!RAW) return;
-
-  const studio  = document.getElementById('fStudio').value;
-  const source  = document.getElementById('fSource').value;
+  const studios = getSelected('studioMenu');
+  const sources  = getSelected('sourceMenu');
   const fromStr = document.getElementById('fFrom').value;
   const toStr   = document.getElementById('fTo').value;
-
-  const from = fromStr ? new Date(fromStr + 'T00:00:00Z') : new Date(RAW.monthly_detail[0].month);
-  const to   = toStr   ? new Date(toStr + 'T23:59:59Z') : new Date();
-
-  const { ppFrom, ppTo, pyFrom, pyTo } = computeWindows(from, to);
-
-  // Current period
-  const currRows = filterRows(from,   to,    studio, source);
-  const ppRows   = filterRows(ppFrom, ppTo,  studio, source);
-  const pyRows   = filterRows(pyFrom, pyTo,  studio, source);
-
-  const curr  = sumRows(currRows);
-  const prev  = sumRows(ppRows);
-  const pyear = sumRows(pyRows);
-
-  const ppLabel = `${fmtDate(ppFrom)} – ${fmtDate(ppTo)}`;
-  const pyLabel = `${fmtDate(pyFrom)} – ${fmtDate(pyTo)}`;
-
-  // Monthly series for trend chart (current period only)
-  const monthly = toMonthlySeries(currRows);
-
-  buildFunnel(curr, prev, pyear, ppLabel, pyLabel);
-  buildTrend(monthly);
+  const from = fromStr ? new Date(fromStr+'T00:00:00Z') : new Date(RAW.monthly_detail[0]?.month+'T00:00:00Z');
+  const to   = toStr   ? new Date(toStr+'T23:59:59Z')   : new Date();
+  updateGranButtons(from, to);
+  const {ppFrom,ppTo,pyFrom,pyTo} = computeWindows(from,to);
+  function filterAll(f,t) {
+    return {
+      daily:   filterRows(RAW.daily_detail,   f, t, studios, sources),
+      monthly: filterRows(RAW.monthly_detail, f, t, studios, sources),
+      get all() { return [...this.daily,...this.monthly]; }
+    };
+  }
+  const curr = filterAll(from,to);
+  const pp   = filterAll(ppFrom,ppTo);
+  const py   = filterAll(pyFrom,pyTo);
+  buildFunnel(sumRows(curr.all), sumRows(pp.all), sumRows(py.all),
+    `${fmtDate(ppFrom)} – ${fmtDate(ppTo)}`, `${fmtDate(pyFrom)} – ${fmtDate(pyTo)}`);
+  buildTrend(toTimeSeries(curr.daily, curr.monthly));
 }
 
-function calcDelta(curr, prev) {
-  if (!prev || prev === 0) return null;
-  return (curr - prev) / prev * 100;
-}
+function calcDelta(curr,prev) { if(!prev||prev===0) return null; return (curr-prev)/prev*100; }
 
-// ── Funnel bars ────────────────────────────────────────────────────────────
 function buildFunnel(curr, prev, pyear, ppLabel, pyLabel) {
   const stages = [
-    { label:'Leads',        curr:curr.leads, prev:prev.leads, py:pyear.leads, color:'#00A3E0' },
-    { label:'First Timers', curr:curr.ft,    prev:prev.ft,    py:pyear.ft,    color:'#00C9A7' },
-    { label:'New Members',  curr:curr.mem,   prev:prev.mem,   py:pyear.mem,   color:'#9aab00' },
+    {label:'Leads',       curr:curr.leads,prev:prev.leads,py:pyear.leads,color:'#00A3E0'},
+    {label:'First Timers',curr:curr.ft,   prev:prev.ft,   py:pyear.ft,   color:'#00C9A7'},
+    {label:'New Members', curr:curr.mem,  prev:prev.mem,  py:pyear.mem,  color:'#9aab00'},
   ];
-  const max = Math.max(...stages.map(s => s.curr), 1);
-
+  const max = Math.max(...stages.map(s=>s.curr),1);
   document.getElementById('funnelBars').innerHTML = stages.map(s => {
-    const w   = Math.max(2, (s.curr / max) * 100);
-    const dpp = calcDelta(s.curr, s.prev);
-    const dpy = calcDelta(s.curr, s.py);
-
-    const ppHTML = dpp !== null
-      ? `<span class="delta ${dpp>=0?'pos':'neg'}" title="vs ${ppLabel}">${dpp>=0?'▲':'▼'} ${Math.abs(dpp).toFixed(1)}% prev period</span>`
-      : `<span class="delta neu" title="No data for ${ppLabel}">— prev period</span>`;
-
-    const pyHTML = dpy !== null
-      ? `<span class="delta ${dpy>=0?'pos':'neg'}" title="vs ${pyLabel}">${dpy>=0?'▲':'▼'} ${Math.abs(dpy).toFixed(1)}% prev year</span>`
-      : `<span class="delta neu" title="No data for ${pyLabel}">— prev year</span>`;
-
-    return `
-      <div>
-        <div class="funnel-stage-label">${s.label}</div>
-        <div class="funnel-row">
-          <div class="funnel-bar-track">
-            <div class="funnel-bar-fill" style="width:${w}%;background:${s.color}"></div>
-          </div>
-          <div class="funnel-num">${s.curr.toLocaleString()}</div>
-          <div class="funnel-deltas">${ppHTML}${pyHTML}</div>
-        </div>
-      </div>`;
+    const w = Math.max(2,(s.curr/max)*100);
+    const dpp = calcDelta(s.curr,s.prev);
+    const dpy = calcDelta(s.curr,s.py);
+    const ppHTML = dpp!==null ? `<span class="delta ${dpp>=0?'pos':'neg'}" title="vs ${ppLabel}">${dpp>=0?'▲':'▼'} ${Math.abs(dpp).toFixed(1)}% prev period</span>` : `<span class="delta neu">— prev period</span>`;
+    const pyHTML = dpy!==null ? `<span class="delta ${dpy>=0?'pos':'neg'}" title="vs ${pyLabel}">${dpy>=0?'▲':'▼'} ${Math.abs(dpy).toFixed(1)}% prev year</span>`   : `<span class="delta neu">— prev year</span>`;
+    return `<div><div class="funnel-stage-label">${s.label}</div><div class="funnel-row"><div class="funnel-bar-track"><div class="funnel-bar-fill" style="width:${w}%;background:${s.color}"></div></div><div class="funnel-num">${s.curr.toLocaleString()}</div><div class="funnel-deltas">${ppHTML}${pyHTML}</div></div></div>`;
   }).join('');
 }
 
-// ── Trend chart ────────────────────────────────────────────────────────────
-function buildTrend(monthly) {
+function buildTrend(series) {
   const isMobile = window.innerWidth <= 768;
-  const labels = monthly.map(m => {
-    const d = new Date(m.month + 'T00:00:00Z');
-    return d.toLocaleString('en-US', { month: 'short', year: '2-digit' });
-  });
-
-  const leadsD = monthly.map(m => m.signups           || 0);
-  const ftD    = monthly.map(m => m.first_visits      || 0);
-  const memD   = monthly.map(m => m.first_activations || 0);
-
+  const labels = series.map(m=>m.label);
+  const leadsD = series.map(m=>m.signups||0);
+  const ftD    = series.map(m=>m.first_visits||0);
+  const memD   = series.map(m=>m.first_activations||0);
   if (trendChart) {
-    // Preserve hidden state of each dataset
-    const hidden = trendChart.data.datasets.map(ds => ds.hidden);
-    trendChart.data.labels = labels;
-    trendChart.data.datasets[0].data = leadsD;
-    trendChart.data.datasets[1].data = ftD;
-    trendChart.data.datasets[2].data = memD;
-    trendChart.data.datasets.forEach((ds, i) => ds.hidden = hidden[i]);
-    trendChart.update();
-    return;
+    const hidden = trendChart.data.datasets.map(ds=>ds.hidden);
+    trendChart.data.labels=labels;
+    trendChart.data.datasets[0].data=leadsD;
+    trendChart.data.datasets[1].data=ftD;
+    trendChart.data.datasets[2].data=memD;
+    trendChart.data.datasets.forEach((ds,i)=>ds.hidden=hidden[i]);
+    trendChart.update(); return;
   }
-
   const ctx = document.getElementById('trendChart').getContext('2d');
   trendChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label:'Leads',        data:leadsD, borderColor:'#00A3E0', borderWidth:2.5, pointRadius:3, pointHoverRadius:6, tension:.4, fill:false, borderDash:[] },
-        { label:'First Timers', data:ftD,    borderColor:'#00C9A7', borderWidth:2.5, pointRadius:3, pointHoverRadius:6, tension:.4, fill:false, borderDash:[6,3] },
-        { label:'New Members',  data:memD,   borderColor:'#9aab00', borderWidth:2.5, pointRadius:3, pointHoverRadius:6, tension:.4, fill:false, borderDash:[2,3] },
-      ]
-    },
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{mode:'index', intersect:false} },
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Leads',       data:leadsD,borderColor:'#00A3E0',borderWidth:2.5,pointRadius:3,pointHoverRadius:6,tension:.4,fill:false,borderDash:[]},
+      {label:'First Timers',data:ftD,   borderColor:'#00C9A7',borderWidth:2.5,pointRadius:3,pointHoverRadius:6,tension:.4,fill:false,borderDash:[6,3]},
+      {label:'New Members', data:memD,  borderColor:'#9aab00',borderWidth:2.5,pointRadius:3,pointHoverRadius:6,tension:.4,fill:false,borderDash:[2,3]},
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
       scales:{
-        x:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:11}, color:'#5a7a8a', autoSkip:true, maxTicksLimit: isMobile ? 5 : 12, maxRotation:0} },
-        y:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:11}, color:'#5a7a8a'} }
+        x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:11},color:'#5a7a8a',autoSkip:true,maxTicksLimit:isMobile?5:12,maxRotation:0}},
+        y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:11},color:'#5a7a8a'}}
       }
     }
   });
@@ -368,15 +463,12 @@ function toggleDs(btn, i) {
   const ds = trendChart.data.datasets[i];
   ds.hidden = !ds.hidden;
   btn.classList.toggle('on');
-  if (btn.classList.contains('on')) {
-    btn.style.background = COLORS[i]; btn.style.borderColor = COLORS[i]; btn.style.color = '#fff';
-  } else {
-    btn.style.background = '#f4f9fd'; btn.style.borderColor = '#c0d4df'; btn.style.color = '#5a7a8a';
-  }
+  if (btn.classList.contains('on')) { btn.style.background=COLORS[i]; btn.style.borderColor=COLORS[i]; btn.style.color='#fff'; }
+  else { btn.style.background='#f4f9fd'; btn.style.borderColor='#c0d4df'; btn.style.color='#5a7a8a'; }
   trendChart.update();
 }
 
-// ── Mock data ──────────────────────────────────────────────────────────────
+
 function getMock() {
   const months = ['2023-04-01','2023-05-01','2023-06-01','2023-07-01','2023-08-01','2023-09-01',
                   '2023-10-01','2023-11-01','2023-12-01','2024-01-01','2024-02-01','2024-03-01',
