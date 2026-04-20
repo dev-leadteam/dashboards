@@ -1,0 +1,41 @@
+name: Refresh Leads Data
+
+on:
+  schedule:
+    - cron: "0 8 * * *"   # Every day at 8:00 AM UTC
+  workflow_dispatch:        # Also allows manual trigger from GitHub UI
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install snowflake-connector-python
+
+      - name: Fetch data from Snowflake
+        env:
+          SF_ACCOUNT:   ${{ secrets.SF_ACCOUNT }}
+          SF_USER:      ${{ secrets.SF_USER }}
+          SF_PASSWORD:  ${{ secrets.SF_PASSWORD }}
+          SF_ROLE:      ${{ secrets.SF_ROLE }}
+          SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
+          SF_DATABASE:  ${{ secrets.SF_DATABASE }}
+          SF_SCHEMA:    ${{ secrets.SF_SCHEMA }}
+        run: python fetch_data.py
+
+      - name: Commit updated data.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git diff --cached --quiet || git commit -m "chore: refresh leads data $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push
