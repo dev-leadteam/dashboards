@@ -170,44 +170,6 @@ const YTD   = new Date(TODAY.getFullYear(), 0, 1);
 document.getElementById('fFrom').value = YTD.toISOString().slice(0,10);
 document.getElementById('fTo').value   = TODAY.toISOString().slice(0,10);
 
-// ── Period comparison logic ────────────────────────────────────────────────
-// Given a from/to date range, compute:
-//   prevPeriod: equal-length period ending the day before `from`
-//   prevYear:   same from/to shifted back exactly 1 year
-function computeComparisonWindows(fromDate, toDate) {
-  // Length in ms
-  const ms       = toDate - fromDate;
-  const oneDayMs = 86400000;
-
-  // Previous period: same duration, ending day before fromDate
-  const ppTo   = new Date(fromDate.getTime() - oneDayMs);
-  const ppFrom = new Date(ppTo.getTime() - ms);
-
-  // Previous year: same calendar dates, 1 year back
-  const pyFrom = new Date(fromDate); pyFrom.setFullYear(pyFrom.getFullYear() - 1);
-  const pyTo   = new Date(toDate);   pyTo.setFullYear(pyTo.getFullYear()   - 1);
-
-  return { ppFrom, ppTo, pyFrom, pyTo };
-}
-
-function sumMonthly(monthly, fromDate, toDate) {
-  return monthly
-    .filter(m => {
-      const d = new Date(m.month);
-      return d >= fromDate && d <= toDate;
-    })
-    .reduce((acc, m) => {
-      acc.leads += (m.signups           || 0);
-      acc.ft    += (m.first_visits      || 0);
-      acc.mem   += (m.first_activations || 0);
-      return acc;
-    }, { leads: 0, ft: 0, mem: 0 });
-}
-
-function fmtDate(d) {
-  return d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
-}
-
 // ── Load ───────────────────────────────────────────────────────────────────
 async function loadData() {
   try {
@@ -217,6 +179,7 @@ async function loadData() {
   } catch(e) {
     console.warn('Using mock data:', e);
     RAW = getMock();
+    populateFilters();
   }
   applyFilters();
 }
@@ -224,43 +187,90 @@ async function loadData() {
 function populateFilters() {
   const fSt = document.getElementById('fStudio');
   const fSr = document.getElementById('fSource');
-  [...new Set(RAW.by_studio.map(s => s.studio).filter(Boolean))].sort().forEach(s => {
-    const o = document.createElement('option'); o.value = s; o.textContent = s; fSt.appendChild(o);
-  });
-  [...new Set(RAW.by_source.map(s => s.source).filter(Boolean))].sort().forEach(s => {
-    const o = document.createElement('option'); o.value = s; o.textContent = s; fSr.appendChild(o);
+  // Use dedicated lists if available, otherwise derive from monthly_detail
+  const studios = RAW.studios || [...new Set(RAW.monthly_detail.map(r => r.studio).filter(Boolean))].sort();
+  const sources  = RAW.sources  || [...new Set(RAW.monthly_detail.map(r => r.source).filter(Boolean))].sort();
+  studios.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; fSt.appendChild(o); });
+  sources.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; fSr.appendChild(o); });
+}
+
+// ── Core filter: slice monthly_detail by studio, source, date ─────────────
+function filterRows(fromDate, toDate, studio, source) {
+  return RAW.monthly_detail.filter(r => {
+    const d = new Date(r.month);
+    if (fromDate && d < fromDate) return false;
+    if (toDate   && d > toDate)   return false;
+    if (studio   && r.studio !== studio) return false;
+    if (source   && r.source !== source) return false;
+    return true;
   });
 }
 
-// ── Apply filters & render ─────────────────────────────────────────────────
+// ── Aggregate rows into totals ─────────────────────────────────────────────
+function sumRows(rows) {
+  return rows.reduce((acc, r) => {
+    acc.leads += r.signups           || 0;
+    acc.ft    += r.first_visits      || 0;
+    acc.mem   += r.first_activations || 0;
+    return acc;
+  }, { leads: 0, ft: 0, mem: 0 });
+}
+
+// ── Aggregate rows into monthly series (collapse studio/source dimension) ──
+function toMonthlySeries(rows) {
+  const map = {};
+  rows.forEach(r => {
+    if (!map[r.month]) map[r.month] = { month: r.month, signups: 0, first_visits: 0, first_activations: 0 };
+    map[r.month].signups           += r.signups           || 0;
+    map[r.month].first_visits      += r.first_visits      || 0;
+    map[r.month].first_activations += r.first_activations || 0;
+  });
+  return Object.values(map).sort((a, b) => a.month.localeCompare(b.month));
+}
+
+// ── Period windows ─────────────────────────────────────────────────────────
+function computeWindows(from, to) {
+  const ms       = to - from;
+  const oneDayMs = 86400000;
+  const ppTo     = new Date(from.getTime() - oneDayMs);
+  const ppFrom   = new Date(ppTo.getTime() - ms);
+  const pyFrom   = new Date(from); pyFrom.setFullYear(pyFrom.getFullYear() - 1);
+  const pyTo     = new Date(to);   pyTo.setFullYear(pyTo.getFullYear()   - 1);
+  return { ppFrom, ppTo, pyFrom, pyTo };
+}
+
+function fmtDate(d) {
+  return d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+}
+
+// ── Apply all filters ──────────────────────────────────────────────────────
 function applyFilters() {
   if (!RAW) return;
 
+  const studio  = document.getElementById('fStudio').value;
+  const source  = document.getElementById('fSource').value;
   const fromStr = document.getElementById('fFrom').value;
   const toStr   = document.getElementById('fTo').value;
 
-  // Parse dates — treat as start/end of day to be inclusive
-  const from = fromStr ? new Date(fromStr + 'T00:00:00') : new Date(RAW.monthly[0].month);
+  const from = fromStr ? new Date(fromStr + 'T00:00:00') : new Date(RAW.monthly_detail[0].month);
   const to   = toStr   ? new Date(toStr   + 'T23:59:59') : new Date();
 
-  // Compute comparison windows
-  const { ppFrom, ppTo, pyFrom, pyTo } = computeComparisonWindows(from, to);
+  const { ppFrom, ppTo, pyFrom, pyTo } = computeWindows(from, to);
 
-  // Sum each window
-  const curr = sumMonthly(RAW.monthly, from, to);
-  const prev = sumMonthly(RAW.monthly, ppFrom, ppTo);
-  const pyear= sumMonthly(RAW.monthly, pyFrom, pyTo);
+  // Current period
+  const currRows = filterRows(from,   to,    studio, source);
+  const ppRows   = filterRows(ppFrom, ppTo,  studio, source);
+  const pyRows   = filterRows(pyFrom, pyTo,  studio, source);
 
-  // Labels for tooltips
-  const currLabel = `${fmtDate(from)} – ${fmtDate(to)}`;
-  const ppLabel   = `${fmtDate(ppFrom)} – ${fmtDate(ppTo)}`;
-  const pyLabel   = `${fmtDate(pyFrom)} – ${fmtDate(pyTo)}`;
+  const curr  = sumRows(currRows);
+  const prev  = sumRows(ppRows);
+  const pyear = sumRows(pyRows);
 
-  // Filtered monthly for chart zoom
-  const monthly = RAW.monthly.filter(m => {
-    const d = new Date(m.month);
-    return d >= from && d <= to;
-  });
+  const ppLabel = `${fmtDate(ppFrom)} – ${fmtDate(ppTo)}`;
+  const pyLabel = `${fmtDate(pyFrom)} – ${fmtDate(pyTo)}`;
+
+  // Monthly series for trend chart (current period only)
+  const monthly = toMonthlySeries(currRows);
 
   buildFunnel(curr, prev, pyear, ppLabel, pyLabel);
   buildTrend(monthly);
@@ -274,9 +284,9 @@ function calcDelta(curr, prev) {
 // ── Funnel bars ────────────────────────────────────────────────────────────
 function buildFunnel(curr, prev, pyear, ppLabel, pyLabel) {
   const stages = [
-    { label:'Leads',        curr: curr.leads, prev: prev.leads, py: pyear.leads, color:'#00A3E0' },
-    { label:'First Timers', curr: curr.ft,    prev: prev.ft,    py: pyear.ft,    color:'#00C9A7' },
-    { label:'New Members',  curr: curr.mem,   prev: prev.mem,   py: pyear.mem,   color:'#9aab00' },
+    { label:'Leads',        curr:curr.leads, prev:prev.leads, py:pyear.leads, color:'#00A3E0' },
+    { label:'First Timers', curr:curr.ft,    prev:prev.ft,    py:pyear.ft,    color:'#00C9A7' },
+    { label:'New Members',  curr:curr.mem,   prev:prev.mem,   py:pyear.mem,   color:'#9aab00' },
   ];
   const max = Math.max(...stages.map(s => s.curr), 1);
 
@@ -287,11 +297,11 @@ function buildFunnel(curr, prev, pyear, ppLabel, pyLabel) {
 
     const ppHTML = dpp !== null
       ? `<span class="delta ${dpp>=0?'pos':'neg'}" title="vs ${ppLabel}">${dpp>=0?'▲':'▼'} ${Math.abs(dpp).toFixed(1)}% prev period</span>`
-      : `<span class="delta neu">— prev period</span>`;
+      : `<span class="delta neu" title="No data for ${ppLabel}">— prev period</span>`;
 
     const pyHTML = dpy !== null
       ? `<span class="delta ${dpy>=0?'pos':'neg'}" title="vs ${pyLabel}">${dpy>=0?'▲':'▼'} ${Math.abs(dpy).toFixed(1)}% prev year</span>`
-      : `<span class="delta neu">— prev year</span>`;
+      : `<span class="delta neu" title="No data for ${pyLabel}">— prev year</span>`;
 
     return `
       <div>
@@ -310,7 +320,7 @@ function buildFunnel(curr, prev, pyear, ppLabel, pyLabel) {
 // ── Trend chart ────────────────────────────────────────────────────────────
 function buildTrend(monthly) {
   const isMobile = window.innerWidth <= 768;
-  const step = isMobile ? Math.ceil(monthly.length / 5) : 1;
+  const step = isMobile ? Math.max(1, Math.ceil(monthly.length / 5)) : 1;
 
   const labels = monthly.map((m, i) => {
     if (i % step !== 0 && i !== monthly.length - 1) return '';
@@ -323,10 +333,13 @@ function buildTrend(monthly) {
   const memD   = monthly.map(m => m.first_activations || 0);
 
   if (trendChart) {
+    // Preserve hidden state of each dataset
+    const hidden = trendChart.data.datasets.map(ds => ds.hidden);
     trendChart.data.labels = labels;
     trendChart.data.datasets[0].data = leadsD;
     trendChart.data.datasets[1].data = ftD;
     trendChart.data.datasets[2].data = memD;
+    trendChart.data.datasets.forEach((ds, i) => ds.hidden = hidden[i]);
     trendChart.update();
     return;
   }
@@ -343,11 +356,11 @@ function buildTrend(monthly) {
       ]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend:{ display:false }, tooltip:{ mode:'index', intersect:false } },
-      scales: {
-        x: { grid:{ color:'rgba(0,0,0,.05)' }, ticks:{ font:{size:11}, color:'#5a7a8a', autoSkip:false, maxRotation:0 } },
-        y: { grid:{ color:'rgba(0,0,0,.05)' }, ticks:{ font:{size:11}, color:'#5a7a8a' } }
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{mode:'index', intersect:false} },
+      scales:{
+        x:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:11}, color:'#5a7a8a', autoSkip:false, maxRotation:0} },
+        y:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:11}, color:'#5a7a8a'} }
       }
     }
   });
@@ -366,24 +379,29 @@ function toggleDs(btn, i) {
   trendChart.update();
 }
 
-// ── Mock ───────────────────────────────────────────────────────────────────
+// ── Mock data ──────────────────────────────────────────────────────────────
 function getMock() {
-  const months = [
-    '2023-04-01','2023-05-01','2023-06-01','2023-07-01','2023-08-01','2023-09-01',
-    '2023-10-01','2023-11-01','2023-12-01','2024-01-01','2024-02-01','2024-03-01',
-    '2024-04-01','2024-05-01','2024-06-01','2024-07-01','2024-08-01','2024-09-01',
-    '2024-10-01','2024-11-01','2024-12-01','2025-01-01','2025-02-01','2025-03-01','2025-04-01'
-  ];
-  const leads = [210,230,250,270,260,280,270,260,275,285,290,300,310,320,335,298,320,315,305,330,295,310,318,330,342];
-  const ft    = [115,126,138,149,143,154,149,143,151,157,160,165,171,177,185,162,174,172,167,181,162,169,176,184,191];
-  const mem   = [48, 53, 58, 63, 60, 65, 63, 60, 64, 66, 67, 70, 72, 75, 78, 68, 74, 73, 70, 77, 67, 72, 74, 79, 84];
-  return {
-    kpis: { total_signups:7600, total_first_visits:4180, total_first_activations:1770, total_first_sales:840 },
-    monthly: months.map((m,i) => ({ month:m, signups:leads[i], first_visits:ft[i], first_activations:mem[i] })),
-    by_studio: [{studio:'Miami Beach'},{studio:'Brickell'},{studio:'Wynwood'},{studio:'Coral Gables'}],
-    by_source:  [{source:'Meta'},{source:'Google'},{source:'Organic'},{source:'Referral'}],
-    funnel: []
-  };
+  const months = ['2023-04-01','2023-05-01','2023-06-01','2023-07-01','2023-08-01','2023-09-01',
+                  '2023-10-01','2023-11-01','2023-12-01','2024-01-01','2024-02-01','2024-03-01',
+                  '2024-04-01','2024-05-01','2024-06-01','2024-07-01','2024-08-01','2024-09-01',
+                  '2024-10-01','2024-11-01','2024-12-01','2025-01-01','2025-02-01','2025-03-01','2025-04-01'];
+  const studios = ['Miami Beach','Brickell','Wynwood','Coral Gables'];
+  const sources  = ['Meta','Google','Organic','Referral'];
+  const rows = [];
+  months.forEach((m, mi) => {
+    studios.forEach(st => {
+      sources.forEach(sr => {
+        const base = 15 + mi + studios.indexOf(st) * 3;
+        rows.push({ month:m, studio:st, source:sr,
+          signups:           Math.round(base * (0.8 + Math.random() * 0.4)),
+          first_visits:      Math.round(base * (0.4 + Math.random() * 0.2)),
+          first_activations: Math.round(base * (0.15 + Math.random() * 0.1)),
+          first_sales:       Math.round(base * (0.07 + Math.random() * 0.05)),
+        });
+      });
+    });
+  });
+  return { studios, sources, monthly_detail: rows };
 }
 
 loadData();
