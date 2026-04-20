@@ -7,10 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  :root{--s-blue:#00A3E0;--s-deep:#0084B5;--s-light:#99DAF3;--s-pale:#D2EFFF;--s-cyan:#00FFC2;--s-yellow:#DDFF00;--c-leads:#00A3E0;--c-ft:#00C9A7;--c-mem:#9aab00}
+  :root{--s-deep:#0084B5;--c-leads:#00A3E0;--c-ft:#00C9A7;--c-mem:#9aab00}
   body{font-family:'Open Sans',sans-serif;background:#f4f9fd;color:#1a1a2e;min-height:100vh}
 
-  /* NAV */
   .nav{background:var(--s-deep);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:200}
   .nav-logo img{height:30px;display:block;filter:brightness(0) invert(1)}
   .nav-tabs{display:flex;gap:2px}
@@ -20,8 +19,7 @@
   .hamburger{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:4px}
   .hamburger span{display:block;width:22px;height:2px;background:#fff;border-radius:2px}
 
-  /* CONTROLS */
-  .controls-bar{background:#fff;border-bottom:0.5px solid #e0eaf0}
+  .controls-bar{background:#fff;border-bottom:0.5px solid #dde8ef}
   .controls-toggle{display:none;width:100%;background:none;border:none;color:#5a7a8a;font-size:12px;font-weight:600;text-align:left;padding:10px 20px;cursor:pointer;text-transform:uppercase;letter-spacing:1px}
   .controls-inner{max-width:1200px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .ctrl-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#5a7a8a;white-space:nowrap}
@@ -30,38 +28,32 @@
   .ctrl-date{display:flex;align-items:center;gap:6px}
   .ctrl-date input{font-size:12px;padding:5px 8px;border-radius:6px;border:0.5px solid #c0d4df;background:#fff;color:#1a1a2e;width:126px}
 
-  /* MAIN */
   .main{max-width:1200px;margin:0 auto;padding:24px}
   .tab-content{display:none}
   .tab-content.active{display:block}
 
-  /* CARDS */
   .chart-card{background:#fff;border:0.5px solid #dde8ef;border-radius:12px;padding:22px;margin-bottom:20px}
   .chart-card-title{font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:18px}
 
-  /* FUNNEL */
-  .funnel-wrap{display:flex;flex-direction:column;gap:14px}
-  .funnel-row{display:grid;grid-template-columns:110px 1fr 130px;align-items:center;gap:12px}
-  .funnel-row-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#5a7a8a}
-  .funnel-bar-track{height:46px;background:#f0f6fa;border-radius:8px;overflow:hidden}
-  .funnel-bar-fill{height:100%;border-radius:8px;display:flex;align-items:center;padding-left:16px;transition:width .9s cubic-bezier(.4,0,.2,1)}
-  .funnel-bar-num{font-size:17px;font-weight:600;color:#fff}
-  .funnel-deltas{display:flex;flex-direction:column;gap:4px}
+  .funnel-wrap{display:flex;flex-direction:column;gap:16px}
+  .funnel-stage-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#5a7a8a;margin-bottom:5px}
+  .funnel-row{display:flex;align-items:center;gap:12px}
+  .funnel-bar-track{flex:1;height:44px;background:#f0f6fa;border-radius:8px;overflow:hidden}
+  .funnel-bar-fill{height:100%;border-radius:8px;transition:width .9s cubic-bezier(.4,0,.2,1);min-width:4px}
+  .funnel-num{font-size:20px;font-weight:600;color:#1a1a2e;white-space:nowrap;min-width:90px}
+  .funnel-deltas{display:flex;flex-direction:column;gap:3px;min-width:160px}
   .delta{font-size:11px;font-weight:600;display:flex;align-items:center;gap:3px}
   .delta.pos{color:#0a8a4a}
   .delta.neg{color:#d32f2f}
   .delta.neu{color:#5a7a8a}
 
-  /* TOGGLES */
   .toggle-group{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
   .tog-btn{display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;border:1.5px solid transparent;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
   .tog-btn .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
-  /* PLACEHOLDER */
   .placeholder-content{display:flex;align-items:center;justify-content:center;min-height:340px;color:#5a7a8a;font-size:14px;font-weight:600;flex-direction:column;gap:10px;border:1.5px dashed #c0d4df;border-radius:12px}
   .placeholder-content .coming{font-size:12px;font-weight:400;color:#8aaabb}
 
-  /* MOBILE */
   @media(max-width:768px){
     .nav-tabs{display:none;position:absolute;top:60px;left:0;right:0;background:var(--s-deep);flex-direction:column;padding:8px 0;z-index:199;box-shadow:0 4px 12px rgba(0,0,0,.2)}
     .nav-tabs.open{display:flex}
@@ -73,8 +65,8 @@
     .ctrl-sep{display:none}
     select,.ctrl-date input{width:100%}
     .ctrl-date{flex-direction:column;align-items:stretch}
-    .funnel-row{grid-template-columns:1fr;gap:6px}
-    .funnel-deltas{flex-direction:row;gap:12px}
+    .funnel-num{min-width:70px;font-size:16px}
+    .funnel-deltas{min-width:120px}
     .main{padding:14px}
     canvas{max-width:100%!important}
   }
@@ -83,9 +75,7 @@
 <body>
 
 <nav class="nav">
-  <div class="nav-logo">
-    <img src="logo.png" alt="SWEAT440"/>
-  </div>
+  <div class="nav-logo"><img src="logo.png" alt="SWEAT440"/></div>
   <div class="nav-tabs" id="navTabs">
     <button class="nav-tab active" onclick="switchTab('funnel',this)">Funnel</button>
     <button class="nav-tab" onclick="switchTab('leads',this)">Leads</button>
@@ -103,26 +93,24 @@
   <button class="controls-toggle" id="ctrlToggle" onclick="toggleControls()">Filters ▾</button>
   <div class="controls-inner" id="ctrlInner">
     <span class="ctrl-label">Studio</span>
-    <select id="fStudio"><option value="">All Studios</option></select>
+    <select id="fStudio" onchange="applyFilters()"><option value="">All Studios</option></select>
     <div class="ctrl-sep"></div>
     <span class="ctrl-label">Source</span>
-    <select id="fSource"><option value="">All Sources</option></select>
+    <select id="fSource" onchange="applyFilters()"><option value="">All Sources</option></select>
     <div class="ctrl-sep"></div>
     <span class="ctrl-label">Date range</span>
     <div class="ctrl-date">
-      <input type="date" id="fFrom"/>
-      <span style="font-size:12px;color:#5a7a8a;text-align:center">→</span>
-      <input type="date" id="fTo"/>
+      <input type="date" id="fFrom" onchange="applyFilters()"/>
+      <span style="font-size:12px;color:#5a7a8a">→</span>
+      <input type="date" id="fTo" onchange="applyFilters()"/>
     </div>
   </div>
 </div>
 
 <div class="main">
-
-  <!-- FUNNEL TAB -->
   <div class="tab-content active" id="tab-funnel">
     <div class="chart-card">
-      <div class="chart-card-title">Conversion funnel — year to date</div>
+      <div class="chart-card-title">Conversion funnel</div>
       <div class="funnel-wrap" id="funnelBars"></div>
     </div>
     <div class="chart-card">
@@ -133,67 +121,35 @@
         <button class="tog-btn on" data-ds="2" onclick="toggleDs(this,2)" style="border-color:#9aab00;background:#9aab00;color:#fff"><span class="dot" style="background:#fff"></span>New Members</button>
       </div>
       <div style="position:relative;width:100%;height:260px">
-        <canvas id="trendChart" role="img" aria-label="Line chart of leads, first timers and new members over 12 months">Monthly funnel trend data.</canvas>
+        <canvas id="trendChart" role="img" aria-label="Line chart of leads, first timers and new members over time">Monthly funnel trend data.</canvas>
       </div>
     </div>
   </div>
 
-  <!-- LEADS TAB -->
   <div class="tab-content" id="tab-leads">
-    <div class="placeholder-content">
-      <span style="font-size:32px">📋</span>
-      <span>Leads</span>
-      <span class="coming">Coming soon</span>
-    </div>
+    <div class="placeholder-content"><span style="font-size:32px">📋</span><span>Leads</span><span class="coming">Coming soon</span></div>
   </div>
-
-  <!-- STAGE TAB -->
   <div class="tab-content" id="tab-stage">
-    <div class="placeholder-content">
-      <span style="font-size:32px">📊</span>
-      <span>Stage View</span>
-      <span class="coming">Coming soon</span>
-    </div>
+    <div class="placeholder-content"><span style="font-size:32px">📊</span><span>Stage View</span><span class="coming">Coming soon</span></div>
   </div>
-
-  <!-- CPR TAB -->
   <div class="tab-content" id="tab-cpr">
-    <div class="placeholder-content">
-      <span style="font-size:32px">💰</span>
-      <span>CPR View</span>
-      <span class="coming">Coming soon</span>
-    </div>
+    <div class="placeholder-content"><span style="font-size:32px">💰</span><span>CPR View</span><span class="coming">Coming soon</span></div>
   </div>
-
-  <!-- META ADS TAB -->
   <div class="tab-content" id="tab-meta">
-    <div class="placeholder-content">
-      <span style="font-size:32px">📱</span>
-      <span>Meta Ads</span>
-      <span class="coming">Coming soon</span>
-    </div>
+    <div class="placeholder-content"><span style="font-size:32px">📱</span><span>Meta Ads</span><span class="coming">Coming soon</span></div>
   </div>
-
-  <!-- GOOGLE ADS TAB -->
   <div class="tab-content" id="tab-google">
-    <div class="placeholder-content">
-      <span style="font-size:32px">🔍</span>
-      <span>Google Ads</span>
-      <span class="coming">Coming soon</span>
-    </div>
+    <div class="placeholder-content"><span style="font-size:32px">🔍</span><span>Google Ads</span><span class="coming">Coming soon</span></div>
   </div>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-// ── Date defaults (YTD) ────────────────────────────────────────────────────
-const TODAY = new Date();
-const YTD   = new Date(TODAY.getFullYear(), 0, 1);
-document.getElementById('fFrom').value = YTD.toISOString().slice(0,10);
-document.getElementById('fTo').value   = TODAY.toISOString().slice(0,10);
+let RAW = null;
+let trendChart = null;
+const COLORS = ['#00A3E0','#00C9A7','#9aab00'];
 
-// ── Navigation ─────────────────────────────────────────────────────────────
+// ── Nav ────────────────────────────────────────────────────────────────────
 function switchTab(id, btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
@@ -205,88 +161,176 @@ function toggleNav() { document.getElementById('navTabs').classList.toggle('open
 function toggleControls() {
   const el = document.getElementById('ctrlInner');
   el.classList.toggle('open');
-  document.getElementById('ctrlToggle').textContent =
-    el.classList.contains('open') ? 'Filters ▴' : 'Filters ▾';
+  document.getElementById('ctrlToggle').textContent = el.classList.contains('open') ? 'Filters ▴' : 'Filters ▾';
 }
 
-// ── Load data.json ─────────────────────────────────────────────────────────
+// ── Date defaults (YTD) ────────────────────────────────────────────────────
+const TODAY = new Date();
+const YTD   = new Date(TODAY.getFullYear(), 0, 1);
+document.getElementById('fFrom').value = YTD.toISOString().slice(0,10);
+document.getElementById('fTo').value   = TODAY.toISOString().slice(0,10);
+
+// ── Period comparison logic ────────────────────────────────────────────────
+// Given a from/to date range, compute:
+//   prevPeriod: equal-length period ending the day before `from`
+//   prevYear:   same from/to shifted back exactly 1 year
+function computeComparisonWindows(fromDate, toDate) {
+  // Length in ms
+  const ms       = toDate - fromDate;
+  const oneDayMs = 86400000;
+
+  // Previous period: same duration, ending day before fromDate
+  const ppTo   = new Date(fromDate.getTime() - oneDayMs);
+  const ppFrom = new Date(ppTo.getTime() - ms);
+
+  // Previous year: same calendar dates, 1 year back
+  const pyFrom = new Date(fromDate); pyFrom.setFullYear(pyFrom.getFullYear() - 1);
+  const pyTo   = new Date(toDate);   pyTo.setFullYear(pyTo.getFullYear()   - 1);
+
+  return { ppFrom, ppTo, pyFrom, pyTo };
+}
+
+function sumMonthly(monthly, fromDate, toDate) {
+  return monthly
+    .filter(m => {
+      const d = new Date(m.month);
+      return d >= fromDate && d <= toDate;
+    })
+    .reduce((acc, m) => {
+      acc.leads += (m.signups           || 0);
+      acc.ft    += (m.first_visits      || 0);
+      acc.mem   += (m.first_activations || 0);
+      return acc;
+    }, { leads: 0, ft: 0, mem: 0 });
+}
+
+function fmtDate(d) {
+  return d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+}
+
+// ── Load ───────────────────────────────────────────────────────────────────
 async function loadData() {
   try {
-    const res  = await fetch('data.json?_=' + Date.now());
-    const data = await res.json();
-    populateFilters(data);
-    buildFunnel(data);
-    buildTrend(data);
+    const res = await fetch('data.json?_=' + Date.now());
+    RAW = await res.json();
+    populateFilters();
   } catch(e) {
-    console.warn('Could not load data.json, using mock data.', e);
-    buildFunnel(null);
-    buildTrend(null);
+    console.warn('Using mock data:', e);
+    RAW = getMock();
   }
+  applyFilters();
 }
 
-function populateFilters(data) {
-  const studios = [...new Set(data.by_studio.map(s => s.studio).filter(Boolean))];
-  const sources  = [...new Set(data.by_source.map(s => s.source).filter(Boolean))];
+function populateFilters() {
   const fSt = document.getElementById('fStudio');
   const fSr = document.getElementById('fSource');
-  studios.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; fSt.appendChild(o); });
-  sources.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; fSr.appendChild(o); });
+  [...new Set(RAW.by_studio.map(s => s.studio).filter(Boolean))].sort().forEach(s => {
+    const o = document.createElement('option'); o.value = s; o.textContent = s; fSt.appendChild(o);
+  });
+  [...new Set(RAW.by_source.map(s => s.source).filter(Boolean))].sort().forEach(s => {
+    const o = document.createElement('option'); o.value = s; o.textContent = s; fSr.appendChild(o);
+  });
+}
+
+// ── Apply filters & render ─────────────────────────────────────────────────
+function applyFilters() {
+  if (!RAW) return;
+
+  const fromStr = document.getElementById('fFrom').value;
+  const toStr   = document.getElementById('fTo').value;
+
+  // Parse dates — treat as start/end of day to be inclusive
+  const from = fromStr ? new Date(fromStr + 'T00:00:00') : new Date(RAW.monthly[0].month);
+  const to   = toStr   ? new Date(toStr   + 'T23:59:59') : new Date();
+
+  // Compute comparison windows
+  const { ppFrom, ppTo, pyFrom, pyTo } = computeComparisonWindows(from, to);
+
+  // Sum each window
+  const curr = sumMonthly(RAW.monthly, from, to);
+  const prev = sumMonthly(RAW.monthly, ppFrom, ppTo);
+  const pyear= sumMonthly(RAW.monthly, pyFrom, pyTo);
+
+  // Labels for tooltips
+  const currLabel = `${fmtDate(from)} – ${fmtDate(to)}`;
+  const ppLabel   = `${fmtDate(ppFrom)} – ${fmtDate(ppTo)}`;
+  const pyLabel   = `${fmtDate(pyFrom)} – ${fmtDate(pyTo)}`;
+
+  // Filtered monthly for chart zoom
+  const monthly = RAW.monthly.filter(m => {
+    const d = new Date(m.month);
+    return d >= from && d <= to;
+  });
+
+  buildFunnel(curr, prev, pyear, ppLabel, pyLabel);
+  buildTrend(monthly);
+}
+
+function calcDelta(curr, prev) {
+  if (!prev || prev === 0) return null;
+  return (curr - prev) / prev * 100;
 }
 
 // ── Funnel bars ────────────────────────────────────────────────────────────
-function buildFunnel(data) {
-  const ytd = data
-    ? { leads: data.kpis.total_signups, ft: data.kpis.total_first_visits, mem: data.kpis.total_first_activations }
-    : { leads: 3842, ft: 2109, mem: 894 };
-
-  // For deltas we'd need period comparison — using mock deltas until richer query added
-  const deltas = {
-    leads: { mom: 10.3, yoy: 28.9 },
-    ft:    { mom: 13.7, yoy: 27.8 },
-    mem:   { mom: 18.3, yoy: 25.9 }
-  };
-
+function buildFunnel(curr, prev, pyear, ppLabel, pyLabel) {
   const stages = [
-    { label: 'Leads',        val: ytd.leads, key: 'leads', color: '#00A3E0' },
-    { label: 'First Timers', val: ytd.ft,    key: 'ft',    color: '#00C9A7' },
-    { label: 'New Members',  val: ytd.mem,   key: 'mem',   color: '#9aab00' },
+    { label:'Leads',        curr: curr.leads, prev: prev.leads, py: pyear.leads, color:'#00A3E0' },
+    { label:'First Timers', curr: curr.ft,    prev: prev.ft,    py: pyear.ft,    color:'#00C9A7' },
+    { label:'New Members',  curr: curr.mem,   prev: prev.mem,   py: pyear.mem,   color:'#9aab00' },
   ];
-  const max = stages[0].val;
+  const max = Math.max(...stages.map(s => s.curr), 1);
 
   document.getElementById('funnelBars').innerHTML = stages.map(s => {
-    const w = Math.max(8, (s.val / max) * 100);
-    const d = deltas[s.key];
+    const w   = Math.max(2, (s.curr / max) * 100);
+    const dpp = calcDelta(s.curr, s.prev);
+    const dpy = calcDelta(s.curr, s.py);
+
+    const ppHTML = dpp !== null
+      ? `<span class="delta ${dpp>=0?'pos':'neg'}" title="vs ${ppLabel}">${dpp>=0?'▲':'▼'} ${Math.abs(dpp).toFixed(1)}% prev period</span>`
+      : `<span class="delta neu">— prev period</span>`;
+
+    const pyHTML = dpy !== null
+      ? `<span class="delta ${dpy>=0?'pos':'neg'}" title="vs ${pyLabel}">${dpy>=0?'▲':'▼'} ${Math.abs(dpy).toFixed(1)}% prev year</span>`
+      : `<span class="delta neu">— prev year</span>`;
+
     return `
-      <div class="funnel-row">
-        <div class="funnel-row-label">${s.label}</div>
-        <div class="funnel-bar-track">
-          <div class="funnel-bar-fill" style="width:${w}%;background:${s.color}">
-            <span class="funnel-bar-num">${s.val.toLocaleString()}</span>
+      <div>
+        <div class="funnel-stage-label">${s.label}</div>
+        <div class="funnel-row">
+          <div class="funnel-bar-track">
+            <div class="funnel-bar-fill" style="width:${w}%;background:${s.color}"></div>
           </div>
-        </div>
-        <div class="funnel-deltas">
-          <span class="delta ${d.mom>=0?'pos':'neg'}">${d.mom>=0?'▲':'▼'} ${Math.abs(d.mom)}% vs last mo</span>
-          <span class="delta ${d.yoy>=0?'pos':'neg'}">${d.yoy>=0?'▲':'▼'} ${Math.abs(d.yoy)}% vs last yr</span>
+          <div class="funnel-num">${s.curr.toLocaleString()}</div>
+          <div class="funnel-deltas">${ppHTML}${pyHTML}</div>
         </div>
       </div>`;
   }).join('');
 }
 
 // ── Trend chart ────────────────────────────────────────────────────────────
-let trendChart;
-function buildTrend(data) {
-  let labels, leadsD, ftD, memD;
-  if (data && data.monthly && data.monthly.length) {
-    labels = data.monthly.map(m => { const d = new Date(m.month); return d.toLocaleString('en-US',{month:'short',year:'2-digit'}); });
-    leadsD = data.monthly.map(m => m.signups);
-    ftD    = data.monthly.map(m => m.first_visits);
-    memD   = data.monthly.map(m => m.first_activations);
-  } else {
-    labels = ['May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr'];
-    leadsD = [290,310,335,298,320,315,305,330,295,310,318,342];
-    ftD    = [158,171,185,162,174,172,167,181,162,169,176,191];
-    memD   = [65,72,78,68,74,73,70,77,67,72,74,84];
+function buildTrend(monthly) {
+  const isMobile = window.innerWidth <= 768;
+  const step = isMobile ? Math.ceil(monthly.length / 5) : 1;
+
+  const labels = monthly.map((m, i) => {
+    if (i % step !== 0 && i !== monthly.length - 1) return '';
+    const d = new Date(m.month);
+    return d.toLocaleString('en-US', { month: 'short', year: '2-digit' });
+  });
+
+  const leadsD = monthly.map(m => m.signups           || 0);
+  const ftD    = monthly.map(m => m.first_visits      || 0);
+  const memD   = monthly.map(m => m.first_activations || 0);
+
+  if (trendChart) {
+    trendChart.data.labels = labels;
+    trendChart.data.datasets[0].data = leadsD;
+    trendChart.data.datasets[1].data = ftD;
+    trendChart.data.datasets[2].data = memD;
+    trendChart.update();
+    return;
   }
+
   const ctx = document.getElementById('trendChart').getContext('2d');
   trendChart = new Chart(ctx, {
     type: 'line',
@@ -309,8 +353,8 @@ function buildTrend(data) {
   });
 }
 
-const COLORS = ['#00A3E0','#00C9A7','#9aab00'];
 function toggleDs(btn, i) {
+  if (!trendChart) return;
   const ds = trendChart.data.datasets[i];
   ds.hidden = !ds.hidden;
   btn.classList.toggle('on');
@@ -320,6 +364,26 @@ function toggleDs(btn, i) {
     btn.style.background = '#f4f9fd'; btn.style.borderColor = '#c0d4df'; btn.style.color = '#5a7a8a';
   }
   trendChart.update();
+}
+
+// ── Mock ───────────────────────────────────────────────────────────────────
+function getMock() {
+  const months = [
+    '2023-04-01','2023-05-01','2023-06-01','2023-07-01','2023-08-01','2023-09-01',
+    '2023-10-01','2023-11-01','2023-12-01','2024-01-01','2024-02-01','2024-03-01',
+    '2024-04-01','2024-05-01','2024-06-01','2024-07-01','2024-08-01','2024-09-01',
+    '2024-10-01','2024-11-01','2024-12-01','2025-01-01','2025-02-01','2025-03-01','2025-04-01'
+  ];
+  const leads = [210,230,250,270,260,280,270,260,275,285,290,300,310,320,335,298,320,315,305,330,295,310,318,330,342];
+  const ft    = [115,126,138,149,143,154,149,143,151,157,160,165,171,177,185,162,174,172,167,181,162,169,176,184,191];
+  const mem   = [48, 53, 58, 63, 60, 65, 63, 60, 64, 66, 67, 70, 72, 75, 78, 68, 74, 73, 70, 77, 67, 72, 74, 79, 84];
+  return {
+    kpis: { total_signups:7600, total_first_visits:4180, total_first_activations:1770, total_first_sales:840 },
+    monthly: months.map((m,i) => ({ month:m, signups:leads[i], first_visits:ft[i], first_activations:mem[i] })),
+    by_studio: [{studio:'Miami Beach'},{studio:'Brickell'},{studio:'Wynwood'},{studio:'Coral Gables'}],
+    by_source:  [{source:'Meta'},{source:'Google'},{source:'Organic'},{source:'Referral'}],
+    funnel: []
+  };
 }
 
 loadData();
