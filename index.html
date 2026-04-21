@@ -405,7 +405,9 @@ function switchTab(id, btn) {
   btn.classList.add('active');
   document.getElementById('navTabs').classList.remove('open');
   // Rebuild charts after tab is visible (Chart.js needs visible canvas to measure dimensions)
-  // Stage tabs always built on applyFilters — nothing extra needed here
+  if (['leads','stage','members'].includes(id) && window._lastCurrFiltered) {
+    buildStageTabs(window._lastCurrFiltered, window._lastPpFiltered, window._lastPyFiltered, window._lastPpLabel, window._lastPyLabel);
+  }
   if (id === 'cpr')    buildCPRTab();
   if (id === 'meta')   buildMetaTab();
   if (id === 'google') buildGoogleTab();
@@ -716,101 +718,73 @@ function buildAreaChart(canvasId, togglesId, series, srcList, valueKey){
   const ctx = document.getElementById(canvasId);
   if (!ctx) return null;
 
-  // Destroy existing chart on this canvas before recreating
-  if (_areaCharts[canvasId]) {
-    _areaCharts[canvasId].destroy();
-    _areaCharts[canvasId] = null;
-  }
+  // Destroy existing chart instance
+  if (_areaCharts[canvasId]) { _areaCharts[canvasId].destroy(); _areaCharts[canvasId] = null; }
 
-  // Show "no data" if series is empty
-  const wrap = ctx.parentElement;
-  const existing = wrap && wrap.querySelector('.no-data-msg');
-  if (existing) existing.remove();
-  if (!series || series.length === 0) {
-    if (wrap) {
-      const msg = document.createElement('div');
-      msg.className = 'no-data-msg';
-      msg.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;color:#5a7a8a;font-family:Oswald,sans-serif;font-style:italic;font-size:13px;text-transform:uppercase;letter-spacing:1px';
-      msg.textContent = 'No data for selected filters';
-      wrap.appendChild(msg);
-    }
-    return null;
-  }
+  const timeKeys = [...new Set(series.map(r=>r.key))].sort();
 
-  const timeKeys = [...new Set(series.map(r => r.key))].sort();
+  // Sort biggest first = bottom of stack
+  const srcTotals = srcList.map(src => series.filter(r=>r.source===src).reduce((s,r)=>s+(r[valueKey]||0),0));
+  const sortedSrcs = [...srcList.keys()].sort((a,b)=>srcTotals[b]-srcTotals[a]).map(i=>srcList[i]);
 
-  // Sort: biggest total first = bottom of stack in Chart.js stacked mode
-  const srcTotals = srcList.map(src => series.filter(r => r.source === src).reduce((s,r) => s+(r[valueKey]||0), 0));
-  const sortedIdxs = [...srcList.keys()].sort((a,b) => srcTotals[b] - srcTotals[a]);
-  const sortedSrcs = sortedIdxs.map(i => srcList[i]); // biggest first = bottom
-
-  const datasets = sortedSrcs.map((src) => {
-    const si = srcList.indexOf(src);
-    const c  = srcColor(src, si);
-    const data = timeKeys.map(tk =>
-      series.filter(r => r.key === tk && r.source === src).reduce((s,r) => s+(r[valueKey]||0), 0)
-    );
-    return { label:src, data, borderColor:c, backgroundColor:c+'cc', borderWidth:1, pointRadius:0, pointHoverRadius:5, tension:.35, fill:true };
+  const datasets = sortedSrcs.map(src => {
+    const c = srcColor(src, srcList.indexOf(src));
+    return { label:src, data:timeKeys.map(tk=>series.filter(r=>r.key===tk&&r.source===src).reduce((s,r)=>s+(r[valueKey]||0),0)),
+      borderColor:c, backgroundColor:c+'cc', borderWidth:1, pointRadius:0, pointHoverRadius:5, tension:.35, fill:true };
   });
 
-  // Toggle buttons (biggest first)
-  const tg = document.getElementById(togglesId);
-  if (tg) {
-    tg.innerHTML = '';
-    sortedSrcs.forEach((src, btnI) => {
-      const si = srcList.indexOf(src);
-      const c  = srcColor(src, si);
-      const btn = document.createElement('button');
-      btn.className = 'tog-btn on';
-      btn.style.cssText = 'border-color:'+c+';background:'+c+';color:#fff;font-size:11px;padding:4px 10px';
-      btn.innerHTML = '<span class="dot" style="background:#fff"></span>'+src;
-      btn.onclick = function() {
-        const chart = _areaCharts[canvasId];
-        if (!chart) return;
-        const ds = chart.data.datasets[btnI]; ds.hidden = !ds.hidden;
-        btn.classList.toggle('on');
-        if (btn.classList.contains('on')) { btn.style.background=c; btn.style.borderColor=c; btn.style.color='#fff'; }
-        else { btn.style.background='#f4f9fd'; btn.style.borderColor='#c0d4df'; btn.style.color='#5a7a8a'; }
-        chart.update();
-      };
-      tg.appendChild(btn);
-    });
-  }
-
-  const isMob = window.innerWidth <= 768;
+  const isMob = window.innerWidth<=768;
   const labels = timeKeys.map(k => k.length===10 && k.slice(8)!=='01'
     ? new Date(k+'T00:00:00Z').toLocaleString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})
-    : new Date(k.slice(0,7)+'-01T00:00:00Z').toLocaleString('en-US',{month:'short',year:'2-digit',timeZone:'UTC'})
-  );
+    : new Date(k.slice(0,7)+'-01T00:00:00Z').toLocaleString('en-US',{month:'short',year:'2-digit',timeZone:'UTC'}));
 
   const chart = new Chart(ctx, {
     type:'line', data:{labels, datasets},
     options:{
       responsive:true, maintainAspectRatio:false,
-      interaction:{mode:'index', intersect:false},
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          mode:'index', intersect:false,
-          callbacks:{
-            label: item => ' '+item.dataset.label+': '+item.parsed.y.toLocaleString(),
-            afterBody: items => {
-              const total = items.filter(i=>!i.dataset.hidden).reduce((s,i)=>s+i.parsed.y, 0);
-              return ['', 'Total: '+total.toLocaleString()];
-            }
-          }
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false}, tooltip:{mode:'index',intersect:false,
+        callbacks:{
+          label: item => ' '+item.dataset.label+': '+item.parsed.y.toLocaleString(),
+          afterBody: items => { const t=items.filter(i=>!i.dataset.hidden).reduce((s,i)=>s+i.parsed.y,0); return ['','Total: '+t.toLocaleString()]; }
         }
-      },
+      }},
       scales:{
-        x:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:10}, color:'#5a7a8a', autoSkip:true, maxTicksLimit:isMob?5:12, maxRotation:0} },
-        y:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:11}, color:'#5a7a8a'}, stacked:true }
+        x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:10},color:'#5a7a8a',autoSkip:true,maxTicksLimit:isMob?5:12,maxRotation:0}},
+        y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:11},color:'#5a7a8a'},stacked:true}
       }
     }
   });
-
   _areaCharts[canvasId] = chart;
+
+  // Build toggle buttons — reference chart via registry, not closure
+  const tg = document.getElementById(togglesId);
+  if (tg) {
+    tg.innerHTML = '';
+    sortedSrcs.forEach((src, btnI) => {
+      const c = srcColor(src, srcList.indexOf(src));
+      const btn = document.createElement('button');
+      btn.className = 'tog-btn on';
+      btn.style.cssText = 'border-color:'+c+';background:'+c+';color:#fff;font-size:11px;padding:4px 10px';
+      btn.innerHTML = '<span class="dot" style="background:#fff"></span>'+src;
+      btn.dataset.canvasId = canvasId;
+      btn.dataset.dsIdx = btnI;
+      btn.onclick = function() {
+        const ch = _areaCharts[this.dataset.canvasId];
+        if (!ch) return;
+        const ds = ch.data.datasets[parseInt(this.dataset.dsIdx)];
+        ds.hidden = !ds.hidden;
+        this.classList.toggle('on');
+        if (this.classList.contains('on')) { this.style.background=c; this.style.borderColor=c; this.style.color='#fff'; }
+        else { this.style.background='#f4f9fd'; this.style.borderColor='#c0d4df'; this.style.color='#5a7a8a'; }
+        ch.update();
+      };
+      tg.appendChild(btn);
+    });
+  }
   return chart;
 }
+
 
 function buildRingChart(canvasId,legendId,labels,values){
   const ctx=document.getElementById(canvasId);if(!ctx)return;
@@ -855,8 +829,14 @@ function toSourceTimeSeries(dailyRows,monthlyRows,gran){
 }
 
 function buildStageTabs(currFiltered, ppFiltered, pyFiltered, ppLabel, pyLabel){
-  const pp  = ppFiltered  || {daily:[],monthly:[],all:[]};
-  const py  = pyFiltered  || {daily:[],monthly:[],all:[]};
+  // Store for use by setAreaGran and filter changes
+  window._lastCurrFiltered = currFiltered;
+  window._lastPpFiltered   = ppFiltered  || {daily:[],monthly:[],all:[]};
+  window._lastPyFiltered   = pyFiltered  || {daily:[],monthly:[],all:[]};
+  window._lastPpLabel      = ppLabel  || '';
+  window._lastPyLabel      = pyLabel  || '';
+  const pp  = window._lastPpFiltered;
+  const py  = window._lastPyFiltered;
   const srcList = RAW.sources.filter(s => !['ClassPass / Platforms','Grassroots'].includes(s));
   const leadsTotal = currFiltered.all.reduce((s,r)=>s+r.signups,0);
   const ftTotal    = currFiltered.all.reduce((s,r)=>s+r.first_visits,0);
@@ -960,14 +940,16 @@ function setAreaGran(canvasId, gran) {
     const btn = document.getElementById('gran-'+g+'-'+canvasId);
     if (btn) btn.classList.toggle('active', g === gran);
   });
-  if (window._lastCurrFiltered) {
-    buildStageTabs(
-      window._lastCurrFiltered,
-      window._lastPpFiltered,
-      window._lastPyFiltered,
-      window._lastPpLabel,
-      window._lastPyLabel
-    );
+  // Only rebuild the specific chart that changed, not all tabs
+  if (!window._lastCurrFiltered) return;
+  const cf = window._lastCurrFiltered;
+  const srcList = RAW.sources.filter(s => !['ClassPass / Platforms','Grassroots'].includes(s));
+  const valueKeyMap = {leadsAreaChart:'signups', ftAreaChart:'first_visits', memAreaChart:'first_activations'};
+  const togglesMap  = {leadsAreaChart:'leads-src-toggles', ftAreaChart:'ft-src-toggles', memAreaChart:'mem-src-toggles'};
+  const vk = valueKeyMap[canvasId];
+  const tg = togglesMap[canvasId];
+  if (vk && tg) {
+    buildAreaChart(canvasId, tg, toSourceTimeSeries(cf.daily, cf.monthly, gran), srcList, vk);
   }
 }
 
