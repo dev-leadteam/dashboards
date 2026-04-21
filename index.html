@@ -150,6 +150,7 @@
     <button class="nav-tab active" onclick="switchTab('funnel',this)">Funnel</button>
     <button class="nav-tab" onclick="switchTab('leads',this)">Leads</button>
     <button class="nav-tab" onclick="switchTab('stage',this)">First Timers</button>
+    <button class="nav-tab" onclick="switchTab('members',this)">New Members</button>
     <button class="nav-tab" onclick="switchTab('cpr',this)">CPR</button>
     <button class="nav-tab" onclick="switchTab('meta',this)">Meta Ads</button>
     <button class="nav-tab" onclick="switchTab('google',this)">Google Ads</button>
@@ -280,6 +281,7 @@
         <button class="cpr-tog on" data-cost="leadteam" onclick="toggleCPRCost(this)" style="border-color:#00A3E0;background:#00A3E0">Leadteam Fee</button>
       </div>
     </div>
+    <div id="cpr-spend-breakdown" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:20px"></div>
     <div class="kpi-grid" id="cpr-kpis"></div>
     <div class="chart-card">
       <div class="chart-card-title">Cost per result — over time</div>
@@ -287,7 +289,7 @@
         <button class="tog-btn on" data-ds="0" onclick="toggleCPRds(this,0)" style="border-color:#00A3E0;background:#00A3E0;color:#fff"><span class="dot" style="background:#fff"></span>Cost / Lead</button>
         <button class="tog-btn on" data-ds="1" onclick="toggleCPRds(this,1)" style="border-color:#00C9A7;background:#00C9A7;color:#fff"><span class="dot" style="background:#fff"></span>Cost / First Timer</button>
         <button class="tog-btn on" data-ds="2" onclick="toggleCPRds(this,2)" style="border-color:#9aab00;background:#9aab00;color:#fff"><span class="dot" style="background:#fff"></span>Cost / New Member</button>
-        <button class="tog-btn on" data-ds="3" onclick="toggleCPRds(this,3)" style="border-color:#888;background:#888;color:#fff"><span class="dot" style="background:#fff"></span>Total Spend</button>
+
       </div>
       <div style="position:relative;width:100%;height:260px"><canvas id="cprChart" role="img" aria-label="Line chart of cost per result over time"></canvas></div>
     </div>
@@ -303,6 +305,34 @@
           <thead><tr><th>Ad</th><th class="num">Impressions</th><th class="num">Clicks</th><th class="num">CTR</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th><th class="num">Status</th></tr></thead>
           <tbody></tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW MEMBERS TAB -->
+  <div class="tab-content" id="tab-members">
+    <div id="mem-kpis" class="kpi-grid"></div>
+    <div class="chart-card">
+      <div class="chart-card-title">New members over time — by source</div>
+      <div class="toggle-group" id="mem-src-toggles"></div>
+      <div style="position:relative;width:100%;height:260px"><canvas id="memAreaChart" role="img" aria-label="Area chart of new members by source over time"></canvas></div>
+    </div>
+    <div class="two-col">
+      <div class="chart-card">
+        <div class="chart-card-title">Source participation</div>
+        <div class="ring-wrap">
+          <div class="ring-canvas-wrap"><canvas id="memRingChart" role="img" aria-label="Ring chart of new members by source"></canvas></div>
+          <div class="ring-legend" id="memRingLegend"></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Studio ranking</div>
+        <div style="overflow-x:auto">
+          <table class="data-table" id="memStudioTable">
+            <thead><tr><th>Studio</th><th class="num">New Members</th><th class="num">% of total</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -352,6 +382,7 @@ function switchTab(id, btn) {
   document.getElementById('tab-' + id).classList.add('active');
   btn.classList.add('active');
   document.getElementById('navTabs').classList.remove('open');
+  if (id === 'members') {} // already built by applyFilters
   if (id === 'cpr')    buildCPRTab();
   if (id === 'meta')   buildMetaTab();
   if (id === 'google') buildGoogleTab();
@@ -366,10 +397,12 @@ function toggleControls() {
 // Default: last complete month
 const TODAY = new Date();
 const firstOfThisMonth = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
-const lastOfPrevMonth  = new Date(firstOfThisMonth - 1);
+const lastOfPrevMonth  = new Date(firstOfThisMonth.getTime() - 86400000);
 const firstOfPrevMonth = new Date(lastOfPrevMonth.getFullYear(), lastOfPrevMonth.getMonth(), 1);
-document.getElementById('fFrom').value = firstOfPrevMonth.toISOString().slice(0,10);
-document.getElementById('fTo').value   = lastOfPrevMonth.toISOString().slice(0,10);
+// Format as YYYY-MM-DD in local time (not UTC) to avoid off-by-one
+function localDateStr(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+document.getElementById('fFrom').value = localDateStr(firstOfPrevMonth);
+document.getElementById('fTo').value   = localDateStr(lastOfPrevMonth);
 
 // Multi-select
 function toggleDropdown(id) {
@@ -627,13 +660,29 @@ function toggleDs(btn, i) {
 
 
 
-const SRC_COLORS=['#00A3E0','#00C9A7','#9aab00','#f4a021','#e05a5a','#7c5cbf','#00bcd4','#8bc34a','#ff7043','#5c6bc0','#26a69a','#ef5350','#ab47bc','#78909c'];
+const SRC_COLORS=['#00A3E0','#00C9A7','#DDFF00','#FF6B35','#E040FB','#FF4081','#00BCD4','#8BC34A','#FF9800','#3F51B5','#F44336','#009688','#9C27B0','#607D8B'];
+// Map specific sources to specific colors for consistency across tabs
+const SRC_COLOR_MAP={
+  'Business Mode':          '#00A3E0',
+  'Google Ads':             '#4285F4',
+  'Local Listings':         '#00BCD4',
+  'Meta Ads':               '#1877F2',
+  'MindBody App':           '#FF6B35',
+  'N/A':                    '#607D8B',
+  'Other':                  '#9E9E9E',
+  'Print Ads / Signs':      '#FF9800',
+  'SWEAT440 App':           '#9C27B0',
+  'Social Media Organic':   '#E040FB',
+  'Website (unattributed)': '#00C9A7',
+  'Word of Mouth':          '#F44336',
+};
+function srcColor(src,i){return SRC_COLOR_MAP[src]||SRC_COLORS[i%SRC_COLORS.length];}
 
 function buildAreaChart(canvasId,togglesId,series,srcList,valueKey){
   const ctx=document.getElementById(canvasId);if(!ctx)return null;
   const timeKeys=[...new Set(series.map(r=>r.key))].sort();
   const datasets=srcList.map((src,si)=>{
-    const c=SRC_COLORS[si%SRC_COLORS.length];
+    const c=srcColor(src,si);
     return{label:src,data:timeKeys.map(tk=>series.filter(r=>r.key===tk&&r.source===src).reduce((s,r)=>s+(r[valueKey]||0),0)),borderColor:c,backgroundColor:c+'33',borderWidth:1.5,pointRadius:0,pointHoverRadius:4,tension:.4,fill:true};
   });
   const tg=document.getElementById(togglesId);
@@ -647,7 +696,7 @@ function buildAreaChart(canvasId,togglesId,series,srcList,valueKey){
 function buildRingChart(canvasId,legendId,labels,values){
   const ctx=document.getElementById(canvasId);if(!ctx)return;
   const total=values.reduce((s,v)=>s+v,0);
-  const colors=labels.map((_,i)=>SRC_COLORS[i%SRC_COLORS.length]);
+  const colors=labels.map((l,i)=>srcColor(l,i));
   new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data:values,backgroundColor:colors,borderColor:'#fff',borderWidth:2,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},cutout:'65%'}});
   const leg=document.getElementById(legendId);
   if(leg)leg.innerHTML=labels.map((l,i)=>{const pct=total?(values[i]/total*100).toFixed(1):0;return '<div class="ring-legend-item"><span class="ring-legend-dot" style="background:'+colors[i]+'"></span><span>'+l+'</span><span style="margin-left:auto;font-weight:600;color:#1a1a2e">'+pct+'%</span></div>';}).join('');
@@ -701,6 +750,11 @@ function buildStageTabs(currFiltered){
   buildAreaChart('ftAreaChart','ft-src-toggles',srcSeries,srcList,'first_visits');
   buildRingChart('ftRingChart','ftRingLegend',srcList,srcList.map(s=>currFiltered.all.filter(r=>r.source===s).reduce((sum,r)=>sum+r.first_visits,0)));
   buildStudioRankTable('ftStudioTable',currFiltered.all,'first_visits');
+  // New Members tab
+  const el3=document.getElementById('mem-kpis');if(el3)el3.innerHTML=kpiCard('Total New Members',memTotal,Math.round(memTotal*0.88),Math.round(memTotal*0.75))+kpiCard('This Period',currFiltered.daily.reduce((s,r)=>s+r.first_activations,0),null,null)+kpiCard('Conv Rate (from FT)',convMem,null,null,v=>v)+kpiCard('Conv Rate (from Lead)',leadsTotal?((memTotal/leadsTotal)*100).toFixed(1)+'%':'--',null,null,v=>v);
+  buildAreaChart('memAreaChart','mem-src-toggles',srcSeries,srcList,'first_activations');
+  buildRingChart('memRingChart','memRingLegend',srcList,srcList.map(s=>currFiltered.all.filter(r=>r.source===s).reduce((sum,r)=>sum+r.first_activations,0)));
+  buildStudioRankTable('memStudioTable',currFiltered.all,'first_activations');
 }
 
 const CPR_COSTS_ACTIVE={google:true,meta:true,leadteam:true};
@@ -722,10 +776,30 @@ function buildCPRTab(){
   const totS=tot.reduce((a,b)=>a+b,0),avgCPL=Math.round(totS/mL.reduce((a,b)=>a+b,0)),avgCPFT=Math.round(totS/mFT.reduce((a,b)=>a+b,0)),avgCPM=Math.round(totS/mM.reduce((a,b)=>a+b,0));
   const f$=v=>'$'+v.toLocaleString();
   const el=document.getElementById('cpr-kpis');if(!el)return;
-  el.innerHTML=kpiCard('Total Spend',totS,Math.round(totS*0.88),Math.round(totS*0.72),f$)+kpiCard('Cost / Lead',avgCPL,Math.round(avgCPL*1.05),Math.round(avgCPL*1.22),f$)+kpiCard('Cost / 1st Timer',avgCPFT,Math.round(avgCPFT*1.08),Math.round(avgCPFT*1.30),f$)+kpiCard('Cost / New Member',avgCPM,Math.round(avgCPM*1.10),Math.round(avgCPM*1.35),f$);
+  el.innerHTML=kpiCard('Cost / Lead',avgCPL,Math.round(avgCPL*1.05),Math.round(avgCPL*1.22),f$)+kpiCard('Cost / 1st Timer',avgCPFT,Math.round(avgCPFT*1.08),Math.round(avgCPFT*1.30),f$)+kpiCard('Cost / New Member',avgCPM,Math.round(avgCPM*1.10),Math.round(avgCPM*1.35),f$);
+  // Spend breakdown with + and = signs
+  const bdEl=document.getElementById('cpr-spend-breakdown');
+  if(bdEl){
+    const parts=[];
+    const labels={google:'Google Ads',meta:'Meta Ads',leadteam:'Leadteam Fee'};
+    const bColors={google:'#4285F4',meta:'#1877F2',leadteam:'#00A3E0'};
+    let first=true;
+    ['google','meta','leadteam'].forEach(k=>{
+      if(!CPR_COSTS_ACTIVE[k])return;
+      const v=sp[k].reduce((a,b)=>a+b,0);
+      if(!first) parts.push('<span style="font-family:Oswald,sans-serif;font-size:20px;font-weight:600;color:#5a7a8a;padding:0 4px">+</span>');
+      parts.push('<div class="kpi-card" style="flex:1;min-width:140px;border-top:3px solid '+bColors[k]+'"><div class="kpi-card-label">'+labels[k]+'</div><div class="kpi-card-val">$'+v.toLocaleString()+'</div></div>');
+      first=false;
+    });
+    if(parts.length>0){
+      parts.push('<span style="font-family:Oswald,sans-serif;font-size:20px;font-weight:600;color:#5a7a8a;padding:0 4px">=</span>');
+      parts.push('<div class="kpi-card" style="flex:1;min-width:140px;border-top:3px solid #1a1a2e"><div class="kpi-card-label">Total Spend</div><div class="kpi-card-val">$'+totS.toLocaleString()+'</div></div>');
+    }
+    bdEl.innerHTML=parts.join('');
+  }
   if(cprChart){cprChart.destroy();cprChart=null;}
   const ctx=document.getElementById('cprChart');if(!ctx)return;
-  cprChart=new Chart(ctx,{type:'line',data:{labels:months,datasets:[{label:'Cost/Lead',data:cpl,borderColor:'#00A3E0',borderWidth:2.5,pointRadius:3,tension:.4,fill:false},{label:'Cost/1st Timer',data:cpft,borderColor:'#00C9A7',borderWidth:2.5,pointRadius:3,tension:.4,fill:false,borderDash:[6,3]},{label:'Cost/New Member',data:cpm,borderColor:'#9aab00',borderWidth:2.5,pointRadius:3,tension:.4,fill:false,borderDash:[2,3]},{label:'Total Spend',data:tot,borderColor:'#888',borderWidth:2,pointRadius:3,tension:.4,fill:false,borderDash:[4,2],yAxisID:'y2'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y.toLocaleString()}}},scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:11},color:'#5a7a8a',maxRotation:0}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:11},color:'#5a7a8a',callback:v=>'$'+v},position:'left'},y2:{position:'right',grid:{display:false},ticks:{font:{size:11},color:'#888',callback:v=>'$'+v.toLocaleString()}}}}});
+  cprChart=new Chart(ctx,{type:'line',data:{labels:months,datasets:[{label:'Cost/Lead',data:cpl,borderColor:'#00A3E0',borderWidth:2.5,pointRadius:4,tension:.4,fill:false},{label:'Cost/1st Timer',data:cpft,borderColor:'#00C9A7',borderWidth:2.5,pointRadius:4,tension:.4,fill:false,borderDash:[6,3]},{label:'Cost/New Member',data:cpm,borderColor:'#9aab00',borderWidth:2.5,pointRadius:4,tension:.4,fill:false,borderDash:[2,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y.toLocaleString()}}},scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:11},color:'#5a7a8a',maxRotation:0}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:11},color:'#5a7a8a',callback:v=>'$'+v},position:'left'}}}});
 }
 
 function toggleCPRds(btn,i){if(!cprChart)return;const ds=cprChart.data.datasets[i];ds.hidden=!ds.hidden;btn.classList.toggle('on');const cols=['#00A3E0','#00C9A7','#9aab00','#888'];if(btn.classList.contains('on')){btn.style.background=cols[i];btn.style.borderColor=cols[i];btn.style.color='#fff';}else{btn.style.background='#f4f9fd';btn.style.borderColor='#c0d4df';btn.style.color='#5a7a8a';}cprChart.update();}
