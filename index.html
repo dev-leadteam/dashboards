@@ -521,6 +521,9 @@ async function loadData() {
   try {
     const res = await fetch('data.json?_=' + Date.now());
     RAW = await res.json();
+    // Ensure both arrays exist (backward compat with old data.json format)
+    if (!RAW.daily_detail)   RAW.daily_detail   = [];
+    if (!RAW.monthly_detail) RAW.monthly_detail = [];
   } catch(e) {
     console.warn('Using mock data:', e); RAW = getMock();
   }
@@ -616,7 +619,7 @@ function applyFilters() {
   buildFunnel(sumRows(curr.all), sumRows(pp.all), sumRows(py.all),
     `${fmtDate(ppFrom)} – ${fmtDate(ppTo)}`, `${fmtDate(pyFrom)} – ${fmtDate(pyTo)}`);
   buildTrend(toTimeSeries(curr.daily, curr.monthly));
-  buildStageTabs(curr);
+  buildStageTabs(curr, pp, py, `${fmtDate(ppFrom)} – ${fmtDate(ppTo)}`, `${fmtDate(pyFrom)} – ${fmtDate(pyTo)}`);
 }
 
 function calcDelta(curr,prev) { if(!prev||prev===0) return null; return (curr-prev)/prev*100; }
@@ -816,32 +819,104 @@ function toSourceTimeSeries(dailyRows,monthlyRows,gran){
   return Object.values(map).sort((a,b)=>a.key.localeCompare(b.key));
 }
 
-function buildStageTabs(currFiltered){
-  window._lastCurrFiltered = currFiltered;
-  const srcList=RAW.sources.filter(s=>!['ClassPass / Platforms','Grassroots'].includes(s));
-  const srcSeries=toSourceTimeSeries(currFiltered.daily,currFiltered.monthly);
-  const leadsTotal=currFiltered.all.reduce((s,r)=>s+r.signups,0);
-  const ftTotal=currFiltered.all.reduce((s,r)=>s+r.first_visits,0);
-  const memTotal=currFiltered.all.reduce((s,r)=>s+r.first_activations,0);
-  const convFT=leadsTotal?((ftTotal/leadsTotal)*100).toFixed(1)+'%':'--';
-  const convMem=ftTotal?((memTotal/ftTotal)*100).toFixed(1)+'%':'--';
-  const el1=document.getElementById('leads-kpis');if(el1)el1.innerHTML=kpiCard('Total Leads',leadsTotal,leadsTotal*0.90,leadsTotal*0.78)+kpiCard('This Period',currFiltered.daily.reduce((s,r)=>s+r.signups,0),null,null)+kpiCard('Conv to 1st Visit',convFT,null,null,v=>v)+kpiCard('Conv to Member',convMem,null,null,v=>v);
-  buildAreaChart('leadsAreaChart','leads-src-toggles',srcSeries,srcList,'signups');
-  buildRingChart('leadsRingChart','leadsRingLegend',srcList,srcList.map(s=>currFiltered.all.filter(r=>r.source===s).reduce((sum,r)=>sum+r.signups,0)));
-  buildStudioRankTable('leadsStudioTable',currFiltered.all,'signups');
-  const el2=document.getElementById('ft-kpis');if(el2)el2.innerHTML=kpiCard('Total First Timers',ftTotal,ftTotal*0.88,ftTotal*0.75)+kpiCard('This Period',currFiltered.daily.reduce((s,r)=>s+r.first_visits,0),null,null)+kpiCard('Conv Rate',convFT,null,null,v=>v)+kpiCard('Conv to Member',convMem,null,null,v=>v);
-  buildAreaChart('ftAreaChart','ft-src-toggles',srcSeries,srcList,'first_visits');
-  buildRingChart('ftRingChart','ftRingLegend',srcList,srcList.map(s=>currFiltered.all.filter(r=>r.source===s).reduce((sum,r)=>sum+r.first_visits,0)));
-  buildStudioRankTable('ftStudioTable',currFiltered.all,'first_visits');
-  // New Members tab
-  const el3=document.getElementById('mem-kpis');if(el3)el3.innerHTML=kpiCard('Total New Members',memTotal,Math.round(memTotal*0.88),Math.round(memTotal*0.75))+kpiCard('This Period',currFiltered.daily.reduce((s,r)=>s+r.first_activations,0),null,null)+kpiCard('Conv Rate (from FT)',convMem,null,null,v=>v)+kpiCard('Conv Rate (from Lead)',leadsTotal?((memTotal/leadsTotal)*100).toFixed(1)+'%':'--',null,null,v=>v);
-  buildAreaChart('memAreaChart','mem-src-toggles',srcSeries,srcList,'first_activations');
-  buildRingChart('memRingChart','memRingLegend',srcList,srcList.map(s=>currFiltered.all.filter(r=>r.source===s).reduce((sum,r)=>sum+r.first_activations,0)));
-  buildStudioRankTable('memStudioTable',currFiltered.all,'first_activations');
-}
+function buildStageTabs(currFiltered, ppFiltered, pyFiltered, ppLabel, pyLabel){
+  window._lastCurrFiltered  = currFiltered;
+  window._lastPpFiltered    = ppFiltered  || {daily:[],monthly:[],all:[]};
+  window._lastPyFiltered    = pyFiltered  || {daily:[],monthly:[],all:[]};
+  window._lastPpLabel       = ppLabel  || '';
+  window._lastPyLabel       = pyLabel  || '';
 
-// Per-area-chart granularity state
-const AREA_GRAN={leadsAreaChart:'daily',ftAreaChart:'daily',memAreaChart:'daily'};
+  const pp  = window._lastPpFiltered;
+  const py  = window._lastPyFiltered;
+
+  // Use selected sources (already filtered) but exclude ClassPass/Grassroots from area chart
+  const srcList = RAW.sources.filter(s => !['ClassPass / Platforms','Grassroots'].includes(s));
+
+  // Totals from real filtered data
+  const leadsTotal = currFiltered.all.reduce((s,r)=>s+r.signups,0);
+  const ftTotal    = currFiltered.all.reduce((s,r)=>s+r.first_visits,0);
+  const memTotal   = currFiltered.all.reduce((s,r)=>s+r.first_activations,0);
+
+  // Prev period & prev year totals
+  const ppLeads = pp.all.reduce((s,r)=>s+r.signups,0);
+  const ppFT    = pp.all.reduce((s,r)=>s+r.first_visits,0);
+  const ppMem   = pp.all.reduce((s,r)=>s+r.first_activations,0);
+  const pyLeads = py.all.reduce((s,r)=>s+r.signups,0);
+  const pyFT    = py.all.reduce((s,r)=>s+r.first_visits,0);
+  const pyMem   = py.all.reduce((s,r)=>s+r.first_activations,0);
+
+  // This-period (daily rows only — current granularity window)
+  const thisLeads = currFiltered.daily.length ? currFiltered.daily.reduce((s,r)=>s+r.signups,0)
+                  : currFiltered.all.reduce((s,r)=>s+r.signups,0);
+  const thisFT    = currFiltered.daily.length ? currFiltered.daily.reduce((s,r)=>s+r.first_visits,0)
+                  : currFiltered.all.reduce((s,r)=>s+r.first_visits,0);
+  const thisMem   = currFiltered.daily.length ? currFiltered.daily.reduce((s,r)=>s+r.first_activations,0)
+                  : currFiltered.all.reduce((s,r)=>s+r.first_activations,0);
+
+  const convFT  = leadsTotal ? ((ftTotal/leadsTotal)*100).toFixed(1)+'%' : '--';
+  const convMem = ftTotal    ? ((memTotal/ftTotal)*100).toFixed(1)+'%'   : '--';
+  const convMemFromLead = leadsTotal ? ((memTotal/leadsTotal)*100).toFixed(1)+'%' : '--';
+
+  // ── LEADS TAB ────────────────────────────────────────────────────────────
+  const el1 = document.getElementById('leads-kpis');
+  if(el1) el1.innerHTML =
+    kpiCard('Total Leads',    leadsTotal, ppLeads||null, pyLeads||null) +
+    kpiCard('This Period',    thisLeads,  null, null) +
+    kpiCard('Conv → 1st Visit', convFT,  null, null, v=>v) +
+    kpiCard('Conv → Member',  convMem,   null, null, v=>v);
+
+  buildAreaChart('leadsAreaChart','leads-src-toggles',
+    toSourceTimeSeries(currFiltered.daily, currFiltered.monthly, AREA_GRAN['leadsAreaChart']),
+    srcList, 'signups');
+  buildRingChart('leadsRingChart','leadsRingLegend', srcList,
+    srcList.map(s=>currFiltered.all.filter(r=>r.source===s).reduce((sum,r)=>sum+r.signups,0)));
+  buildStudioRankTable('leadsStudioTable', currFiltered.all, 'signups');
+
+  // ── FIRST TIMERS TAB ─────────────────────────────────────────────────────
+  const el2 = document.getElementById('ft-kpis');
+  if(el2) el2.innerHTML =
+    kpiCard('Total First Timers', ftTotal, ppFT||null, pyFT||null) +
+    kpiCard('This Period',        thisFT,  null, null) +
+    kpiCard('Conv Rate',          convFT,  null, null, v=>v) +
+    kpiCard('Conv → Member',      convMem, null, null, v=>v);
+
+  buildAreaChart('ftAreaChart','ft-src-toggles',
+    toSourceTimeSeries(currFiltered.daily, currFiltered.monthly, AREA_GRAN['ftAreaChart']),
+    srcList, 'first_visits');
+  buildRingChart('ftRingChart','ftRingLegend', srcList,
+    srcList.map(s=>currFiltered.all.filter(r=>r.source===s).reduce((sum,r)=>sum+r.first_visits,0)));
+  buildStudioRankTable('ftStudioTable', currFiltered.all, 'first_visits');
+
+  // ── NEW MEMBERS TAB ──────────────────────────────────────────────────────
+  const el3 = document.getElementById('mem-kpis');
+  if(el3) el3.innerHTML =
+    kpiCard('Total New Members',    memTotal, ppMem||null, pyMem||null) +
+    kpiCard('This Period',          thisMem,  null, null) +
+    kpiCard('Conv Rate (from FT)',  convMem,  null, null, v=>v) +
+    kpiCard('Conv Rate (from Lead)',convMemFromLead, null, null, v=>v);
+
+  buildAreaChart('memAreaChart','mem-src-toggles',
+    toSourceTimeSeries(currFiltered.daily, currFiltered.monthly, AREA_GRAN['memAreaChart']),
+    srcList, 'first_activations');
+  buildRingChart('memRingChart','memRingLegend', srcList,
+    srcList.map(s=>currFiltered.all.filter(r=>r.source===s).reduce((sum,r)=>sum+r.first_activations,0)));
+  buildStudioRankTable('memStudioTable', currFiltered.all, 'first_activations');
+
+  // ── Update area gran button states ────────────────────────────────────────
+  ['leadsAreaChart','ftAreaChart','memAreaChart'].forEach(id=>{
+    const {dailyFrom,dailyTo} = getQuarterBounds();
+    const from = new Date(document.getElementById('fFrom').value+'T00:00:00Z');
+    const to   = new Date(document.getElementById('fTo').value+'T23:59:59Z');
+    const hasDaily  = from <= dailyTo && to >= dailyFrom;
+    const daysDiff  = (to - from) / 86400000;
+    const bd = document.getElementById('gran-daily-'+id);
+    const bw = document.getElementById('gran-weekly-'+id);
+    if(bd) bd.disabled = !hasDaily;
+    if(bw) bw.disabled = daysDiff > 366;
+    if(AREA_GRAN[id]==='daily'  && bd && bd.disabled) { AREA_GRAN[id]='weekly';  setAreaGran(id,'weekly'); }
+    if(AREA_GRAN[id]==='weekly' && bw && bw.disabled) { AREA_GRAN[id]='monthly'; setAreaGran(id,'monthly'); }
+  });
+}
 
 function setAreaGran(canvasId, gran) {
   AREA_GRAN[canvasId] = gran;
@@ -849,8 +924,15 @@ function setAreaGran(canvasId, gran) {
     const btn = document.getElementById('gran-'+g+'-'+canvasId);
     if (btn) btn.classList.toggle('active', g === gran);
   });
-  // Rebuild just that chart using current filtered data
-  if (window._lastCurrFiltered) buildStageTabs(window._lastCurrFiltered);
+  if (window._lastCurrFiltered) {
+    buildStageTabs(
+      window._lastCurrFiltered,
+      window._lastPpFiltered,
+      window._lastPyFiltered,
+      window._lastPpLabel,
+      window._lastPyLabel
+    );
+  }
 }
 
 const CPR_COSTS_ACTIVE={google:true,meta:true,leadteam:true};
