@@ -78,7 +78,7 @@
   /* Stage / Leads tabs */
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
   .three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:20px}
-  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px} .kpi-grid.three{grid-template-columns:repeat(3,1fr)}
   .kpi-card{background:#fff;border:0.5px solid #dde8ef;border-radius:10px;padding:18px 16px}
   .kpi-card-label{font-family:'Oswald',sans-serif;font-style:italic;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:1.5px;color:#5a7a8a;margin-bottom:6px}
   .kpi-card-val{font-size:26px;font-weight:600;color:#1a1a2e;line-height:1}
@@ -216,7 +216,7 @@
 
   <!-- LEADS TAB -->
   <div class="tab-content" id="tab-leads">
-    <div id="leads-kpis" class="kpi-grid"></div>
+    <div id="leads-kpis" class="kpi-grid three"></div>
     <div class="chart-card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
         <div class="chart-card-title" style="margin-bottom:0">Leads over time — by source</div>
@@ -251,7 +251,7 @@
 
   <!-- FIRST TIMERS TAB -->
   <div class="tab-content" id="tab-stage">
-    <div id="ft-kpis" class="kpi-grid"></div>
+    <div id="ft-kpis" class="kpi-grid three"></div>
     <div class="chart-card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
         <div class="chart-card-title" style="margin-bottom:0">First timers over time — by source</div>
@@ -325,7 +325,7 @@
 
   <!-- NEW MEMBERS TAB -->
   <div class="tab-content" id="tab-members">
-    <div id="mem-kpis" class="kpi-grid"></div>
+    <div id="mem-kpis" class="kpi-grid three"></div>
     <div class="chart-card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
         <div class="chart-card-title" style="margin-bottom:0">New members over time — by source</div>
@@ -705,77 +705,93 @@ const SRC_COLOR_MAP={
 };
 function srcColor(src,i){return SRC_COLOR_MAP[src]||SRC_COLORS[i%SRC_COLORS.length];}
 
-function buildAreaChart(canvasId,togglesId,series,srcList,valueKey){
-  const ctx=document.getElementById(canvasId);if(!ctx)return null;
-  const timeKeys=[...new Set(series.map(r=>r.key))].sort();
+// Chart instance registry — tracks all area chart instances for destroy/recreate
+const _areaCharts = {};
 
-  // Sort: biggest total first for buttons, biggest FIRST in datasets = bottom of stack
-  const srcTotals=srcList.map(src=>series.filter(r=>r.source===src).reduce((s,r)=>s+(r[valueKey]||0),0));
-  const sortedIdxs=[...srcList.keys()].sort((a,b)=>srcTotals[b]-srcTotals[a]);
-  const sortedSrcs=sortedIdxs.map(i=>srcList[i]); // biggest first
+function buildAreaChart(canvasId, togglesId, series, srcList, valueKey){
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return null;
 
-  // In Chart.js stacked area: FIRST dataset = bottom. So sortedSrcs (biggest first) = biggest at bottom.
-  const datasets=sortedSrcs.map((src)=>{
-    const si=srcList.indexOf(src);
-    const c=srcColor(src,si);
-    const data=timeKeys.map(tk=>series.filter(r=>r.key===tk&&r.source===src).reduce((s,r)=>s+(r[valueKey]||0),0));
-    return{label:src,data,borderColor:c,backgroundColor:c+'cc',borderWidth:1,pointRadius:0,pointHoverRadius:5,tension:.35,fill:true};
+  // Destroy existing chart on this canvas before recreating
+  if (_areaCharts[canvasId]) {
+    _areaCharts[canvasId].destroy();
+    _areaCharts[canvasId] = null;
+  }
+
+  const timeKeys = [...new Set(series.map(r => r.key))].sort();
+
+  // Sort: biggest total first = bottom of stack in Chart.js stacked mode
+  const srcTotals = srcList.map(src => series.filter(r => r.source === src).reduce((s,r) => s+(r[valueKey]||0), 0));
+  const sortedIdxs = [...srcList.keys()].sort((a,b) => srcTotals[b] - srcTotals[a]);
+  const sortedSrcs = sortedIdxs.map(i => srcList[i]); // biggest first = bottom
+
+  const datasets = sortedSrcs.map((src) => {
+    const si = srcList.indexOf(src);
+    const c  = srcColor(src, si);
+    const data = timeKeys.map(tk =>
+      series.filter(r => r.key === tk && r.source === src).reduce((s,r) => s+(r[valueKey]||0), 0)
+    );
+    return { label:src, data, borderColor:c, backgroundColor:c+'cc', borderWidth:1, pointRadius:0, pointHoverRadius:5, tension:.35, fill:true };
   });
 
-  // Toggle buttons — biggest first
-  const tg=document.getElementById(togglesId);
-  if(tg){
-    tg.innerHTML='';
-    sortedSrcs.forEach((src,btnI)=>{
-      const si=srcList.indexOf(src);
-      const c=srcColor(src,si);
-      const btn=document.createElement('button');
-      btn.className='tog-btn on';
-      btn.style.cssText='border-color:'+c+';background:'+c+';color:#fff;font-size:11px;padding:4px 10px';
-      btn.innerHTML='<span class="dot" style="background:#fff"></span>'+src;
-      btn.onclick=function(){
-        const ds=chart.data.datasets[btnI];ds.hidden=!ds.hidden;
+  // Toggle buttons (biggest first)
+  const tg = document.getElementById(togglesId);
+  if (tg) {
+    tg.innerHTML = '';
+    sortedSrcs.forEach((src, btnI) => {
+      const si = srcList.indexOf(src);
+      const c  = srcColor(src, si);
+      const btn = document.createElement('button');
+      btn.className = 'tog-btn on';
+      btn.style.cssText = 'border-color:'+c+';background:'+c+';color:#fff;font-size:11px;padding:4px 10px';
+      btn.innerHTML = '<span class="dot" style="background:#fff"></span>'+src;
+      btn.onclick = function() {
+        const chart = _areaCharts[canvasId];
+        if (!chart) return;
+        const ds = chart.data.datasets[btnI]; ds.hidden = !ds.hidden;
         btn.classList.toggle('on');
-        if(btn.classList.contains('on')){btn.style.background=c;btn.style.borderColor=c;btn.style.color='#fff';}
-        else{btn.style.background='#f4f9fd';btn.style.borderColor='#c0d4df';btn.style.color='#5a7a8a';}
+        if (btn.classList.contains('on')) { btn.style.background=c; btn.style.borderColor=c; btn.style.color='#fff'; }
+        else { btn.style.background='#f4f9fd'; btn.style.borderColor='#c0d4df'; btn.style.color='#5a7a8a'; }
         chart.update();
       };
       tg.appendChild(btn);
     });
   }
 
-  const isMob=window.innerWidth<=768;
-  const labels=timeKeys.map(k=>k.length===10&&k.slice(8)!=='01'
-    ?new Date(k+'T00:00:00Z').toLocaleString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})
-    :new Date(k.slice(0,7)+'-01T00:00:00Z').toLocaleString('en-US',{month:'short',year:'2-digit',timeZone:'UTC'}));
+  const isMob = window.innerWidth <= 768;
+  const labels = timeKeys.map(k => k.length===10 && k.slice(8)!=='01'
+    ? new Date(k+'T00:00:00Z').toLocaleString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})
+    : new Date(k.slice(0,7)+'-01T00:00:00Z').toLocaleString('en-US',{month:'short',year:'2-digit',timeZone:'UTC'})
+  );
 
-  const chart=new Chart(ctx,{
-    type:'line',data:{labels,datasets},
+  const chart = new Chart(ctx, {
+    type:'line', data:{labels, datasets},
     options:{
-      responsive:true,maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index', intersect:false},
       plugins:{
         legend:{display:false},
         tooltip:{
-          mode:'index',intersect:false,
+          mode:'index', intersect:false,
           callbacks:{
-            label:item=>' '+item.dataset.label+': '+item.parsed.y.toLocaleString(),
-            afterBody:items=>{
-              const total=items.filter(i=>!i.dataset.hidden).reduce((s,i)=>s+i.parsed.y,0);
-              return['','Total: '+total.toLocaleString()];
+            label: item => ' '+item.dataset.label+': '+item.parsed.y.toLocaleString(),
+            afterBody: items => {
+              const total = items.filter(i=>!i.dataset.hidden).reduce((s,i)=>s+i.parsed.y, 0);
+              return ['', 'Total: '+total.toLocaleString()];
             }
           }
         }
       },
       scales:{
-        x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:10},color:'#5a7a8a',autoSkip:true,maxTicksLimit:isMob?5:12,maxRotation:0}},
-        y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:11},color:'#5a7a8a'},stacked:true}
+        x:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:10}, color:'#5a7a8a', autoSkip:true, maxTicksLimit:isMob?5:12, maxRotation:0} },
+        y:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:11}, color:'#5a7a8a'}, stacked:true }
       }
     }
   });
+
+  _areaCharts[canvasId] = chart;
   return chart;
 }
-
 
 function buildRingChart(canvasId,legendId,labels,values){
   const ctx=document.getElementById(canvasId);if(!ctx)return;
@@ -857,13 +873,33 @@ function buildStageTabs(currFiltered, ppFiltered, pyFiltered, ppLabel, pyLabel){
   const convMem = ftTotal    ? ((memTotal/ftTotal)*100).toFixed(1)+'%'   : '--';
   const convMemFromLead = leadsTotal ? ((memTotal/leadsTotal)*100).toFixed(1)+'%' : '--';
 
+  // Conversion rates for prev periods (for comparison)
+  const ppConvFT  = ppLeads  ? (ppFT /ppLeads *100) : null;
+  const ppConvMem = ppFT     ? (ppMem/ppFT   *100) : null;
+  const pyConvFT  = pyLeads  ? (pyFT /pyLeads*100)  : null;
+  const pyConvMem = pyFT     ? (pyMem/pyFT   *100)  : null;
+
+  const currConvFT  = leadsTotal ? ftTotal /leadsTotal*100 : null;
+  const currConvMem = ftTotal    ? memTotal/ftTotal  *100  : null;
+  const currConvMemLead = leadsTotal ? memTotal/leadsTotal*100 : null;
+
+  // Conv KPI: show rate + % improvement vs prev (relative change)
+  function convCard(label, curr, ppRate, pyRate) {
+    if (curr === null) return kpiCard(label, '--', null, null, v=>v);
+    const fmt = v => typeof v==='number' ? v.toFixed(1)+'%' : v;
+    const dpp = ppRate != null ? (curr - ppRate) / ppRate * 100 : null;
+    const dpy = pyRate != null ? (curr - pyRate) / pyRate * 100 : null;
+    const ppH = dpp!=null ? '<div class="kpi-card-delta '+(dpp>=0?'pos':'neg')+'">'+(dpp>=0?'&#9650;':'&#9660;')+' '+Math.abs(dpp).toFixed(1)+'% prev period</div>' : '';
+    const pyH = dpy!=null ? '<div class="kpi-card-delta '+(dpy>=0?'pos':'neg')+'">'+(dpy>=0?'&#9650;':'&#9660;')+' '+Math.abs(dpy).toFixed(1)+'% prev year</div>'   : '';
+    return '<div class="kpi-card"><div class="kpi-card-label">'+label+'</div><div class="kpi-card-val">'+curr.toFixed(1)+'%</div>'+ppH+pyH+'</div>';
+  }
+
   // ── LEADS TAB ────────────────────────────────────────────────────────────
   const el1 = document.getElementById('leads-kpis');
   if(el1) el1.innerHTML =
-    kpiCard('Total Leads',    leadsTotal, ppLeads||null, pyLeads||null) +
-    kpiCard('This Period',    thisLeads,  null, null) +
-    kpiCard('Conv → 1st Visit', convFT,  null, null, v=>v) +
-    kpiCard('Conv → Member',  convMem,   null, null, v=>v);
+    kpiCard('Total Leads', leadsTotal, ppLeads||null, pyLeads||null) +
+    convCard('Conv → 1st Visit', currConvFT,  ppConvFT,  pyConvFT) +
+    convCard('Conv → Member',    currConvMem, ppConvMem, pyConvMem);
 
   buildAreaChart('leadsAreaChart','leads-src-toggles',
     toSourceTimeSeries(currFiltered.daily, currFiltered.monthly, AREA_GRAN['leadsAreaChart']),
@@ -876,9 +912,8 @@ function buildStageTabs(currFiltered, ppFiltered, pyFiltered, ppLabel, pyLabel){
   const el2 = document.getElementById('ft-kpis');
   if(el2) el2.innerHTML =
     kpiCard('Total First Timers', ftTotal, ppFT||null, pyFT||null) +
-    kpiCard('This Period',        thisFT,  null, null) +
-    kpiCard('Conv Rate',          convFT,  null, null, v=>v) +
-    kpiCard('Conv → Member',      convMem, null, null, v=>v);
+    convCard('Conv Rate (Lead→FT)', currConvFT,  ppConvFT,  pyConvFT) +
+    convCard('Conv → Member',       currConvMem, ppConvMem, pyConvMem);
 
   buildAreaChart('ftAreaChart','ft-src-toggles',
     toSourceTimeSeries(currFiltered.daily, currFiltered.monthly, AREA_GRAN['ftAreaChart']),
@@ -890,10 +925,9 @@ function buildStageTabs(currFiltered, ppFiltered, pyFiltered, ppLabel, pyLabel){
   // ── NEW MEMBERS TAB ──────────────────────────────────────────────────────
   const el3 = document.getElementById('mem-kpis');
   if(el3) el3.innerHTML =
-    kpiCard('Total New Members',    memTotal, ppMem||null, pyMem||null) +
-    kpiCard('This Period',          thisMem,  null, null) +
-    kpiCard('Conv Rate (from FT)',  convMem,  null, null, v=>v) +
-    kpiCard('Conv Rate (from Lead)',convMemFromLead, null, null, v=>v);
+    kpiCard('Total New Members', memTotal, ppMem||null, pyMem||null) +
+    convCard('Conv Rate (FT→Mbr)', currConvMem,      ppConvMem, pyConvMem) +
+    convCard('Conv Rate (Lead→Mbr)',currConvMemLead,  ppConvFT!=null&&ppConvMem!=null?ppConvFT*ppConvMem/100:null, pyConvFT!=null&&pyConvMem!=null?pyConvFT*pyConvMem/100:null);
 
   buildAreaChart('memAreaChart','mem-src-toggles',
     toSourceTimeSeries(currFiltered.daily, currFiltered.monthly, AREA_GRAN['memAreaChart']),
