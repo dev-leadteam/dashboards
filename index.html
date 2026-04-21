@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SWEAT440 — Leads Dashboard</title>
+<title>SWEAT440  Leads Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -219,7 +219,7 @@
     <div id="leads-kpis" class="kpi-grid three"></div>
     <div class="chart-card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
-        <div class="chart-card-title" style="margin-bottom:0">Leads over time — by source</div>
+        <div class="chart-card-title" style="margin-bottom:0">Leads over time  by source</div>
         <div class="gran-group" id="gran-leadsAreaChart">
           <button class="gran-btn active" id="gran-daily-leadsAreaChart"  onclick="setAreaGran('leadsAreaChart','daily')">Daily</button>
           <button class="gran-btn"        id="gran-weekly-leadsAreaChart" onclick="setAreaGran('leadsAreaChart','weekly')">Weekly</button>
@@ -254,7 +254,7 @@
     <div id="ft-kpis" class="kpi-grid three"></div>
     <div class="chart-card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
-        <div class="chart-card-title" style="margin-bottom:0">First timers over time — by source</div>
+        <div class="chart-card-title" style="margin-bottom:0">First timers over time  by source</div>
         <div class="gran-group" id="gran-ftAreaChart">
           <button class="gran-btn active" id="gran-daily-ftAreaChart"  onclick="setAreaGran('ftAreaChart','daily')">Daily</button>
           <button class="gran-btn"        id="gran-weekly-ftAreaChart" onclick="setAreaGran('ftAreaChart','weekly')">Weekly</button>
@@ -298,7 +298,7 @@
     <div id="cpr-spend-breakdown" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:20px"></div>
     <div class="kpi-grid" id="cpr-kpis"></div>
     <div class="chart-card">
-      <div class="chart-card-title">Cost per result — over time</div>
+      <div class="chart-card-title">Cost per result  over time</div>
       <div class="toggle-group" id="cpr-toggles">
         <button class="tog-btn on" data-ds="0" onclick="toggleCPRds(this,0)" style="border-color:#00A3E0;background:#00A3E0;color:#fff"><span class="dot" style="background:#fff"></span>Cost / Lead</button>
         <button class="tog-btn on" data-ds="1" onclick="toggleCPRds(this,1)" style="border-color:#00C9A7;background:#00C9A7;color:#fff"><span class="dot" style="background:#fff"></span>Cost / First Timer</button>
@@ -328,7 +328,7 @@
     <div id="mem-kpis" class="kpi-grid three"></div>
     <div class="chart-card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
-        <div class="chart-card-title" style="margin-bottom:0">New members over time — by source</div>
+        <div class="chart-card-title" style="margin-bottom:0">New members over time  by source</div>
         <div class="gran-group" id="gran-memAreaChart">
           <button class="gran-btn active" id="gran-daily-memAreaChart"  onclick="setAreaGran('memAreaChart','daily')">Daily</button>
           <button class="gran-btn"        id="gran-weekly-memAreaChart" onclick="setAreaGran('memAreaChart','weekly')">Weekly</button>
@@ -428,6 +428,9 @@ const firstOfPrevMonth = new Date(lastOfPrevMonth.getFullYear(), lastOfPrevMonth
 function localDateStr(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 document.getElementById('fFrom').value = localDateStr(firstOfPrevMonth);
 document.getElementById('fTo').value   = localDateStr(lastOfPrevMonth);
+// After data loads, if default range has no data, fall back to last available month
+window._defaultFrom = localDateStr(firstOfPrevMonth);
+window._defaultTo   = localDateStr(lastOfPrevMonth);
 
 // Multi-select
 function toggleDropdown(id) {
@@ -535,6 +538,26 @@ async function loadData() {
   buildMultiSelect('sourceMenu', 'sourceLabel', RAW.sources, DEFAULT_EXCL_SOURCES);
   setGran('daily');
 
+  // If default date range has no data, fall back to last available month in dataset
+  const allRows = [...(RAW.daily_detail||[]), ...(RAW.monthly_detail||[])];
+  const allKeys = allRows.map(r=>r.date||r.month).filter(Boolean).sort();
+  if (allKeys.length) {
+    const lastKey  = allKeys[allKeys.length-1].slice(0,7); // YYYY-MM
+    const defFrom  = document.getElementById('fFrom').value.slice(0,7);
+    const defTo    = document.getElementById('fTo').value.slice(0,7);
+    // Check if any data exists in default range
+    const hasData = allKeys.some(k => k >= defFrom+'-01' && k <= defTo+'-31');
+    if (!hasData) {
+      // Fall back to last month of available data
+      const lastDate = new Date(lastKey+'-01T00:00:00Z');
+      const y = lastDate.getUTCFullYear(), m = lastDate.getUTCMonth();
+      const firstOfLast = new Date(Date.UTC(y,m,1));
+      const lastOfLast  = new Date(Date.UTC(y,m+1,0));
+      document.getElementById('fFrom').value = firstOfLast.toISOString().slice(0,10);
+      document.getElementById('fTo').value   = lastOfLast.toISOString().slice(0,10);
+    }
+  }
+
   applyFilters();
 }
 
@@ -624,7 +647,7 @@ function applyFilters() {
   buildFunnel(sumRows(curr.all), sumRows(pp.all), sumRows(py.all),
     `${fmtDate(ppFrom)} – ${fmtDate(ppTo)}`, `${fmtDate(pyFrom)} – ${fmtDate(pyTo)}`);
   buildTrend(toTimeSeries(curr.daily, curr.monthly));
-  // Always build all tabs — all are rendered (just hidden via opacity/height)
+  // Always build all tabs  all are rendered (just hidden via opacity/height)
   buildStageTabs(curr, pp, py, fmtDate(ppFrom)+' – '+fmtDate(ppTo), fmtDate(pyFrom)+' – '+fmtDate(pyTo));
 }
 
@@ -641,8 +664,8 @@ function buildFunnel(curr, prev, pyear, ppLabel, pyLabel) {
     const w = Math.max(2,(s.curr/max)*100);
     const dpp = calcDelta(s.curr,s.prev);
     const dpy = calcDelta(s.curr,s.py);
-    const ppHTML = dpp!==null ? `<span class="delta ${dpp>=0?'pos':'neg'}" title="vs ${ppLabel}">${dpp>=0?'▲':'▼'} ${Math.abs(dpp).toFixed(1)}% prev period</span>` : `<span class="delta neu">— prev period</span>`;
-    const pyHTML = dpy!==null ? `<span class="delta ${dpy>=0?'pos':'neg'}" title="vs ${pyLabel}">${dpy>=0?'▲':'▼'} ${Math.abs(dpy).toFixed(1)}% prev year</span>`   : `<span class="delta neu">— prev year</span>`;
+    const ppHTML = dpp!==null ? `<span class="delta ${dpp>=0?'pos':'neg'}" title="vs ${ppLabel}">${dpp>=0?'▲':'▼'} ${Math.abs(dpp).toFixed(1)}% prev period</span>` : `<span class="delta neu"> prev period</span>`;
+    const pyHTML = dpy!==null ? `<span class="delta ${dpy>=0?'pos':'neg'}" title="vs ${pyLabel}">${dpy>=0?'▲':'▼'} ${Math.abs(dpy).toFixed(1)}% prev year</span>`   : `<span class="delta neu"> prev year</span>`;
     return `<div><div class="funnel-stage-label">${s.label}</div><div class="funnel-row"><div class="funnel-bar-track"><div class="funnel-bar-fill" style="width:${w}%;background:${s.color}"></div></div><div class="funnel-num">${s.curr.toLocaleString()}</div><div class="funnel-deltas">${ppHTML}${pyHTML}</div></div></div>`;
   }).join('');
 }
@@ -711,7 +734,7 @@ const SRC_COLOR_MAP={
 };
 function srcColor(src,i){return SRC_COLOR_MAP[src]||SRC_COLORS[i%SRC_COLORS.length];}
 
-// Chart instance registry — tracks all area chart instances for destroy/recreate
+// Chart instance registry  tracks all area chart instances for destroy/recreate
 const _areaCharts = {};
 
 function buildAreaChart(canvasId, togglesId, series, srcList, valueKey){
@@ -751,13 +774,13 @@ function buildAreaChart(canvasId, togglesId, series, srcList, valueKey){
       }},
       scales:{
         x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:10},color:'#5a7a8a',autoSkip:true,maxTicksLimit:isMob?5:12,maxRotation:0}},
-        y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:11},color:'#5a7a8a'},stacked:true}
+        y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:11},color:'#5a7a8a'},stacked:true,min:0}
       }
     }
   });
   _areaCharts[canvasId] = chart;
 
-  // Build toggle buttons — reference chart via registry, not closure
+  // Build toggle buttons  reference chart via registry, not closure
   const tg = document.getElementById(togglesId);
   if (tg) {
     tg.innerHTML = '';
@@ -788,9 +811,10 @@ function buildAreaChart(canvasId, togglesId, series, srcList, valueKey){
 
 function buildRingChart(canvasId,legendId,labels,values){
   const ctx=document.getElementById(canvasId);if(!ctx)return;
+  if(_areaCharts[canvasId]){_areaCharts[canvasId].destroy();_areaCharts[canvasId]=null;}
   const total=values.reduce((s,v)=>s+v,0);
   const colors=labels.map((l,i)=>srcColor(l,i));
-  new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data:values,backgroundColor:colors,borderColor:'#fff',borderWidth:2,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},cutout:'65%'}});
+  _areaCharts[canvasId]=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data:values,backgroundColor:colors,borderColor:'#fff',borderWidth:2,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},cutout:'65%'}});
   const leg=document.getElementById(legendId);
   if(leg)leg.innerHTML=labels.map((l,i)=>{const pct=total?(values[i]/total*100).toFixed(1):0;return '<div class="ring-legend-item"><span class="ring-legend-dot" style="background:'+colors[i]+'"></span><span>'+l+'</span><span style="margin-left:auto;font-weight:600;color:#1a1a2e">'+pct+'%</span></div>';}).join('');
 }
@@ -876,7 +900,7 @@ function buildStageTabs(currFiltered, ppFiltered, pyFiltered, ppLabel, pyLabel){
     return '<div class="kpi-card"><div class="kpi-card-label">'+label+'</div><div class="kpi-card-val">'+curr.toFixed(1)+'%</div>'+ppH+pyH+'</div>';
   }
 
-  // ── LEADS TAB ────────────────────────────────────────────────────────────
+  //  LEADS TAB 
   const el1 = document.getElementById('leads-kpis');
   if(el1) el1.innerHTML =
     kpiCard('Total Leads', leadsTotal, ppLeads||null, pyLeads||null) +
@@ -890,7 +914,7 @@ function buildStageTabs(currFiltered, ppFiltered, pyFiltered, ppLabel, pyLabel){
     srcList.map(s=>currFiltered.all.filter(r=>r.source===s).reduce((sum,r)=>sum+r.signups,0)));
   buildStudioRankTable('leadsStudioTable', currFiltered.all, 'signups');
 
-  // ── FIRST TIMERS TAB ─────────────────────────────────────────────────────
+  //  FIRST TIMERS TAB 
   const el2 = document.getElementById('ft-kpis');
   if(el2) el2.innerHTML =
     kpiCard('Total First Timers', ftTotal, ppFT||null, pyFT||null) +
@@ -904,7 +928,7 @@ function buildStageTabs(currFiltered, ppFiltered, pyFiltered, ppLabel, pyLabel){
     srcList.map(s=>currFiltered.all.filter(r=>r.source===s).reduce((sum,r)=>sum+r.first_visits,0)));
   buildStudioRankTable('ftStudioTable', currFiltered.all, 'first_visits');
 
-  // ── NEW MEMBERS TAB ──────────────────────────────────────────────────────
+  //  NEW MEMBERS TAB 
   const el3 = document.getElementById('mem-kpis');
   if(el3) el3.innerHTML =
     kpiCard('Total New Members', memTotal, ppMem||null, pyMem||null) +
@@ -918,19 +942,30 @@ function buildStageTabs(currFiltered, ppFiltered, pyFiltered, ppLabel, pyLabel){
     srcList.map(s=>currFiltered.all.filter(r=>r.source===s).reduce((sum,r)=>sum+r.first_activations,0)));
   buildStudioRankTable('memStudioTable', currFiltered.all, 'first_activations');
 
-  // ── Update area gran button states ────────────────────────────────────────
+  //  Update area gran button states (no recursive calls)
   ['leadsAreaChart','ftAreaChart','memAreaChart'].forEach(id=>{
     const {dailyFrom,dailyTo} = getQuarterBounds();
     const from = new Date(document.getElementById('fFrom').value+'T00:00:00Z');
     const to   = new Date(document.getElementById('fTo').value+'T23:59:59Z');
-    const hasDaily  = from <= dailyTo && to >= dailyFrom;
-    const daysDiff  = (to - from) / 86400000;
+    const hasDaily = from <= dailyTo && to >= dailyFrom;
+    const daysDiff = (to - from) / 86400000;
     const bd = document.getElementById('gran-daily-'+id);
     const bw = document.getElementById('gran-weekly-'+id);
     if(bd) bd.disabled = !hasDaily;
     if(bw) bw.disabled = daysDiff > 366;
-    if(AREA_GRAN[id]==='daily'  && bd && bd.disabled) { AREA_GRAN[id]='weekly';  setAreaGran(id,'weekly'); }
-    if(AREA_GRAN[id]==='weekly' && bw && bw.disabled) { AREA_GRAN[id]='monthly'; setAreaGran(id,'monthly'); }
+    // Auto-downgrade granularity WITHOUT recursive call
+    if(AREA_GRAN[id]==='daily'  && bd && bd.disabled) {
+      AREA_GRAN[id]='weekly';
+      if(bd) bd.classList.remove('on');
+      const bw2=document.getElementById('gran-weekly-'+id);
+      if(bw2) bw2.classList.add('on');
+    }
+    if(AREA_GRAN[id]==='weekly' && bw && bw.disabled) {
+      AREA_GRAN[id]='monthly';
+      if(bw) bw.classList.remove('on');
+      const bm=document.getElementById('gran-monthly-'+id);
+      if(bm) bm.classList.add('on');
+    }
   });
 }
 
@@ -940,17 +975,8 @@ function setAreaGran(canvasId, gran) {
     const btn = document.getElementById('gran-'+g+'-'+canvasId);
     if (btn) btn.classList.toggle('active', g === gran);
   });
-  // Only rebuild the specific chart that changed, not all tabs
-  if (!window._lastCurrFiltered) return;
-  const cf = window._lastCurrFiltered;
-  const srcList = RAW.sources.filter(s => !['ClassPass / Platforms','Grassroots'].includes(s));
-  const valueKeyMap = {leadsAreaChart:'signups', ftAreaChart:'first_visits', memAreaChart:'first_activations'};
-  const togglesMap  = {leadsAreaChart:'leads-src-toggles', ftAreaChart:'ft-src-toggles', memAreaChart:'mem-src-toggles'};
-  const vk = valueKeyMap[canvasId];
-  const tg = togglesMap[canvasId];
-  if (vk && tg) {
-    buildAreaChart(canvasId, tg, toSourceTimeSeries(cf.daily, cf.monthly, gran), srcList, vk);
-  }
+  // Re-run full applyFilters so chart uses current filter state
+  applyFilters();
 }
 
 const CPR_COSTS_ACTIVE={google:true,meta:true,leadteam:true};
@@ -1022,7 +1048,7 @@ function toggleCPRds(btn,i){if(!cprChart)return;const ds=cprChart.data.datasets[
 function buildMetaTab(){
   const el=document.getElementById('meta-kpis');if(!el)return;
   el.innerHTML=kpiCard('Total Spend',18420,16800,12300,v=>'$'+v.toLocaleString())+kpiCard('Impressions','1.24M',null,null,v=>v)+kpiCard('Clicks',38450,34200,24100)+kpiCard('Cost per Lead',12.40,13.20,16.80,v=>'$'+v.toFixed(2));
-  const ads=[{name:'Summer Sweat — Video',type:'Video',status:'active',imp:'284K',clk:'9,200',ctr:'3.24%',spend:'$4,120',leads:'332',cpl:'$12.41'},{name:'Transform in 45 — Carousel',type:'Carousel',status:'active',imp:'196K',clk:'6,800',ctr:'3.47%',spend:'$3,850',leads:'298',cpl:'$12.92'},{name:'New Studio Open — Image',type:'Image',status:'active',imp:'152K',clk:'4,900',ctr:'3.22%',spend:'$2,980',leads:'241',cpl:'$12.37'},{name:'Free Trial Offer',type:'Image',status:'active',imp:'118K',clk:'3,750',ctr:'3.18%',spend:'$2,310',leads:'187',cpl:'$12.35'},{name:'Member Testimonial — Video',type:'Video',status:'paused',imp:'89K',clk:'2,400',ctr:'2.70%',spend:'$1,960',leads:'142',cpl:'$13.80'},{name:'Referral Program',type:'Carousel',status:'paused',imp:'72K',clk:'1,980',ctr:'2.75%',spend:'$1,560',leads:'118',cpl:'$13.22'},{name:'HIIT Challenge — Reel',type:'Video',status:'active',imp:'65K',clk:'2,100',ctr:'3.23%',spend:'$1,640',leads:'131',cpl:'$12.52'}];
+  const ads=[{name:'Summer Sweat  Video',type:'Video',status:'active',imp:'284K',clk:'9,200',ctr:'3.24%',spend:'$4,120',leads:'332',cpl:'$12.41'},{name:'Transform in 45  Carousel',type:'Carousel',status:'active',imp:'196K',clk:'6,800',ctr:'3.47%',spend:'$3,850',leads:'298',cpl:'$12.92'},{name:'New Studio Open  Image',type:'Image',status:'active',imp:'152K',clk:'4,900',ctr:'3.22%',spend:'$2,980',leads:'241',cpl:'$12.37'},{name:'Free Trial Offer',type:'Image',status:'active',imp:'118K',clk:'3,750',ctr:'3.18%',spend:'$2,310',leads:'187',cpl:'$12.35'},{name:'Member Testimonial  Video',type:'Video',status:'paused',imp:'89K',clk:'2,400',ctr:'2.70%',spend:'$1,960',leads:'142',cpl:'$13.80'},{name:'Referral Program',type:'Carousel',status:'paused',imp:'72K',clk:'1,980',ctr:'2.75%',spend:'$1,560',leads:'118',cpl:'$13.22'},{name:'HIIT Challenge  Reel',type:'Video',status:'active',imp:'65K',clk:'2,100',ctr:'3.23%',spend:'$1,640',leads:'131',cpl:'$12.52'}];
   const tb=document.querySelector('#meta-ads-table tbody');if(!tb)return;
   tb.innerHTML=ads.map(a=>'<tr><td><div style="display:flex;align-items:center;gap:10px"><div class="ad-thumb">'+(a.type==='Video'?'&#9654;':'&#128444;')+'</div><div><div class="ad-title">'+a.name+'</div><div class="pill-bar"><span class="pill">'+a.type+'</span></div></div></div></td><td class="num">'+a.imp+'</td><td class="num">'+a.clk+'</td><td class="num">'+a.ctr+'</td><td class="num">'+a.spend+'</td><td class="num">'+a.leads+'</td><td class="num">'+a.cpl+'</td><td><span class="badge '+a.status+'">'+a.status+'</span></td></tr>').join('');
 }
@@ -1039,46 +1065,59 @@ function buildGoogleTab(){
 
 
 function getMock() {
-  const months = ['2023-04-01','2023-05-01','2023-06-01','2023-07-01','2023-08-01','2023-09-01',
-                  '2023-10-01','2023-11-01','2023-12-01','2024-01-01','2024-02-01','2024-03-01',
-                  '2024-04-01','2024-05-01','2024-06-01','2024-07-01','2024-08-01','2024-09-01',
-                  '2024-10-01','2024-11-01','2024-12-01','2025-01-01','2025-02-01','2025-03-01','2025-04-01'];
-  const studios = ['Miami Beach','Brickell','Wynwood','Coral Gables'];
-  const sources  = ['Meta','Google','Organic','Referral'];
-  const rows = [];
-  months.forEach((m, mi) => {
-    studios.forEach(st => {
-      sources.forEach(sr => {
-        const base = 15 + mi + studios.indexOf(st) * 3;
-        rows.push({ month:m, studio:st, source:sr,
-          signups:           Math.round(base * (0.8 + Math.random() * 0.4)),
-          first_visits:      Math.round(base * (0.4 + Math.random() * 0.2)),
-          first_activations: Math.round(base * (0.15 + Math.random() * 0.1)),
-          first_sales:       Math.round(base * (0.07 + Math.random() * 0.05)),
+  const studios = [
+    'SWEAT440 Miami Beach','SWEAT440 Brickell','SWEAT440 Wynwood',
+    'SWEAT440 Coral Gables','SWEAT440 Doral','SWEAT440 Miami Lakes'
+  ];
+  const sources = [
+    'Website (unattributed)','Business Mode','Meta Ads','Google Ads',
+    'SWEAT440 App','MindBody App','Social Media Organic','Local Listings',
+    'Word of Mouth','Print Ads / Signs','N/A','Other'
+  ];
+  // Deterministic seed — no Math.random()
+  function seed(studio, source, month) {
+    const si = studios.indexOf(studio), ri = sources.indexOf(source);
+    const mi = parseInt(month.slice(5,7));
+    return (si+1)*7 + (ri+1)*3 + mi;
+  }
+  const monthly = [];
+  for (let y=2023; y<=2025; y++) {
+    for (let mo=1; mo<=12; mo++) {
+      const month = y+'-'+String(mo).padStart(2,'0')+'-01';
+      studios.forEach(st => {
+        sources.forEach(sr => {
+          const b = seed(st, sr, month);
+          monthly.push({ month, studio:st, source:sr,
+            signups:           b,
+            first_visits:      Math.floor(b*0.7),
+            first_activations: Math.floor(b*0.15),
+            first_sales:       Math.floor(b*0.08),
+          });
         });
       });
-    });
-  });
-  // Daily: last 90 days split across studios/sources
+    }
+  }
+  // Daily: last 90 days, also deterministic
   const daily = [];
-  const today = new Date();
-  for (let i = 89; i >= 0; i--) {
-    const d = new Date(today); d.setDate(d.getDate() - i);
-    const dateStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    studios.forEach((st, si) => {
-      sources.forEach((sr, ri) => {
-        const base = 3 + si * 0.5 + ri * 0.3;
-        daily.push({ date:dateStr, studio:st, source:sr,
-          signups:           Math.round(base * (0.8 + Math.random() * 0.4)),
-          first_visits:      Math.round(base * (0.4 + Math.random() * 0.2)),
-          first_activations: Math.round(base * (0.12 + Math.random() * 0.08)),
-          first_sales:       Math.round(base * (0.05 + Math.random() * 0.04)),
+  const baseMs = new Date('2026-01-20T00:00:00Z').getTime(); // JS will compute this correctly at runtime
+  for (let i=89; i>=0; i--) {
+    const d = new Date(baseMs - i*86400000);
+    const ds = d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');
+    studios.forEach((st,si) => {
+      sources.forEach((sr,ri) => {
+        const b = (si+1)*2 + (ri+1) + (i%7);
+        daily.push({ date:ds, studio:st, source:sr,
+          signups:           b,
+          first_visits:      Math.floor(b*0.7),
+          first_activations: Math.floor(b*0.15),
+          first_sales:       Math.floor(b*0.08),
         });
       });
     });
   }
-  return { studios, sources, daily_detail: daily, monthly_detail: rows };
+  return { studios, sources, monthly_detail:monthly, daily_detail:daily };
 }
+
 
 loadData();
 </script>
