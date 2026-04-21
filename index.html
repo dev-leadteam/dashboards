@@ -413,6 +413,7 @@ function switchTab(id, btn) {
         window._lastPpLabel,
         window._lastPyLabel
       );
+      STAGE_BUILT[id] = true;
     }
   }
   if (id === 'cpr')    buildCPRTab();
@@ -541,6 +542,7 @@ async function loadData() {
   buildMultiSelect('studioMenu', 'studioLabel', RAW.studios, DEFAULT_EXCL_STUDIOS);
   buildMultiSelect('sourceMenu', 'sourceLabel', RAW.sources, DEFAULT_EXCL_SOURCES);
   setGran('daily');
+
   applyFilters();
 }
 
@@ -630,7 +632,17 @@ function applyFilters() {
   buildFunnel(sumRows(curr.all), sumRows(pp.all), sumRows(py.all),
     `${fmtDate(ppFrom)} – ${fmtDate(ppTo)}`, `${fmtDate(pyFrom)} – ${fmtDate(pyTo)}`);
   buildTrend(toTimeSeries(curr.daily, curr.monthly));
-  buildStageTabs(curr, pp, py, `${fmtDate(ppFrom)} – ${fmtDate(ppTo)}`, `${fmtDate(pyFrom)} – ${fmtDate(pyTo)}`);
+  // Always store latest data for when stage tabs are opened
+  window._lastCurrFiltered = curr;
+  window._lastPpFiltered   = pp;
+  window._lastPyFiltered   = py;
+  window._lastPpLabel      = fmtDate(ppFrom)+' – '+fmtDate(ppTo);
+  window._lastPyLabel      = fmtDate(pyFrom)+' – '+fmtDate(pyTo);
+  // Only rebuild stage tabs if one is currently active (visible)
+  const activeTab = document.querySelector('.tab-content.active');
+  if (activeTab && ['tab-leads','tab-stage','tab-members'].includes(activeTab.id)) {
+    buildStageTabs(curr, pp, py, fmtDate(ppFrom)+' – '+fmtDate(ppTo), fmtDate(pyFrom)+' – '+fmtDate(pyTo));
+  }
 }
 
 function calcDelta(curr,prev) { if(!prev||prev===0) return null; return (curr-prev)/prev*100; }
@@ -862,14 +874,8 @@ function toSourceTimeSeries(dailyRows,monthlyRows,gran){
 }
 
 function buildStageTabs(currFiltered, ppFiltered, pyFiltered, ppLabel, pyLabel){
-  window._lastCurrFiltered  = currFiltered;
-  window._lastPpFiltered    = ppFiltered  || {daily:[],monthly:[],all:[]};
-  window._lastPyFiltered    = pyFiltered  || {daily:[],monthly:[],all:[]};
-  window._lastPpLabel       = ppLabel  || '';
-  window._lastPyLabel       = pyLabel  || '';
-
-  const pp  = window._lastPpFiltered;
-  const py  = window._lastPyFiltered;
+  const pp  = ppFiltered  || {daily:[],monthly:[],all:[]};
+  const py  = pyFiltered  || {daily:[],monthly:[],all:[]};
 
   // Use selected sources (already filtered) but exclude ClassPass/Grassroots from area chart
   const srcList = RAW.sources.filter(s => !['ClassPass / Platforms','Grassroots'].includes(s));
