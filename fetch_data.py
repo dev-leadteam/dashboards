@@ -209,3 +209,243 @@ size_kb = os.path.getsize("data.json") / 1024
 print(f"\n✅  data.json written — {size_kb:.1f} KB")
 print(f"    Snowflake: {len(daily_detail):,} daily + {len(monthly_detail):,} monthly rows")
 print(f"    Meta:      {len(meta_daily)} daily + {len(meta_monthly)} monthly rows")
+
+# ════════════════════════════════════════════════════════════════════════════
+# META ADS — Campaign/Studio breakdown for Daniel's Paid Ads Dashboard
+# ════════════════════════════════════════════════════════════════════════════
+# Studio code mapping: derive from ad account name
+STUDIO_MAP = {
+    "SWEAT440 - Corporate Studios": {"code": "CORP", "state": "FL"},
+    "SWEAT440 - Chelsea":           {"code": "NYC-CH", "state": "NY"},
+    "SWEAT440 - South Miami":       {"code": "S-MIA", "state": "FL"},
+    "SWEAT440 - West Palm Beach":   {"code": "WPB", "state": "FL"},
+    "SWEAT440 - Toms River":        {"code": "TOM-R", "state": "NJ"},
+    "SWEAT440 - Park Slope":        {"code": "PK-SL", "state": "NY"},
+    "SWEAT440 - Pinecrest":         {"code": "PINE", "state": "FL"},
+    "SWEAT440 - Midtown":           {"code": "NYC-MT", "state": "NY"},
+    "SWEAT440 - Austin":            {"code": "AUS", "state": "TX"},
+    "SWEAT440 - NODA":              {"code": "NODA", "state": "NC"},
+    "SWEAT440 - Ocean Township":    {"code": "OCN", "state": "NJ"},
+    "SWEAT440 - Wall Township":     {"code": "WALL", "state": "NJ"},
+    "SWEAT440 - Miami Lakes (US)":  {"code": "MIA-L", "state": "FL"},
+    "SWEAT440 - Miramar":           {"code": "MIR", "state": "FL"},
+    "SWEAT440 Pembroke Pines":      {"code": "PEM", "state": "FL"},
+}
+
+# Audience and pillar keywords to tag campaigns
+AUDIENCE_TAGS = {
+    "DINKS": ["dinks", "dual income", "couple", "couples"],
+    "POC":   ["poc", "diversity", "multicultural", "urban"],
+    "PYC":   ["youth", "young", "college", "student", "pyc"],
+    "SI":    ["sport", "athlete", "active", "fitness", "si "],
+    "SAHP":  ["parent", "mom", "dad", "family", "sahp"],
+}
+PILLAR_TAGS = {
+    "DR":    ["dr", "direct response", "lead gen"],
+    "DF":    ["df", "dynamic", "flexible"],
+    "P&R":   ["p&r", "promo", "promotion", "offer", "deal"],
+    "PS":    ["ps", "personal", "story"],
+    "SSB":   ["ssb", "social", "brand"],
+    "HYROX": ["hyrox"],
+}
+
+def tag_campaign(name):
+    """Return audience and pillar tags for a campaign name."""
+    lower = name.lower()
+    aud = next((k for k, kws in AUDIENCE_TAGS.items() if any(w in lower for w in kws)), None)
+    pil = next((k for k, kws in PILLAR_TAGS.items() if any(w in lower for w in kws)), None)
+    return aud, pil
+
+meta_campaigns = []
+
+if META_TOKEN:
+    print("Fetching Meta campaign-level data...")
+
+    ALL_ACCOUNTS = [
+        {"id": "act_1553887681409034", "name": "SWEAT440 - Corporate Studios"},
+        {"id": "act_749102506206346",  "name": "SWEAT440 - Chelsea"},
+        {"id": "act_1795229744165777", "name": "SWEAT440 - South Miami"},
+        {"id": "act_1266906073888479", "name": "SWEAT440 - West Palm Beach"},
+        {"id": "act_722137459480350",  "name": "SWEAT440 - Toms River"},
+        {"id": "act_3592335067660902", "name": "SWEAT440 - Park Slope"},
+        {"id": "act_549718637200114",  "name": "SWEAT440 - Pinecrest"},
+        {"id": "act_525795066285979",  "name": "SWEAT440 - Midtown"},
+        {"id": "act_1307376339906650", "name": "SWEAT440 - Austin"},
+        {"id": "act_767334518751566",  "name": "SWEAT440 - NODA"},
+        {"id": "act_1459694534903632", "name": "SWEAT440 - Ocean Township"},
+        {"id": "act_1792866574556378", "name": "SWEAT440 - Wall Township"},
+        {"id": "act_1636907403815262", "name": "SWEAT440 - Miami Lakes (US)"},
+        {"id": "act_707802134775869",  "name": "SWEAT440 - Miramar"},
+        {"id": "act_468747239241253",  "name": "SWEAT440 Pembroke Pines"},
+    ]
+
+    # Last 30 days
+    until = date.today().isoformat()
+    since = (date.today() - timedelta(days=30)).isoformat()
+
+    studios_meta = []
+    all_campaigns = []
+
+    for acct in ALL_ACCOUNTS:
+        acct_id   = acct["id"]
+        acct_name = acct["name"]
+        info      = STUDIO_MAP.get(acct_name, {"code": acct_name[:6].upper(), "state": "???"})
+
+        try:
+            # Account-level totals
+            r = requests.get(f"{META_API}/{acct_id}/insights", params={
+                "access_token": META_TOKEN,
+                "fields": "spend,impressions,reach,clicks,actions",
+                "time_range": json.dumps({"since": since, "until": until}),
+                "limit": 1,
+            }, timeout=20)
+            acct_data = r.json().get("data", [{}])
+            row = acct_data[0] if acct_data else {}
+            actions = row.get("actions", [])
+
+            spend       = float(row.get("spend", 0))
+            impressions = int(row.get("impressions", 0))
+            reach       = int(row.get("reach", 0))
+            clicks      = int(row.get("clicks", 0))
+            leads       = get_action(actions, "lead", "onsite_conversion.lead_grouped")
+            purchases   = get_action(actions, "omni_purchase", "purchase")
+            trials      = get_action(actions, "start_trial", "omni_activate_app")
+            ctr         = round(clicks / impressions * 100, 2) if impressions else 0
+            cpm         = round(spend / impressions * 1000, 2) if impressions else 0
+            cpl         = round(spend / leads, 2) if leads else 0
+
+            studio_obj = {
+                "code":        info["code"],
+                "name":        acct_name.replace("SWEAT440 - ", "").replace("SWEAT440 ", ""),
+                "state":       info["state"],
+                "spend":       round(spend, 2),
+                "impressions": impressions,
+                "reach":       reach,
+                "clicks":      clicks,
+                "leads":       leads,
+                "purchases":   purchases,
+                "trials":      trials,
+                "ctr":         ctr,
+                "cpm":         cpm,
+                "cpl":         cpl,
+                "aud":         {},   # audience breakdown below
+                "pillars":     [],
+            }
+
+            # Campaign-level breakdown for audience/pillar tagging
+            r2 = requests.get(f"{META_API}/{acct_id}/campaigns", params={
+                "access_token": META_TOKEN,
+                "fields": "id,name,status",
+                "limit": 50,
+            }, timeout=20)
+            campaigns = r2.json().get("data", [])
+
+            for camp in campaigns:
+                if camp.get("status") not in ("ACTIVE", "PAUSED"):
+                    continue
+                # Get insights for this campaign
+                r3 = requests.get(f"{META_API}/{camp['id']}/insights", params={
+                    "access_token": META_TOKEN,
+                    "fields": "spend,impressions,clicks,actions",
+                    "time_range": json.dumps({"since": since, "until": until}),
+                    "limit": 1,
+                }, timeout=20)
+                cdata = r3.json().get("data", [{}])
+                crow  = cdata[0] if cdata else {}
+                cactions = crow.get("actions", [])
+
+                c_spend  = float(crow.get("spend", 0))
+                c_impr   = int(crow.get("impressions", 0))
+                c_leads  = get_action(cactions, "lead", "onsite_conversion.lead_grouped")
+                c_cpl    = round(c_spend / c_leads, 2) if c_leads else 0
+
+                aud, pil = tag_campaign(camp["name"])
+
+                all_campaigns.append({
+                    "campaign":    camp["name"],
+                    "studio_code": info["code"],
+                    "studio_name": studio_obj["name"],
+                    "spend":       round(c_spend, 2),
+                    "impressions": c_impr,
+                    "leads":       c_leads,
+                    "cpl":         c_cpl,
+                    "audience":    aud,
+                    "pillar":      pil,
+                    "status":      camp["status"],
+                })
+
+                # Accumulate audience spend/leads on studio
+                if aud:
+                    if aud not in studio_obj["aud"]:
+                        studio_obj["aud"][aud] = {"spend": 0, "leads": 0, "impr": 0}
+                    studio_obj["aud"][aud]["spend"] += c_spend
+                    studio_obj["aud"][aud]["leads"] += c_leads
+                    studio_obj["aud"][aud]["impr"]  += c_impr
+
+            studios_meta.append(studio_obj)
+            print(f"  {info['code']}: ${spend:.0f} spend, {leads} leads")
+
+        except Exception as e:
+            print(f"  ⚠ {acct_name}: {e}")
+            continue
+
+    # ── Aggregate pillars across all campaigns ────────────────────────────
+    pillar_map = {}
+    for c in all_campaigns:
+        p = c.get("pillar")
+        if not p:
+            continue
+        if p not in pillar_map:
+            pillar_map[p] = {"pillar": p, "spend": 0, "impressions": 0, "leads": 0}
+        pillar_map[p]["spend"]       += c["spend"]
+        pillar_map[p]["impressions"] += c["impressions"]
+        pillar_map[p]["leads"]       += c["leads"]
+
+    for p in pillar_map.values():
+        p["cpl"] = round(p["spend"] / p["leads"], 2) if p["leads"] else 0
+
+    # ── Aggregate concepts (campaign name prefix before " — ") ───────────
+    concept_map = {}
+    for c in all_campaigns:
+        concept = c["campaign"].split(" — ")[0].split(" - ")[0].strip()
+        if concept not in concept_map:
+            concept_map[concept] = {"concept": concept, "spend": 0, "impressions": 0, "leads": 0, "ads": []}
+        concept_map[concept]["spend"]       += c["spend"]
+        concept_map[concept]["impressions"] += c["impressions"]
+        concept_map[concept]["leads"]       += c["leads"]
+        concept_map[concept]["ads"].append(c["campaign"])
+
+    for cv in concept_map.values():
+        cv["cpl"] = round(cv["spend"] / cv["leads"], 2) if cv["leads"] else 0
+
+    # ── Totals ────────────────────────────────────────────────────────────
+    def sum_field(arr, field):
+        return sum(s.get(field, 0) for s in arr)
+
+    total_spend = sum_field(studios_meta, "spend")
+    total_leads = sum_field(studios_meta, "leads")
+
+    meta_campaigns = {
+        "period":   f"{since} to {until}",
+        "totals": {
+            "spend":       round(total_spend, 2),
+            "impressions": sum_field(studios_meta, "impressions"),
+            "reach":       sum_field(studios_meta, "reach"),
+            "clicks":      sum_field(studios_meta, "clicks"),
+            "leads":       total_leads,
+            "purchases":   sum_field(studios_meta, "purchases"),
+            "trials":      sum_field(studios_meta, "trials"),
+            "cpl":         round(total_spend / total_leads, 2) if total_leads else 0,
+            "ctr":         0,
+            "cpm":         0,
+        },
+        "studios":   studios_meta,
+        "pillars":   sorted(pillar_map.values(), key=lambda x: -x["spend"]),
+        "concepts":  sorted(concept_map.values(), key=lambda x: -x["leads"]),
+        "campaigns": all_campaigns,
+    }
+
+    print(f"  Meta campaigns: {len(studios_meta)} studios, {len(all_campaigns)} campaigns")
+
+# ── Merge into output ──────────────────────────────────────────────────────
+output["meta_ads"] = meta_campaigns
