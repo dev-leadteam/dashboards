@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWEAT440 — Paid Ads Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#00A3E0;--deep:#0084B5;--light:#99DAF3;--ice:#D2EFFF;
+  --cyan:#00FFC2;--lime:#DDFF00;--white:#fff;
+  --gray1:#F5F9FF;--gray2:#E8F4FD;--gray6:#5A7A8A;--gray8:#1E3A4A;--black:#0D1E26;
+  --sidebar:265px;
+}
+html,body{height:100%;font-family:'Open Sans','Helvetica Neue',Arial,sans-serif;background:var(--gray1);color:var(--black);overflow:hidden}
+
+/* ── HEADER ── */
+.header{position:fixed;top:0;left:0;right:0;height:60px;background:var(--blue);display:flex;align-items:center;padding:0 20px;gap:16px;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.logo{background:white;color:var(--blue);font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:16px;padding:5px 11px;border-radius:4px;letter-spacing:.5px;white-space:nowrap}
+.header-title{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:20px;color:white;text-transform:uppercase;letter-spacing:1px}
+.header-sep{width:1px;height:28px;background:rgba(255,255,255,.3)}
+.header-campaign{font-size:12px;color:var(--ice)}
+.header-campaign-picker{display:flex;align-items:center;gap:8px;margin-left:12px}
+.header-campaign-picker label{font-size:10px;color:var(--ice);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.header-campaign-picker select{
+  font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;
+  background:white;color:var(--deep);border:0;border-radius:4px;padding:6px 28px 6px 10px;
+  cursor:pointer;appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%230084B5' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;background-size:10px;
+}
+.header-campaign-picker select:focus{outline:2px solid var(--cyan)}
+.header-period{margin-left:auto;text-align:right;white-space:nowrap}
+.header-period .lbl{font-size:10px;color:var(--ice);text-transform:uppercase;letter-spacing:1px}
+.header-period .val{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:15px;color:white}
+.accent-bar{position:fixed;top:60px;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--cyan) 0%,var(--lime) 50%,var(--cyan) 100%);z-index:100}
+
+/* ── LAYOUT ── */
+.layout{display:flex;margin-top:64px;height:calc(100vh - 64px)}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar);flex-shrink:0;background:var(--gray8);overflow-y:auto;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--blue);border-radius:2px}
+
+.sid-overview{padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.09);cursor:pointer;transition:.15s;display:flex;align-items:center;gap:10px}
+.sid-overview:hover,.sid-overview.active{background:var(--blue)}
+.ov-icon{font-size:18px;flex-shrink:0}
+.ov-label{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:13.5px;text-transform:uppercase;color:white;letter-spacing:.5px}
+.ov-sub{font-size:9.5px;color:var(--light);margin-top:1px}
+
+.sid-state-header{padding:8px 16px 3px;font-size:8.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--light);opacity:.55;margin-top:6px}
+
+.sid-studio{padding:8px 14px;cursor:pointer;border-left:3px solid transparent;transition:.15s;display:flex;align-items:center;gap:8px}
+.sid-studio:hover{background:rgba(255,255,255,.055);border-left-color:var(--light)}
+.sid-studio.active{background:rgba(0,163,224,.22);border-left-color:var(--cyan)}
+.s-info{flex:1;min-width:0}
+.s-code{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:11px;color:var(--cyan);letter-spacing:.3px}
+.s-name{font-size:11px;color:var(--light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.s-leads-badge{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;color:white;background:rgba(0,163,224,.3);border-radius:10px;padding:1px 7px;flex-shrink:0}
+.sid-studio.active .s-leads-badge{background:var(--cyan);color:var(--black)}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;padding:22px 26px 40px}
+.main::-webkit-scrollbar{width:6px}
+.main::-webkit-scrollbar-track{background:var(--gray2)}
+.main::-webkit-scrollbar-thumb{background:var(--light);border-radius:3px}
+
+.view{display:none}
+.view.active{display:block}
+
+/* ── SECTION TITLE ── */
+.sec-title{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:16px;text-transform:uppercase;letter-spacing:.8px;color:var(--deep);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.sec-title::after{content:'';flex:1;height:2px;background:linear-gradient(90deg,var(--blue),transparent);border-radius:1px}
+
+/* ── KPI CARDS ── */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:12px;margin-bottom:24px}
+.kpi{background:white;border-radius:10px;padding:16px 14px 13px;border-top:4px solid var(--blue);box-shadow:0 2px 8px rgba(0,163,224,.07)}
+.kpi.c-cyan{border-top-color:var(--cyan)}
+.kpi.c-lime{border-top-color:var(--lime)}
+.kpi.c-deep{border-top-color:var(--deep)}
+.kpi-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--gray6);margin-bottom:5px}
+.kpi-val{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:26px;color:var(--black);line-height:1}
+.kpi-sub{font-size:10px;color:var(--gray6);margin-top:3px}
+
+/* ── CHARTS ── */
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:24px}
+.chart-card{background:white;border-radius:10px;padding:18px;box-shadow:0 2px 8px rgba(0,163,224,.07)}
+.chart-title{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:12.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--deep);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--ice)}
+
+/* ── AUDIENCE OVERVIEW ── */
+.aud-trio{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+.aud-box{background:white;border-radius:10px;padding:16px;box-shadow:0 2px 8px rgba(0,163,224,.07);position:relative;overflow:hidden}
+.aud-box::after{content:attr(data-label);position:absolute;right:10px;top:6px;font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:30px;color:var(--ice);line-height:1;pointer-events:none;letter-spacing:-1px}
+.aud-tag{display:inline-block;font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:2px 9px;border-radius:3px;margin-bottom:10px}
+.aud-box.d{border-left:5px solid var(--blue)} .aud-box.d .aud-tag{background:var(--blue);color:white}
+.aud-box.p{border-left:5px solid var(--cyan)} .aud-box.p .aud-tag{background:var(--cyan);color:var(--black)}
+.aud-box.y{border-left:5px solid var(--lime)} .aud-box.y .aud-tag{background:var(--lime);color:var(--black)}
+.aud-box.s{border-left:5px solid var(--deep)} .aud-box.s .aud-tag{background:var(--deep);color:white}
+.aud-box.h{border-left:5px solid #6B3FA0} .aud-box.h .aud-tag{background:#6B3FA0;color:white}
+.aud-stats{display:flex;gap:14px;flex-wrap:wrap}
+.aud-stat-v{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:20px;color:var(--black);line-height:1}
+.aud-stat-l{font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:var(--gray6);font-weight:700;margin-top:2px}
+.aud-note{margin-top:9px;font-size:10.5px;font-weight:700;color:var(--gray6);background:var(--gray1);padding:4px 9px;border-radius:5px}
+
+/* ── PILLARS OVERVIEW ── */
+.pillars-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:24px}
+.pillar-box{background:white;border-radius:10px;padding:14px 14px 12px;box-shadow:0 2px 8px rgba(0,163,224,.07);border-top:4px solid var(--deep);position:relative;overflow:hidden}
+.pillar-box::after{content:attr(data-code);position:absolute;right:10px;top:4px;font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:28px;color:var(--ice);line-height:1;pointer-events:none;letter-spacing:-1px}
+.pillar-box.c1{border-top-color:var(--blue)}
+.pillar-box.c2{border-top-color:var(--cyan)}
+.pillar-box.c3{border-top-color:var(--lime)}
+.pillar-box.c4{border-top-color:var(--deep)}
+.pillar-box.c5{border-top-color:#6B3FA0}
+.pillar-box.c6{border-top-color:#FF7A59}
+.pillar-tag{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:14px;color:var(--black);margin-bottom:8px}
+.pillar-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
+.pillar-stat{}
+.pillar-stat .v{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:16px;color:var(--black);line-height:1}
+.pillar-stat .l{font-size:8.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--gray6);font-weight:700;margin-top:2px}
+
+/* ── CONCEPTS TABLE ── */
+.concepts-wrap{background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,163,224,.07);margin-bottom:24px}
+.concepts-table{width:100%;border-collapse:collapse;font-size:12px}
+.concepts-table thead th{background:var(--gray8);color:white;padding:10px 12px;text-align:left;font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+.concepts-table thead th.num{text-align:right}
+.concepts-table tbody td{padding:9px 12px;border-bottom:1px solid var(--gray2)}
+.concepts-table tbody td.num{text-align:right;font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700}
+.concepts-table tbody tr:hover{background:var(--gray1)}
+.concept-chip{display:inline-block;background:var(--ice);color:var(--deep);font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;padding:2px 10px;border-radius:10px;font-size:11.5px;letter-spacing:.3px}
+
+/* ── ALL STUDIOS TABLE ── */
+.all-table-wrap{background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,163,224,.07);margin-bottom:24px}
+.all-table{width:100%;border-collapse:collapse;font-size:12px}
+.all-table thead th{background:var(--blue);color:white;padding:10px 11px;font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:600;font-style:italic;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;cursor:pointer;user-select:none;transition:.12s}
+.all-table thead th:hover{background:var(--deep)}
+.all-table td{padding:8px 11px;border-bottom:1px solid var(--gray2);color:var(--gray8);white-space:nowrap}
+.all-table tr:hover td{background:var(--ice);cursor:pointer}
+.all-table .td-code{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:12px;color:var(--blue)}
+.all-table .td-name{font-weight:700;color:var(--black)}
+.all-table .td-num{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;text-align:right}
+
+/* ── STUDIO DETAIL ── */
+.breadcrumb{font-size:12px;color:var(--gray6);margin-bottom:14px;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.breadcrumb:hover .bc-link{text-decoration:underline}
+.bc-link{color:var(--blue);font-weight:700}
+
+.studio-header{background:linear-gradient(135deg,var(--blue) 0%,var(--deep) 100%);border-radius:12px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.sh-code{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:13px;background:rgba(255,255,255,.18);color:white;padding:3px 11px;border-radius:4px;letter-spacing:.5px;white-space:nowrap}
+.sh-name{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:24px;color:white;text-transform:uppercase;letter-spacing:1px}
+.sh-state{font-size:11px;color:var(--ice);margin-top:1px}
+.sh-leads-wrap{margin-left:auto;text-align:center;background:rgba(255,255,255,.12);border-radius:8px;padding:8px 16px}
+.sh-leads-val{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:38px;color:var(--cyan);line-height:1}
+.sh-leads-lbl{font-size:9.5px;color:var(--ice);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+
+/* ── AUDIENCE DETAIL CARDS ── */
+.aud-detail{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px}
+.adb{background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,163,224,.07)}
+.adb-head{padding:11px 15px;display:flex;align-items:center;justify-content:space-between}
+.adb-head.d{background:var(--blue);color:white}
+.adb-head.p{background:var(--cyan);color:var(--black)}
+.adb-head.y{background:var(--lime);color:var(--black)}
+.adb-label{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:14px;text-transform:uppercase;letter-spacing:.5px}
+.adb-sublabel{font-size:9px;opacity:.75;margin-top:1px}
+.adb-leads-num{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:26px;line-height:1}
+.adb-leads-unit{font-size:11px;opacity:.8}
+.adb-body{padding:13px 15px}
+.adb-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--gray2)}
+.adb-row:last-of-type{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.adb-metric-lbl{font-size:10px;color:var(--gray6);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.adb-metric-val{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:14px;color:var(--black)}
+.cpl-badge{display:inline-block;font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:12px;padding:2px 8px;border-radius:4px}
+.cpl-good{background:#D4F7EC;color:#0A7A50}
+.cpl-mid{background:var(--ice);color:var(--deep)}
+.cpl-bad{background:#FDECEA;color:#C0392B}
+.cpl-none{background:var(--gray2);color:var(--gray6)}
+.ads-section{margin-top:10px;padding-top:8px;border-top:1px solid var(--gray2)}
+.ads-label{font-size:8.5px;text-transform:uppercase;letter-spacing:.9px;color:var(--gray6);font-weight:700;margin-bottom:5px}
+.ad-chip{display:inline-block;background:var(--gray1);border:1px solid var(--gray2);border-radius:3px;padding:2px 6px;font-size:9.5px;margin:2px 2px 0 0;color:var(--gray8)}
+
+/* ── STUDIO CHARTS ── */
+.studio-charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+
+/* ── AD TABLE ── */
+.ad-list-card{background:white;border-radius:10px;padding:16px;box-shadow:0 2px 8px rgba(0,163,224,.07);margin-bottom:20px}
+.ad-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:8px}
+.ad-table th{background:var(--blue);color:white;padding:8px 11px;text-align:left;font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:600;font-style:italic;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px}
+.ad-table th:first-child{border-radius:5px 0 0 0}
+.ad-table th:last-child{border-radius:0 5px 0 0}
+.ad-table td{padding:7px 11px;border-bottom:1px solid var(--gray2);color:var(--gray8)}
+.ad-table tr:last-child td{border-bottom:none}
+.ad-table tr:hover td{background:var(--ice)}
+.pill{display:inline-block;font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:9.5px;padding:2px 7px;border-radius:3px;text-transform:uppercase;letter-spacing:.2px}
+.pill.D{background:var(--blue);color:white}
+.pill.P{background:var(--cyan);color:var(--black)}
+.pill.Y{background:var(--lime);color:var(--black)}
+.pill.S{background:var(--deep);color:white}
+.pill.H{background:#6B3FA0;color:white}
+.lead-dot{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:11px}
+.lead-dot.hi{background:var(--cyan);color:var(--black)}
+.lead-dot.md{background:var(--light);color:var(--black)}
+.lead-dot.lo{background:var(--ice);color:var(--gray6)}
+
+/* ── COMPARISON BAR ── */
+.cmp-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.cmp-label{width:50px;font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:11px;color:var(--gray8)}
+.cmp-track{flex:1;height:18px;background:var(--ice);border-radius:3px;overflow:hidden}
+.cmp-fill{height:100%;border-radius:3px;transition:width .4s}
+.cmp-val{width:45px;text-align:right;font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:12px;color:var(--black)}
+
+/* ── INSIGHTS STRIP ── */
+.insights-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.insight-box{background:white;border-radius:9px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,163,224,.06);border-left:4px solid var(--cyan);display:flex;gap:12px;align-items:flex-start}
+.insight-icon{font-size:22px;flex-shrink:0;margin-top:1px}
+.insight-title{font-family:'Oswald','Arial Narrow',Arial,sans-serif;font-weight:700;font-style:italic;font-size:12px;text-transform:uppercase;color:var(--deep);margin-bottom:3px;letter-spacing:.4px}
+.insight-body{font-size:11.5px;color:var(--gray6);line-height:1.5}
+.insight-body strong{color:var(--black)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">SWEAT440</div>
+  <div class="header-sep"></div>
+  <div class="header-title" id="hdr-title">Meta Ads Campaigns</div>
+  <div class="header-campaign-picker">
+    <label for="campaign-select">Campaign</label>
+    <select id="campaign-select" aria-label="Select campaign">
+      <option value="">Loading…</option>
+    </select>
+  </div>
+  <div class="header-campaign" style="display:none" id="hdr-studio-name"></div>
+  <div class="header-period">
+    <div class="lbl">Campaign Period</div>
+    <div class="val" id="hdr-period">—</div>
+  </div>
+  <div id="refresh-root" style="margin-left:16px"></div>
+</div>
+<div class="accent-bar"></div>
+
+<div class="layout">
+
+  <!-- ══ SIDEBAR ══ -->
+  <div class="sidebar">
+    <div class="sid-overview active" id="btn-overview" onclick="showOverview()">
+      <div class="ov-icon">📊</div>
+      <div>
+        <div class="ov-label">Campaign Overview</div>
+        <div class="ov-sub">All Studios · 25 Ad Sets</div>
+      </div>
+    </div>
+    <div id="studio-list"></div>
+  </div>
+
+  <!-- ══ MAIN CONTENT ══ -->
+  <div class="main">
+
+    <!-- ═══ OVERVIEW VIEW ═══ -->
+    <div class="view active" id="view-overview">
+
+      <div class="sec-title">Campaign Summary</div>
+      <div class="kpi-row">
+        <div class="kpi c-cyan"><div class="kpi-label">Total Leads</div><div class="kpi-val" id="kpi-leads">—</div><div class="kpi-sub" id="kpi-leads-sub">&nbsp;</div></div>
+        <div class="kpi"><div class="kpi-label">Total Spend</div><div class="kpi-val" id="kpi-spend">—</div><div class="kpi-sub" id="kpi-spend-sub">&nbsp;</div></div>
+        <div class="kpi"><div class="kpi-label">Avg. CPL</div><div class="kpi-val" id="kpi-cpl">—</div><div class="kpi-sub" id="kpi-cpl-sub">&nbsp;</div></div>
+        <div class="kpi c-lime"><div class="kpi-label">Impressions</div><div class="kpi-val" id="kpi-impr">—</div><div class="kpi-sub" id="kpi-impr-sub">&nbsp;</div></div>
+        <div class="kpi c-deep"><div class="kpi-label">Reach</div><div class="kpi-val" id="kpi-reach">—</div><div class="kpi-sub">unique people</div></div>
+        <div class="kpi"><div class="kpi-label">Avg. CTR</div><div class="kpi-val" id="kpi-ctr">—</div><div class="kpi-sub" id="kpi-ctr-sub">&nbsp;</div></div>
+        <div class="kpi"><div class="kpi-label">Total Clicks</div><div class="kpi-val" id="kpi-clicks">—</div><div class="kpi-sub">all link clicks</div></div>
+        <div class="kpi c-cyan"><div class="kpi-label">Avg. CPM</div><div class="kpi-val" id="kpi-cpm">—</div><div class="kpi-sub" id="kpi-cpm-sub">&nbsp;</div></div>
+        <div class="kpi c-lime"><div class="kpi-label">Purchases</div><div class="kpi-val" id="kpi-purchases">—</div><div class="kpi-sub" id="kpi-purchases-sub">&nbsp;</div></div>
+        <div class="kpi"><div class="kpi-label">Cost / Purchase</div><div class="kpi-val" id="kpi-cpp">—</div><div class="kpi-sub" id="kpi-cpp-sub">&nbsp;</div></div>
+        <div class="kpi c-deep"><div class="kpi-label">Trials Started</div><div class="kpi-val" id="kpi-trials">—</div><div class="kpi-sub" id="kpi-trials-sub">&nbsp;</div></div>
+        <div class="kpi"><div class="kpi-label">Cost / Trial</div><div class="kpi-val" id="kpi-cpt">—</div><div class="kpi-sub" id="kpi-cpt-sub">&nbsp;</div></div>
+      </div>
+
+      <div class="sec-title">Audience Performance — DINKS · POC · PYC · SI · SAHP</div>
+      <div class="aud-trio" id="aud-trio-overview"></div>
+
+      <div class="sec-title">Pillar Performance — DR · DF · P&amp;R · PS · SSB · HYROX</div>
+      <div class="pillars-grid" id="pillars-overview"></div>
+
+      <div class="sec-title">Creative Concept Performance</div>
+      <div class="concepts-wrap">
+        <table class="concepts-table">
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th class="num">Leads</th>
+              <th class="num">Spend</th>
+              <th class="num">CPL</th>
+              <th class="num">Impressions</th>
+              <th class="num">Ads</th>
+            </tr>
+          </thead>
+          <tbody id="concepts-overview"></tbody>
+        </table>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title">Leads by Studio — Click a bar to view studio detail</div>
+          <div style="position:relative;height:290px"><canvas id="chart-leads"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Spend Distribution by Audience</div>
+          <div style="position:relative;height:290px"><canvas id="chart-aud"></canvas></div>
+        </div>
+      </div>
+
+      <div class="sec-title">All Studios — Click any row to view detail</div>
+      <div class="all-table-wrap">
+        <table class="all-table">
+          <thead>
+            <tr>
+              <th onclick="sortTable('code')">Code ↕</th>
+              <th onclick="sortTable('name')">Studio ↕</th>
+              <th onclick="sortTable('leads')" style="text-align:right">Leads ↕</th>
+              <th onclick="sortTable('cpl')" style="text-align:right">CPL ↕</th>
+              <th onclick="sortTable('spend')" style="text-align:right">Spend ↕</th>
+              <th onclick="sortTable('impressions')" style="text-align:right">Impressions ↕</th>
+              <th onclick="sortTable('ctr')" style="text-align:right">CTR ↕</th>
+              <th onclick="sortTable('cpm')" style="text-align:right">CPM ↕</th>
+              <th onclick="sortTable('reach')" style="text-align:right">Reach ↕</th>
+              <th onclick="sortTable('purchases')" style="text-align:right">Purchases ↕</th>
+              <th style="text-align:right">Trials</th>
+              <th>Best Aud.</th>
+            </tr>
+          </thead>
+          <tbody id="all-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ STUDIO DETAIL VIEW ═══ -->
+    <div class="view" id="view-studio">
+      <div class="breadcrumb" onclick="showOverview()">
+        ← <span class="bc-link">Back to Campaign Overview</span>
+      </div>
+      <div id="studio-content"></div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════
+let STUDIOS = [];     // populated at runtime from data.json
+let PILLARS_G = [];   // global pillars from data.json
+let CONCEPTS_G = [];  // global concepts from data.json
+
+const STATE_NAMES = { FL:"Florida", NC:"North Carolina", NJ:"New Jersey", NY:"New York", TX:"Texas" };
+
+const ALL_AUDIENCES = ["DINKS","POC","PYC","SI","SAHP"];
+const ALL_PILLARS   = ["DR","DF","P&R","PS","SSB","HYROX"];
+
+const AUD_COLORS = {
+  DINKS: "#00A3E0", POC: "#00FFC2", PYC: "#DDFF00",
+  SI:    "#0084B5", SAHP:"#6B3FA0"
+};
+const AUD_PILL = { DINKS:"D", POC:"P", PYC:"Y", SI:"S", SAHP:"H" };
+const AUD_CLS  = { DINKS:"d", POC:"p", PYC:"y", SI:"s",  SAHP:"h"  };
+const PILLAR_COLORS = ["#00A3E0","#00FFC2","#DDFF00","#0084B5","#6B3FA0","#FF7A59"];
+
+function getBestAud(s) {
+  return ALL_AUDIENCES.reduce((best, k) => {
+    const a = s.aud[k] || {leads:0,spend:0}, bst = s.aud[best] || {leads:0,spend:0};
+    if (a.leads > bst.leads) return k;
+    if (a.leads === bst.leads && a.leads > 0 && a.spend / a.leads < bst.spend / bst.leads) return k;
+    return best;
+  }, ALL_AUDIENCES[0]);
+}
+
+// ══════════════════════════════════════════════════════════════
+// SIDEBAR
+// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// AUDIENCE OVERVIEW CARDS — computed from STUDIOS array
+// ══════════════════════════════════════════════════════════════
+function buildAudienceOverview() {
+  const totals = {};
+  ALL_AUDIENCES.forEach(a => totals[a] = { spend:0, leads:0, impr:0 });
+  STUDIOS.forEach(s => {
+    ALL_AUDIENCES.forEach(a => {
+      const x = s.aud && s.aud[a];
+      if (x) {
+        totals[a].spend += x.spend || 0;
+        totals[a].leads += x.leads || 0;
+        totals[a].impr  += x.impr  || 0;
+      }
+    });
+  });
+  const totalLeads = Object.values(totals).reduce((s,v) => s + v.leads, 0);
+
+  // Best CPL audience (among those with leads)
+  const withLeads = Object.entries(totals).filter(([,v]) => v.leads > 0);
+  const bestAud = withLeads.length
+    ? withLeads.reduce((best, cur) =>
+        (cur[1].spend / cur[1].leads) < (best[1].spend / best[1].leads) ? cur : best
+      )[0]
+    : null;
+
+  // Highest lead volume
+  const mostLeadsAud = Object.entries(totals).reduce(
+    (best, cur) => cur[1].leads > best[1].leads ? cur : best,
+    Object.entries(totals)[0]
+  )[0];
+
+  const container = document.getElementById('aud-trio-overview');
+  if (!container) return;
+  container.innerHTML = ALL_AUDIENCES.map(a => {
+    const v = totals[a];
+    const cpl = v.leads > 0 ? (v.spend / v.leads).toFixed(2) : '—';
+    const spendFmt = '$' + Math.round(v.spend).toLocaleString();
+    const pctLeads = totalLeads > 0 ? ((v.leads / totalLeads) * 100).toFixed(0) : '0';
+    let note = `📊 ${pctLeads}% of all campaign leads`;
+    if (a === bestAud) note = '🏆 Best CPL — Most Efficient Audience';
+    else if (a === mostLeadsAud && v.leads > 0) note = `📊 ${pctLeads}% of leads (highest volume)`;
+    const cls = AUD_CLS[a] || 'd';
+    return `<div class="aud-box ${cls}" data-label="${a}">
+      <div class="aud-tag">${a}</div>
+      <div class="aud-stats">
+        <div><div class="aud-stat-v">${v.leads > 0 ? '$'+cpl : '—'}</div><div class="aud-stat-l">CPL</div></div>
+        <div><div class="aud-stat-v">${v.leads}</div><div class="aud-stat-l">Leads</div></div>
+        <div><div class="aud-stat-v">${spendFmt}</div><div class="aud-stat-l">Spend</div></div>
+      </div>
+      <div class="aud-note">${note}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// PILLARS OVERVIEW
+// ══════════════════════════════════════════════════════════════
+function buildPillarsOverview() {
+  const container = document.getElementById('pillars-overview');
+  if (!container) return;
+
+  // Merge config-order with data; show all 6 even if zero
+  const byCode = {};
+  (PILLARS_G || []).forEach(p => byCode[p.pillar] = p);
+
+  container.innerHTML = ALL_PILLARS.map((code, i) => {
+    const p = byCode[code] || { pillar: code, spend:0, impressions:0, leads:0, cpl:0 };
+    const cplFmt = p.leads > 0 ? '$' + p.cpl.toFixed(2) : '—';
+    const spendFmt = '$' + Math.round(p.spend).toLocaleString();
+    const imprFmt  = (p.impressions || 0).toLocaleString();
+    return `<div class="pillar-box c${(i%6)+1}" data-code="${code}">
+      <div class="pillar-tag">${code}</div>
+      <div class="pillar-stats">
+        <div class="pillar-stat"><div class="v">${p.leads}</div><div class="l">Leads</div></div>
+        <div class="pillar-stat"><div class="v">${cplFmt}</div><div class="l">CPL</div></div>
+        <div class="pillar-stat"><div class="v">${spendFmt}</div><div class="l">Spend</div></div>
+        <div class="pillar-stat"><div class="v">${imprFmt}</div><div class="l">Impr.</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// CONCEPTS OVERVIEW  (table sorted by leads desc)
+// ══════════════════════════════════════════════════════════════
+function buildConceptsOverview() {
+  const tbody = document.getElementById('concepts-overview');
+  if (!tbody) return;
+  const rows = (CONCEPTS_G || []).map(c => {
+    const cplFmt = c.leads > 0 ? '$' + c.cpl.toFixed(2) : '—';
+    const nAds = (c.ads || []).length;
+    return `<tr>
+      <td><span class="concept-chip">${c.concept}</span></td>
+      <td class="num">${c.leads}</td>
+      <td class="num">$${Math.round(c.spend).toLocaleString()}</td>
+      <td class="num">${cplFmt}</td>
+      <td class="num">${(c.impressions || 0).toLocaleString()}</td>
+      <td class="num">${nAds}</td>
+    </tr>`;
+  }).join('');
+  tbody.innerHTML = rows || `<tr><td colspan="6" style="text-align:center;color:var(--gray6);padding:16px">No concepts detected in ad names</td></tr>`;
+}
+
+function buildSidebar() {
+  const states = [...new Set(STUDIOS.map(s => s.state))];
+  let html = "";
+  states.forEach(st => {
+    html += `<div class="sid-state-header">${STATE_NAMES[st] || st}</div>`;
+    STUDIOS.filter(s => s.state === st).forEach(s => {
+      html += `<div class="sid-studio" id="sid-${s.code}" onclick="showStudio('${s.code}')">
+        <div class="s-info">
+          <div class="s-code">${s.code}</div>
+          <div class="s-name">${s.name}</div>
+        </div>
+        <div class="s-leads-badge">${s.leads}</div>
+      </div>`;
+    });
+  });
+  document.getElementById("studio-list").innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+// ALL STUDIOS TABLE
+// ══════════════════════════════════════════════════════════════
+let sortKey = "leads", sortDir = -1;
+
+function buildTable() {
+  const data = [...STUDIOS].sort((a, b) => {
+    const av = a[sortKey], bv = b[sortKey];
+    return (typeof av === "string" ? av.localeCompare(bv) : av - bv) * sortDir;
+  });
+  const rows = data.map(s => {
+    const ba = getBestAud(s);
+    const cplColor = s.cpl < 30 ? "color:#0A7A50;font-weight:900" : s.cpl > 70 ? "color:#C0392B" : "";
+    const leadsStyle = s.leads >= 15
+      ? "background:var(--cyan);color:var(--black)"
+      : s.leads >= 10 ? "background:var(--light);color:var(--black)"
+      : "background:var(--ice);color:var(--gray6)";
+    return `<tr onclick="showStudio('${s.code}')">
+      <td class="td-code">${s.code}</td>
+      <td class="td-name">${s.name}</td>
+      <td class="td-num"><span style="${leadsStyle};padding:2px 9px;border-radius:10px;font-family:'Oswald',Arial,sans-serif;font-weight:700;font-size:13px">${s.leads}</span></td>
+      <td class="td-num" style="${cplColor}">$${s.cpl.toFixed(2)}</td>
+      <td class="td-num">$${s.spend.toFixed(2)}</td>
+      <td class="td-num">${s.impressions.toLocaleString()}</td>
+      <td class="td-num">${s.ctr.toFixed(2)}%</td>
+      <td class="td-num">$${s.cpm.toFixed(2)}</td>
+      <td class="td-num">${s.reach.toLocaleString()}</td>
+      <td class="td-num">${s.purchases > 0 ? `<span style="background:var(--lime);color:#000;padding:1px 8px;border-radius:10px;font-weight:700;font-size:12px">${s.purchases}</span>` : `<span style="color:var(--gray6)">—</span>`}</td>
+      <td class="td-num">${s.trials > 0 ? `<span style="background:var(--blue);color:#fff;padding:1px 8px;border-radius:10px;font-weight:700;font-size:12px">${s.trials}</span>` : s.trials === 0 ? `<span style="color:var(--gray6)">0</span>` : `<span style="color:var(--gray6);font-size:10px">N/A</span>`}</td>
+      <td><span class="pill ${AUD_PILL[ba]}">${ba}</span></td>
+    </tr>`;
+  }).join("");
+  document.getElementById("all-tbody").innerHTML = rows;
+}
+
+function sortTable(key) {
+  if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = -1; }
+  buildTable();
+}
+
+// ══════════════════════════════════════════════════════════════
+// OVERVIEW CHARTS
+// ══════════════════════════════════════════════════════════════
+let chartL, chartA;
+function buildOverviewCharts() {
+  const sorted = [...STUDIOS].sort((a, b) => b.leads - a.leads);
+  const colors = sorted.map(s => s.leads >= 15 ? "#00FFC2" : s.leads >= 10 ? "#00A3E0" : "#99DAF3");
+
+  if (chartL) chartL.destroy();
+  chartL = new Chart(document.getElementById("chart-leads"), {
+    type: "bar",
+    data: { labels: sorted.map(s => s.code), datasets: [{ data: sorted.map(s => s.leads), backgroundColor: colors, borderRadius: 4 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { font: { family: "'Oswald',Arial", size: 10 }, color: "#1E3A4A" }, grid: { display: false } },
+        y: { ticks: { stepSize: 2 }, grid: { color: "#E8F4FD" } }
+      },
+      onClick: (e, els) => { if (els.length) showStudio(sorted[els[0].index].code); }
+    }
+  });
+
+  const audSpendTotals = {};
+  ALL_AUDIENCES.forEach(a => audSpendTotals[a] = 0);
+  STUDIOS.forEach(s => ALL_AUDIENCES.forEach(a => { if(s.aud && s.aud[a]) audSpendTotals[a] += s.aud[a].spend || 0; }));
+  if (chartA) chartA.destroy();
+  chartA = new Chart(document.getElementById("chart-aud"), {
+    type: "doughnut",
+    data: {
+      labels: ALL_AUDIENCES,
+      datasets: [{
+        data: ALL_AUDIENCES.map(a => Math.round(audSpendTotals[a])),
+        backgroundColor: ALL_AUDIENCES.map(a => AUD_COLORS[a]),
+        borderWidth: 3, borderColor: "white"
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: "62%",
+      plugins: {
+        legend: { position: "bottom", labels: { font: { family: "'Oswald',Arial", size: 12 }, color: "#1E3A4A", padding: 14 } },
+        tooltip: { callbacks: { label: ctx => ` $${ctx.parsed.toLocaleString()} spend` } }
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// STUDIO DETAIL
+// ══════════════════════════════════════════════════════════════
+let scS, scL;
+function showStudio(code) {
+  const s = STUDIOS.find(x => x.code === code);
+  if (!s) return;
+
+  document.querySelectorAll(".sid-studio").forEach(el => el.classList.remove("active"));
+  const sid = document.getElementById("sid-" + code);
+  if (sid) { sid.classList.add("active"); sid.scrollIntoView({ block: "nearest" }); }
+  document.getElementById("btn-overview").classList.remove("active");
+  document.getElementById("view-overview").classList.remove("active");
+  document.getElementById("view-studio").classList.add("active");
+
+  const ba = getBestAud(s);
+
+  function cplBadge(spend, leads) {
+    if (!leads) return `<span class="cpl-badge cpl-none">No leads</span>`;
+    const c = spend / leads;
+    const cls = c < 30 ? "cpl-good" : c > 60 ? "cpl-bad" : "cpl-mid";
+    return `<span class="cpl-badge ${cls}">$${c.toFixed(2)}</span>`;
+  }
+
+  function audCard(k) {
+    const a = s.aud && s.aud[k] ? s.aud[k] : { leads:0, spend:0, impr:0, ads:[] };
+    const isBest = k === ba;
+    const hc = AUD_CLS[k] || "d";
+    const adChips = (a.ads || []).length
+      ? a.ads.map(ad => `<span class="ad-chip">${ad}</span>`).join("")
+      : `<span style="font-size:10px;color:var(--gray6)">No active ads</span>`;
+    const spendPct = s.spend > 0 ? ((a.spend / s.spend) * 100).toFixed(1) : "0.0";
+    return `
+    <div class="adb">
+      <div class="adb-head ${hc}">
+        <div>
+          <div class="adb-label">${k}${isBest ? " ⭐" : ""}</div>
+          <div class="adb-sublabel">${isBest ? "Best audience this studio" : "&nbsp;"}</div>
+        </div>
+        <div><span class="adb-leads-num">${a.leads}</span> <span class="adb-leads-unit">leads</span></div>
+      </div>
+      <div class="adb-body">
+        <div class="adb-row"><span class="adb-metric-lbl">Spend</span><span class="adb-metric-val">$${a.spend.toFixed(2)}</span></div>
+        <div class="adb-row"><span class="adb-metric-lbl">Impressions</span><span class="adb-metric-val">${a.impr.toLocaleString()}</span></div>
+        <div class="adb-row"><span class="adb-metric-lbl">CPL</span>${cplBadge(a.spend, a.leads)}</div>
+        <div class="adb-row"><span class="adb-metric-lbl">% of spend</span><span class="adb-metric-val">${spendPct}%</span></div>
+        <div class="ads-section">
+          <div class="ads-label">Active Ads</div>
+          ${adChips}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // Studio-level pillar cards
+  const studioPillars = s.pillars || {};
+  const pillarCardsHtml = ALL_PILLARS.map((code, i) => {
+    const p = studioPillars[code] || { spend:0, impr:0, leads:0, cpl:0 };
+    const cplFmt = p.leads > 0 ? '$' + p.cpl.toFixed(2) : '—';
+    return `<div class="pillar-box c${(i%6)+1}" data-code="${code}">
+      <div class="pillar-tag">${code}</div>
+      <div class="pillar-stats">
+        <div class="pillar-stat"><div class="v">${p.leads}</div><div class="l">Leads</div></div>
+        <div class="pillar-stat"><div class="v">${cplFmt}</div><div class="l">CPL</div></div>
+        <div class="pillar-stat"><div class="v">$${Math.round(p.spend).toLocaleString()}</div><div class="l">Spend</div></div>
+        <div class="pillar-stat"><div class="v">${(p.impr||0).toLocaleString()}</div><div class="l">Impr.</div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Studio-level concept rows (sorted by leads desc)
+  const studioConcepts = Object.entries(s.concepts || {})
+    .map(([k,v]) => ({ concept:k, ...v }))
+    .sort((a,b) => (b.leads - a.leads) || (b.spend - a.spend));
+  const conceptRowsHtml = studioConcepts.length
+    ? studioConcepts.map(c => {
+        const cplFmt = c.leads > 0 ? '$' + c.cpl.toFixed(2) : '—';
+        return `<tr>
+          <td><span class="concept-chip">${c.concept}</span></td>
+          <td class="num">${c.leads}</td>
+          <td class="num">$${Math.round(c.spend).toLocaleString()}</td>
+          <td class="num">${cplFmt}</td>
+          <td class="num">${(c.impr || 0).toLocaleString()}</td>
+        </tr>`;
+      }).join('')
+    : `<tr><td colspan="5" style="text-align:center;color:var(--gray6);padding:14px">No concepts detected for this studio</td></tr>`;
+
+  // Ad table rows (breakdown per audience)
+  const adRows = ALL_AUDIENCES.flatMap(k => {
+    const a = s.aud && s.aud[k] ? s.aud[k] : null;
+    if (!a || !a.ads || !a.ads.length) return [];
+    const n = a.ads.length;
+    return a.ads.map((adName, i) => {
+      const adjSpend = (a.spend / n);
+      const adjImpr  = Math.round(a.impr / n);
+      const adjLeads = i === 0 ? a.leads : 0;
+      const cpl = adjLeads > 0 ? (a.spend / adjLeads).toFixed(2) : "—";
+      const dotCls = adjLeads >= 3 ? "hi" : adjLeads >= 1 ? "md" : "lo";
+      return `<tr>
+        <td style="font-weight:700">${adName}</td>
+        <td><span class="pill ${AUD_PILL[k]}">${k}</span></td>
+        <td style="text-align:right">${adjImpr.toLocaleString()}</td>
+        <td style="text-align:right">$${adjSpend.toFixed(2)}</td>
+        <td style="text-align:right"><span class="lead-dot ${dotCls}">${adjLeads}</span></td>
+        <td style="text-align:right">${cpl !== "—" ? "$" + cpl : "—"}</td>
+      </tr>`;
+    });
+  }).join("");
+
+  // Compare vs campaign avg
+  const avgCPL = 42.54, avgCTR = 1.13, avgCPM = 31.83;
+  function cmpBar(label, val, avg, fmt, lowerIsBetter) {
+    const max = Math.max(val, avg) * 1.25;
+    const vPct = (val / max * 100).toFixed(1);
+    const aPct = (avg / max * 100).toFixed(1);
+    const vBetter = lowerIsBetter ? val <= avg : val >= avg;
+    const vColor = vBetter ? "#00A3E0" : "#C0392B";
+    return `<div style="margin-bottom:14px">
+      <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--gray6);margin-bottom:5px">${label}</div>
+      <div class="cmp-bar-row"><span class="cmp-label" style="color:${vColor};font-size:11px">This Studio</span><div class="cmp-track"><div class="cmp-fill" style="width:${vPct}%;background:${vColor}"></div></div><span class="cmp-val">${fmt(val)}</span></div>
+      <div class="cmp-bar-row"><span class="cmp-label" style="font-size:11px">Avg</span><div class="cmp-track"><div class="cmp-fill" style="width:${aPct}%;background:var(--light)"></div></div><span class="cmp-val" style="color:var(--gray6)">${fmt(avg)}</span></div>
+    </div>`;
+  }
+
+  document.getElementById("studio-content").innerHTML = `
+    <div class="studio-header">
+      <span class="sh-code">${s.code}</span>
+      <div>
+        <div class="sh-name">${s.name}</div>
+        <div class="sh-state">${STATE_NAMES[s.state] || s.state} · Apr 1–14, 2026</div>
+      </div>
+      <div class="sh-leads-wrap">
+        <div class="sh-leads-val">${s.leads}</div>
+        <div class="sh-leads-lbl">Total Leads</div>
+      </div>
+    </div>
+
+    <div class="kpi-row" style="margin-bottom:18px">
+      <div class="kpi"><div class="kpi-label">Spend</div><div class="kpi-val" style="font-size:20px">$${s.spend.toFixed(2)}</div></div>
+      <div class="kpi c-cyan"><div class="kpi-label">CPL</div><div class="kpi-val" style="font-size:20px;color:${s.cpl<30?"#0A7A50":s.cpl>70?"#C0392B":"inherit"}">$${s.cpl.toFixed(2)}</div><div class="kpi-sub">Avg $42.54</div></div>
+      <div class="kpi"><div class="kpi-label">Impressions</div><div class="kpi-val" style="font-size:20px">${s.impressions.toLocaleString()}</div></div>
+      <div class="kpi"><div class="kpi-label">Reach</div><div class="kpi-val" style="font-size:20px">${s.reach.toLocaleString()}</div></div>
+      <div class="kpi c-lime"><div class="kpi-label">CTR</div><div class="kpi-val" style="font-size:20px">${s.ctr.toFixed(2)}%</div><div class="kpi-sub">Avg 1.13%</div></div>
+      <div class="kpi"><div class="kpi-label">CPM</div><div class="kpi-val" style="font-size:20px">$${s.cpm.toFixed(2)}</div></div>
+      <div class="kpi"><div class="kpi-label">Clicks</div><div class="kpi-val" style="font-size:20px">${s.clicks.toLocaleString()}</div></div>
+      <div class="kpi ${s.purchases > 0 ? 'c-lime' : ''}"><div class="kpi-label">Purchases</div><div class="kpi-val" style="font-size:20px">${s.purchases}</div><div class="kpi-sub">${s.purchases > 0 ? 'omni_purchase' : 'No purchases'}</div></div>
+      <div class="kpi ${s.trials > 0 ? 'c-deep' : ''}"><div class="kpi-label">Trials Started</div><div class="kpi-val" style="font-size:20px">${s.trials >= 0 ? s.trials : '—'}</div><div class="kpi-sub">${s.trials > 0 ? '$'+(s.spend/s.trials).toFixed(0)+' cost/trial' : s.trials === 0 ? 'No trials' : 'See Meta UI'}</div></div>
+    </div>
+
+    <div class="sec-title">Audience Breakdown — DINKS · POC · PYC · SI · SAHP</div>
+    <div class="aud-detail">
+      ${ALL_AUDIENCES.map(a => audCard(a)).join("")}
+    </div>
+
+    <div class="sec-title">Pillar Performance — DR · DF · P&amp;R · PS · SSB · HYROX</div>
+    <div class="pillars-grid">
+      ${pillarCardsHtml}
+    </div>
+
+    <div class="sec-title">Creative Concept Performance</div>
+    <div class="concepts-wrap">
+      <table class="concepts-table">
+        <thead>
+          <tr>
+            <th>Concept</th>
+            <th class="num">Leads</th>
+            <th class="num">Spend</th>
+            <th class="num">CPL</th>
+            <th class="num">Impressions</th>
+          </tr>
+        </thead>
+        <tbody>${conceptRowsHtml}</tbody>
+      </table>
+    </div>
+
+    <div class="studio-charts">
+      <div class="chart-card">
+        <div class="chart-title">Spend by Audience</div>
+        <div style="position:relative;height:200px"><canvas id="sc-spend"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">vs. Campaign Average</div>
+        ${cmpBar("Cost Per Lead (CPL)", s.cpl, avgCPL, v=>"$"+v.toFixed(2), true)}
+        ${cmpBar("Click-Through Rate (CTR)", s.ctr, avgCTR, v=>v.toFixed(2)+"%", false)}
+        ${cmpBar("Cost Per 1,000 Impr. (CPM)", s.cpm, avgCPM, v=>"$"+v.toFixed(2), true)}
+      </div>
+    </div>
+
+    <div class="ad-list-card">
+      <div class="chart-title">Ad-Level Breakdown by Audience</div>
+      <table class="ad-table">
+        <thead><tr>
+          <th>Ad Name</th><th>Audience</th>
+          <th style="text-align:right">Impressions</th>
+          <th style="text-align:right">Spend</th>
+          <th style="text-align:right">Leads</th>
+          <th style="text-align:right">CPL</th>
+        </tr></thead>
+        <tbody>${adRows || '<tr><td colspan="6" style="text-align:center;color:var(--gray6);padding:14px">No ad data available</td></tr>'}</tbody>
+      </table>
+    </div>
+  `;
+
+  // Studio charts — Spend by Audience (5 buckets)
+  if (scS) scS.destroy();
+  scS = new Chart(document.getElementById("sc-spend"), {
+    type: "bar",
+    data: {
+      labels: ALL_AUDIENCES,
+      datasets: [{
+        data: ALL_AUDIENCES.map(k => (s.aud && s.aud[k]) ? s.aud[k].spend : 0),
+        backgroundColor: ALL_AUDIENCES.map(k => AUD_COLORS[k]),
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { font: { family: "'Oswald',Arial", size: 12, weight: "bold" } }, grid: { display: false } },
+        y: { ticks: { callback: v => "$" + v }, grid: { color: "#E8F4FD" } }
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// SHOW OVERVIEW
+// ══════════════════════════════════════════════════════════════
+function showOverview() {
+  document.querySelectorAll(".sid-studio").forEach(el => el.classList.remove("active"));
+  document.getElementById("btn-overview").classList.add("active");
+  document.getElementById("view-studio").classList.remove("active");
+  document.getElementById("view-overview").classList.add("active");
+}
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// REACT REFRESH BUTTON (mounted in the header)
+// ══════════════════════════════════════════════════════════════
+const { createElement: h, useState } = React;
+
+function RefreshButton() {
+  const [state, setState] = useState("idle");  // "idle" | "loading" | "ok" | "err"
+  const [lastRun, setLastRun] = useState(null);
+
+  const baseStyle = {
+    background: "rgba(255,255,255,0.18)", color: "white",
+    border: "1px solid rgba(255,255,255,0.3)", borderRadius: 6,
+    fontFamily: "'Oswald',Arial,sans-serif", fontWeight: 700,
+    fontStyle: "italic", fontSize: 11, textTransform: "uppercase",
+    letterSpacing: ".5px", padding: "7px 14px", cursor: "pointer",
+    transition: ".15s"
+  };
+
+  async function refresh() {
+    setState("loading");
+    try {
+      // Refresh: just reload page (data.json is updated daily by GitHub Actions)
+      location.reload();
+      const data = await r.json();
+      if (data.ok) {
+        setState("ok");
+        setTimeout(() => window.location.reload(), 800);
+      } else {
+        setState("err");
+        console.error("ETL error:", data);
+      }
+    } catch (e) {
+      setState("err");
+      console.error(e);
+    }
+  }
+
+  const labels = {
+    idle: "↻ Refresh Data", loading: "Syncing…",
+    ok: "✓ Done — reloading", err: "✕ Error — see console"
+  };
+
+  return h("button", {
+    style: { ...baseStyle, opacity: state === "loading" ? 0.6 : 1 },
+    disabled: state === "loading",
+    onClick: refresh, title: "Trigger ETL: Meta Ads → Google Sheets"
+  }, labels[state]);
+}
+
+ReactDOM.createRoot(document.getElementById("refresh-root")).render(h(RefreshButton));
+
+// ══════════════════════════════════════════════════════════════
+// DATA LOADING — reads from data.json
+// ══════════════════════════════════════════════════════════════
+function fmtK(n) {
+  if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1) + "K";
+  return n.toString();
+}
+function fmt$(n, decimals = 2) {
+  return "$" + Number(n).toLocaleString(undefined, {
+    minimumFractionDigits: decimals, maximumFractionDigits: decimals
+  });
+}
+
+function updateHeader(meta) {
+  // El título es fijo ("Meta Ads Campaigns"). Solo actualizamos el periodo
+  // y el tab-title del navegador para que cambie según la campaña elegida.
+  document.getElementById("hdr-period").textContent = meta.period || "—";
+  document.title = `SWEAT440 — ${meta.campaign || "Meta Ads Campaigns"}`;
+}
+
+function updateKPIs(totals, studios) {
+  const $ = id => document.getElementById(id);
+  const n = studios.length;
+
+  // Best studio by CPL (with leads)
+  const withLeads = studios.filter(s => s.leads > 0);
+  const bestCpl = withLeads.reduce((b, s) => s.cpl < b.cpl ? s : b, withLeads[0] || {});
+  const bestCtr = studios.reduce((b, s) => s.ctr > (b?.ctr || 0) ? s : b, null);
+  const lowestCpm = studios.filter(s => s.cpm > 0)
+    .reduce((b, s) => s.cpm < (b?.cpm || Infinity) ? s : b, null);
+  const nWithPurchases = studios.filter(s => s.purchases > 0).length;
+  const costPerPurchase = totals.purchases > 0 ? totals.spend / totals.purchases : 0;
+  const costPerTrial = totals.trials > 0 ? totals.spend / totals.trials : 0;
+
+  $("kpi-leads").textContent = totals.leads.toLocaleString();
+  $("kpi-leads-sub").textContent = `across ${n} studios`;
+
+  $("kpi-spend").textContent = "$" + fmtK(totals.spend);
+  $("kpi-spend-sub").textContent = fmt$(totals.spend);
+
+  $("kpi-cpl").textContent = fmt$(totals.cpl);
+  $("kpi-cpl-sub").textContent = bestCpl ? `Best: ${fmt$(bestCpl.cpl)} ${bestCpl.name}` : "—";
+
+  $("kpi-impr").textContent = fmtK(totals.impressions);
+  $("kpi-impr-sub").textContent = totals.impressions.toLocaleString() + " total";
+
+  $("kpi-reach").textContent = fmtK(totals.reach);
+
+  $("kpi-ctr").textContent = totals.ctr.toFixed(2) + "%";
+  $("kpi-ctr-sub").textContent = bestCtr ? `Best: ${bestCtr.name} ${bestCtr.ctr.toFixed(2)}%` : "—";
+
+  $("kpi-clicks").textContent = totals.clicks.toLocaleString();
+
+  $("kpi-cpm").textContent = fmt$(totals.cpm);
+  $("kpi-cpm-sub").textContent = lowestCpm ? `Lowest: ${lowestCpm.name} ${fmt$(lowestCpm.cpm)}` : "—";
+
+  $("kpi-purchases").textContent = totals.purchases;
+  $("kpi-purchases-sub").textContent = totals.purchases > 0
+    ? `omni_purchase · ${nWithPurchases} studios` : "none";
+
+  $("kpi-cpp").textContent = costPerPurchase > 0 ? "$" + Math.round(costPerPurchase).toLocaleString() : "—";
+  $("kpi-cpp-sub").textContent = totals.purchases > 0
+    ? `${fmt$(totals.spend, 0)} ÷ ${totals.purchases} purchases` : "No purchases yet";
+
+  $("kpi-trials").textContent = totals.trials;
+  $("kpi-trials-sub").textContent = costPerTrial > 0
+    ? `start_trial events` : "No trials yet";
+
+  $("kpi-cpt").textContent = costPerTrial > 0 ? "$" + Math.round(costPerTrial).toLocaleString() : "—";
+  $("kpi-cpt-sub").textContent = totals.trials > 0
+    ? `${fmt$(totals.spend, 0)} ÷ ${totals.trials} trials` : "No trials yet";
+}
+
+// ══════════════════════════════════════════════════════════════
+// LOAD FROM data.json (shared repo data source)
+// ══════════════════════════════════════════════════════════════
+async function loadDashboard() {
+  try {
+    const res = await fetch('data.json?_=' + Date.now());
+    if (!res.ok) throw new Error("data.json returned " + res.status);
+    const raw = await res.json();
+    const data = raw.meta_ads || {};
+
+    // Hydrate globals
+    STUDIOS    = data.studios   || [];
+    PILLARS_G  = data.pillars   || [];
+    CONCEPTS_G = data.concepts  || [];
+
+    // Update header
+    updateHeader({ period: data.period || raw.generated_at?.slice(0,10) || "—" });
+    updateKPIs(data.totals || {
+      spend:0, impressions:0, reach:0, clicks:0,
+      leads:0, purchases:0, trials:0, cpl:0, ctr:0, cpm:0
+    }, STUDIOS);
+
+    // Overview sub-label
+    const ov = document.querySelector("#btn-overview .ov-sub");
+    if (ov) ov.textContent = `All Studios · ${STUDIOS.length} locations`;
+
+    // Hide campaign picker — not needed with data.json
+    const picker = document.querySelector(".header-campaign-picker");
+    if (picker) picker.style.display = "none";
+
+    showOverview();
+    buildSidebar();
+    buildTable();
+    buildAudienceOverview();
+    buildPillarsOverview();
+    buildConceptsOverview();
+    setTimeout(buildOverviewCharts, 80);
+  } catch (e) {
+    console.error("Dashboard load failed:", e);
+    document.getElementById("hdr-period").textContent =
+      "⚠ data.json not found — run the GitHub Action to generate it.";
+  }
+}
+
+loadDashboard();
+</script>
+</body>
+</html>
