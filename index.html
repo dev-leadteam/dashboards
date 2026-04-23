@@ -287,14 +287,7 @@ function toggleControls() {
   document.getElementById('ctrlToggle').textContent = el.classList.contains('open') ? 'Filters ▴' : 'Filters ▾';
 }
 
-// Default: last complete month
-const TODAY = new Date();
-const firstOfThisMonth = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
-const lastOfPrevMonth  = new Date(firstOfThisMonth.getTime() - 86400000);
-const firstOfPrevMonth = new Date(lastOfPrevMonth.getFullYear(), lastOfPrevMonth.getMonth(), 1);
-// Format as YYYY-MM-DD in local time (not UTC) to avoid off-by-one
-document.getElementById('fFrom').value = localDateStr(firstOfPrevMonth);
-document.getElementById('fTo').value   = localDateStr(lastOfPrevMonth);
+// Date inputs set in loadData() after utils.js is available
 
 
 async function loadData() {
@@ -307,6 +300,14 @@ async function loadData() {
   } catch(e) {
     console.warn('Using mock data:', e); RAW = getMock();
   }
+  // Set default date range: last complete month
+  const _today = new Date();
+  const _firstOfThisMonth = new Date(_today.getFullYear(), _today.getMonth(), 1);
+  const _lastOfPrev  = new Date(_firstOfThisMonth.getTime() - 86400000);
+  const _firstOfPrev = new Date(_lastOfPrev.getFullYear(), _lastOfPrev.getMonth(), 1);
+  document.getElementById('fFrom').value = localDateStr(_firstOfPrev);
+  document.getElementById('fTo').value   = localDateStr(_lastOfPrev);
+
   buildMultiSelect('studioMenu', 'studioLabel', RAW.studios, DEFAULT_EXCL_STUDIOS);
   buildMultiSelect('sourceMenu', 'sourceLabel', RAW.sources, DEFAULT_EXCL_SOURCES);
   setGran('daily');
