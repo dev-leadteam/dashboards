@@ -37,11 +37,6 @@ const DEFAULT_EXCL_STUDIOS = [
 ];
 
 function localDateStr(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-document.getElementById('fFrom').value = localDateStr(firstOfPrevMonth);
-document.getElementById('fTo').value   = localDateStr(lastOfPrevMonth);
-// After data loads, if default range has no data, fall back to last available month
-window._defaultFrom = localDateStr(firstOfPrevMonth);
-window._defaultTo   = localDateStr(lastOfPrevMonth);
 
 // Multi-select
 
@@ -207,8 +202,7 @@ function calcDelta(curr,prev) { if(!prev||prev===0) return null; return (curr-pr
 
 function srcColor(src,i){return SRC_COLOR_MAP[src]||SRC_COLORS[i%SRC_COLORS.length];}
 
-// Chart instance registry  tracks all area chart instances for destroy/recreate
-const _areaCharts = {};
+// Chart instance registry — see top of file
 
 function buildAreaChart(canvasId, togglesId, series, srcList, valueKey){
   const ctx = document.getElementById(canvasId);
@@ -387,6 +381,3 @@ function getMock() {
   }
   return { studios, sources, monthly_detail:monthly, daily_detail:daily };
 }
-
-
-loadData();
