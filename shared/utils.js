@@ -1,5 +1,11 @@
 // SWEAT440 Dashboard — Shared Utilities
 // Import this file in every dashboard HTML
+// Each dashboard must define applyFilters() in its own <script> block
+
+function _applyFilters() {
+  if (typeof applyFilters === 'function') applyFilters();
+}
+
 
 // ── Chart instance registry ────────────────────────────────────────────────
 const _areaCharts = {};
@@ -61,7 +67,7 @@ function buildMultiSelect(menuId, labelId, items, defaultExcluded) {
     const checked = !defaultExcluded.includes(item);
     const safeId = `ms_${menuId}_${item.replace(/[^a-z0-9]/gi,'_')}`;
     div.innerHTML = `<input type="checkbox" id="${safeId}" value="${item}" ${checked?'checked':''}> <label for="${safeId}" style="cursor:pointer">${item}</label>`;
-    div.querySelector('input').addEventListener('change', () => { syncSelectAll(menuId); updateLabel(menuId, labelId, items); applyFilters(); });
+    div.querySelector('input').addEventListener('change', () => { syncSelectAll(menuId); updateLabel(menuId, labelId, items); _applyFilters(); });
     menu.appendChild(div);
   });
 
@@ -69,7 +75,7 @@ function buildMultiSelect(menuId, labelId, items, defaultExcluded) {
   syncSelectAll(menuId);
   allChk.addEventListener('change', () => {
     menu.querySelectorAll('input[value]').forEach(c => c.checked = allChk.checked);
-    updateLabel(menuId, labelId, items); applyFilters();
+    updateLabel(menuId, labelId, items); _applyFilters();
   });
   updateLabel(menuId, labelId, items);
 }
@@ -113,7 +119,7 @@ function setGran(gran) {
     const btn = document.getElementById('gran'+g.charAt(0).toUpperCase()+g.slice(1));
     if (btn) btn.classList.toggle('active', g === gran);
   });
-  applyFilters();
+  _applyFilters();
 }
 
 function updateGranButtons(from, to) {
