@@ -66,9 +66,9 @@
       <div class="chart-card-title">Funnel over time</div>
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
         <div class="toggle-group" style="margin-bottom:0">
-          <button class="tog-btn on" data-ds="0" onclick="toggleDs(this,0)" style="border-color:#00A3E0;background:#00A3E0;color:#fff"><span class="dot" style="background:#fff"></span>Leads</button>
-          <button class="tog-btn on" data-ds="1" onclick="toggleDs(this,1)" style="border-color:#00C9A7;background:#00C9A7;color:#fff"><span class="dot" style="background:#fff"></span>First Timers</button>
-          <button class="tog-btn on" data-ds="2" onclick="toggleDs(this,2)" style="border-color:#9aab00;background:#9aab00;color:#fff"><span class="dot" style="background:#fff"></span>New Members</button>
+          <button class="tog-btn on" data-ds="0" onclick="toggleDs(this,0)" style="border-color:#00A3E0;background:#00A3E0;color:#000"><span class="dot" style="background:#000"></span>Leads</button>
+          <button class="tog-btn on" data-ds="1" onclick="toggleDs(this,1)" style="border-color:#00FFC2;background:#00FFC2;color:#000"><span class="dot" style="background:#000"></span>First Timers</button>
+          <button class="tog-btn on" data-ds="2" onclick="toggleDs(this,2)" style="border-color:#DDFF00;background:#DDFF00;color:#000"><span class="dot" style="background:#000"></span>New Members</button>
         </div>
         <div class="gran-group">
           <button class="gran-btn" id="granDaily"   onclick="setGran('daily')">Daily</button>
@@ -89,8 +89,8 @@
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
         <div class="chart-card-title" style="margin-bottom:0">Leads over time  by source</div>
         <div class="gran-group" id="gran-leadsAreaChart">
-          <button class="gran-btn active" id="gran-daily-leadsAreaChart"  onclick="setAreaGran('leadsAreaChart','daily')">Daily</button>
-          <button class="gran-btn"        id="gran-weekly-leadsAreaChart" onclick="setAreaGran('leadsAreaChart','weekly')">Weekly</button>
+          <button class="gran-btn"        id="gran-daily-leadsAreaChart"  onclick="setAreaGran('leadsAreaChart','daily')">Daily</button>
+          <button class="gran-btn active" id="gran-weekly-leadsAreaChart" onclick="setAreaGran('leadsAreaChart','weekly')">Weekly</button>
           <button class="gran-btn"        id="gran-monthly-leadsAreaChart"onclick="setAreaGran('leadsAreaChart','monthly')">Monthly</button>
         </div>
       </div>
@@ -124,8 +124,8 @@
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
         <div class="chart-card-title" style="margin-bottom:0">First timers over time  by source</div>
         <div class="gran-group" id="gran-ftAreaChart">
-          <button class="gran-btn active" id="gran-daily-ftAreaChart"  onclick="setAreaGran('ftAreaChart','daily')">Daily</button>
-          <button class="gran-btn"        id="gran-weekly-ftAreaChart" onclick="setAreaGran('ftAreaChart','weekly')">Weekly</button>
+          <button class="gran-btn"        id="gran-daily-ftAreaChart"  onclick="setAreaGran('ftAreaChart','daily')">Daily</button>
+          <button class="gran-btn active" id="gran-weekly-ftAreaChart" onclick="setAreaGran('ftAreaChart','weekly')">Weekly</button>
           <button class="gran-btn"        id="gran-monthly-ftAreaChart"onclick="setAreaGran('ftAreaChart','monthly')">Monthly</button>
         </div>
       </div>
@@ -168,9 +168,9 @@
     <div class="chart-card">
       <div class="chart-card-title">Cost per result  over time</div>
       <div class="toggle-group" id="cpr-toggles">
-        <button class="tog-btn on" data-ds="0" onclick="toggleCPRds(this,0)" style="border-color:#00A3E0;background:#00A3E0;color:#fff"><span class="dot" style="background:#fff"></span>Cost / Lead</button>
-        <button class="tog-btn on" data-ds="1" onclick="toggleCPRds(this,1)" style="border-color:#00C9A7;background:#00C9A7;color:#fff"><span class="dot" style="background:#fff"></span>Cost / First Timer</button>
-        <button class="tog-btn on" data-ds="2" onclick="toggleCPRds(this,2)" style="border-color:#9aab00;background:#9aab00;color:#fff"><span class="dot" style="background:#fff"></span>Cost / New Member</button>
+        <button class="tog-btn on" data-ds="0" onclick="toggleCPRds(this,0)" style="border-color:#00A3E0;background:#00A3E0;color:#000"><span class="dot" style="background:#000"></span>Cost / Lead</button>
+        <button class="tog-btn on" data-ds="1" onclick="toggleCPRds(this,1)" style="border-color:#00FFC2;background:#00FFC2;color:#000"><span class="dot" style="background:#000"></span>Cost / First Timer</button>
+        <button class="tog-btn on" data-ds="2" onclick="toggleCPRds(this,2)" style="border-color:#DDFF00;background:#DDFF00;color:#000"><span class="dot" style="background:#000"></span>Cost / New Member</button>
 
       </div>
       <div style="position:relative;width:100%;height:260px"><canvas id="cprChart" role="img" aria-label="Line chart of cost per result over time"></canvas></div>
@@ -198,8 +198,8 @@
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
         <div class="chart-card-title" style="margin-bottom:0">New members over time  by source</div>
         <div class="gran-group" id="gran-memAreaChart">
-          <button class="gran-btn active" id="gran-daily-memAreaChart"  onclick="setAreaGran('memAreaChart','daily')">Daily</button>
-          <button class="gran-btn"        id="gran-weekly-memAreaChart" onclick="setAreaGran('memAreaChart','weekly')">Weekly</button>
+          <button class="gran-btn"        id="gran-daily-memAreaChart"  onclick="setAreaGran('memAreaChart','daily')">Daily</button>
+          <button class="gran-btn active" id="gran-weekly-memAreaChart" onclick="setAreaGran('memAreaChart','weekly')">Weekly</button>
           <button class="gran-btn"        id="gran-monthly-memAreaChart"onclick="setAreaGran('memAreaChart','monthly')">Monthly</button>
         </div>
       </div>
@@ -420,7 +420,7 @@ function toggleDs(btn, i) {
   const ds = trendChart.data.datasets[i];
   ds.hidden = !ds.hidden;
   btn.classList.toggle('on');
-  if (btn.classList.contains('on')) { btn.style.background=COLORS[i]; btn.style.borderColor=COLORS[i]; btn.style.color='#fff'; }
+  if (btn.classList.contains('on')) { btn.style.background=COLORS[i]; btn.style.borderColor=COLORS[i]; btn.style.color='#000'; btn.querySelector('.dot').style.background='#000'; }
   else { btn.style.background='#f4f9fd'; btn.style.borderColor='#c0d4df'; btn.style.color='#5a7a8a'; }
   trendChart.update();
 }
@@ -615,7 +615,7 @@ function buildCPRTab(){
 }
 
 
-function toggleCPRds(btn,i){if(!cprChart)return;const ds=cprChart.data.datasets[i];ds.hidden=!ds.hidden;btn.classList.toggle('on');const cols=['#00A3E0','#00C9A7','#9aab00','#888'];if(btn.classList.contains('on')){btn.style.background=cols[i];btn.style.borderColor=cols[i];btn.style.color='#fff';}else{btn.style.background='#f4f9fd';btn.style.borderColor='#c0d4df';btn.style.color='#5a7a8a';}cprChart.update();}
+function toggleCPRds(btn,i){if(!cprChart)return;const ds=cprChart.data.datasets[i];ds.hidden=!ds.hidden;btn.classList.toggle('on');const cols=['#00A3E0','#00FFC2','#DDFF00','#888'];if(btn.classList.contains('on')){btn.style.background=cols[i];btn.style.borderColor=cols[i];btn.style.color='#000';}else{btn.style.background='#f4f9fd';btn.style.borderColor='#c0d4df';btn.style.color='#5a7a8a';}cprChart.update();}
 
 
 function buildMetaTab(){
