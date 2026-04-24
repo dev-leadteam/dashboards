@@ -258,9 +258,9 @@
 // ── Dashboard state ───────────────────────────────────────────────────────
 let RAW = null;
 let trendChart = null;
-let GRAN = 'daily';
-const COLORS = ['#00A3E0','#00C9A7','#9aab00'];
-const AREA_GRAN = {leadsAreaChart:'daily', ftAreaChart:'daily', memAreaChart:'daily'};
+let GRAN = 'weekly';
+const COLORS = ['#00A3E0','#00FFC2','#DDFF00'];
+const AREA_GRAN = {leadsAreaChart:'weekly', ftAreaChart:'weekly', memAreaChart:'weekly'};
 
 // ── Franchisee view: locked to these studios ───────────────────────────────
 const FRANCHISEE_STUDIOS = ['SWEAT440 Miami - Brickell', 'SWEAT440 Miami Beach'];
@@ -303,18 +303,16 @@ async function loadData() {
   } catch(e) {
     console.warn('Using mock data:', e); RAW = getMock();
   }
-  // Set default date range: last complete month
+  // Set default date range: year to date
   const _today = new Date();
-  const _firstOfThisMonth = new Date(_today.getFullYear(), _today.getMonth(), 1);
-  const _lastOfPrev  = new Date(_firstOfThisMonth.getTime() - 86400000);
-  const _firstOfPrev = new Date(_lastOfPrev.getFullYear(), _lastOfPrev.getMonth(), 1);
-  document.getElementById('fFrom').value = localDateStr(_firstOfPrev);
-  document.getElementById('fTo').value   = localDateStr(_lastOfPrev);
+  const _jan1  = new Date(_today.getFullYear(), 0, 1);
+  document.getElementById('fFrom').value = localDateStr(_jan1);
+  document.getElementById('fTo').value   = localDateStr(_today);
 
   // Franchisee view: only pass the 2 allowed studios to the dropdown
   buildMultiSelect('studioMenu', 'studioLabel', FRANCHISEE_STUDIOS, []);
   buildMultiSelect('sourceMenu', 'sourceLabel', RAW.sources, DEFAULT_EXCL_SOURCES);
-  setGran('daily');
+  setGran('weekly');
 
   // If default date range has no data, fall back to last available month in dataset
   const allRows = [...(RAW.daily_detail||[]), ...(RAW.monthly_detail||[])];
@@ -405,9 +403,9 @@ function buildTrend(series) {
   trendChart = new Chart(ctx, {
     type:'line',
     data:{labels,datasets:[
-      {label:'Leads',       data:leadsD,borderColor:'#00A3E0',borderWidth:2.5,pointRadius:3,pointHoverRadius:6,tension:.4,fill:false,borderDash:[]},
-      {label:'First Timers',data:ftD,   borderColor:'#00C9A7',borderWidth:2.5,pointRadius:3,pointHoverRadius:6,tension:.4,fill:false,borderDash:[6,3]},
-      {label:'New Members', data:memD,  borderColor:'#9aab00',borderWidth:2.5,pointRadius:3,pointHoverRadius:6,tension:.4,fill:false,borderDash:[2,3]},
+      {label:'Leads',       data:leadsD,borderColor:'#00A3E0',backgroundColor:'#00A3E022',borderWidth:2.5,pointRadius:3,pointHoverRadius:6,tension:.4,fill:true},
+      {label:'First Timers',data:ftD,   borderColor:'#00FFC2',backgroundColor:'#00FFC222',borderWidth:2.5,pointRadius:3,pointHoverRadius:6,tension:.4,fill:true},
+      {label:'New Members', data:memD,  borderColor:'#DDFF00',backgroundColor:'#DDFF0022',borderWidth:2.5,pointRadius:3,pointHoverRadius:6,tension:.4,fill:true},
     ]},
     options:{
       responsive:true,maintainAspectRatio:false,
