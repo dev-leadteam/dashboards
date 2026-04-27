@@ -287,12 +287,7 @@ function toggleControls() {
   document.getElementById('ctrlToggle').textContent = el.classList.contains('open') ? 'Filters ▴' : 'Filters ▾';
 }
 
-// Default: last complete month
-const TODAY = new Date();
-const firstOfThisMonth = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
-const lastOfPrevMonth  = new Date(firstOfThisMonth.getTime() - 86400000);
-const firstOfPrevMonth = new Date(lastOfPrevMonth.getFullYear(), lastOfPrevMonth.getMonth(), 1);
-// Format as YYYY-MM-DD in local time (not UTC) to avoid off-by-one
+// Date inputs set in loadData() after utils.js is available
 
 
 async function loadData() {
@@ -305,6 +300,14 @@ async function loadData() {
   } catch(e) {
     console.warn('Using mock data:', e); RAW = getMock();
   }
+  // Set default date range: last complete month
+  const _today = new Date();
+  const _firstOfThisMonth = new Date(_today.getFullYear(), _today.getMonth(), 1);
+  const _lastOfPrev  = new Date(_firstOfThisMonth.getTime() - 86400000);
+  const _firstOfPrev = new Date(_lastOfPrev.getFullYear(), _lastOfPrev.getMonth(), 1);
+  document.getElementById('fFrom').value = localDateStr(_firstOfPrev);
+  document.getElementById('fTo').value   = localDateStr(_lastOfPrev);
+
   buildMultiSelect('studioMenu', 'studioLabel', RAW.studios, DEFAULT_EXCL_STUDIOS);
   buildMultiSelect('sourceMenu', 'sourceLabel', RAW.sources, DEFAULT_EXCL_SOURCES);
   setGran('daily');
@@ -426,22 +429,7 @@ function toggleDs(btn, i) {
 
 
 
-const SRC_COLORS=['#00A3E0','#00C9A7','#DDFF00','#FF6B35','#E040FB','#FF4081','#00BCD4','#8BC34A','#FF9800','#3F51B5','#F44336','#009688','#9C27B0','#607D8B'];
 // Map specific sources to specific colors for consistency across tabs
-const SRC_COLOR_MAP={
-  'Business Mode':          '#00A3E0',
-  'Google Ads':             '#4285F4',
-  'Local Listings':         '#00BCD4',
-  'Meta Ads':               '#1877F2',
-  'MindBody App':           '#FF6B35',
-  'N/A':                    '#607D8B',
-  'Other':                  '#9E9E9E',
-  'Print Ads / Signs':      '#FF9800',
-  'SWEAT440 App':           '#9C27B0',
-  'Social Media Organic':   '#E040FB',
-  'Website (unattributed)': '#00C9A7',
-  'Word of Mouth':          '#F44336',
-};
 
 
 function buildStageTabs(currFiltered, ppFiltered, pyFiltered, ppLabel, pyLabel){
