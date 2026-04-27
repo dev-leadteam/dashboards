@@ -33,6 +33,7 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
+          cache-dependency-path: requirements-paid-ads.txt
 
       - name: Install dependencies
         run: |

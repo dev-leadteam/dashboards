@@ -118,6 +118,28 @@
     background: #EFF6FF; color: var(--brand-blue-deep); font-size: 11px;
     font-weight: 600; margin-right: 4px;
   }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex; gap: 2px; flex-wrap: wrap;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .tab {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 10px 18px; border: none; background: transparent;
+    color: var(--ink-soft); cursor: pointer;
+    text-transform: uppercase; letter-spacing: .5px;
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
+    transition: color .15s, border-color .15s;
+  }
+  .tab:hover:not(.active) { color: var(--ink); }
+  .tab.active {
+    color: var(--brand-blue-deep);
+    border-bottom-color: var(--brand-blue);
+  }
+  .tab-panel.hidden { display: none; }
 </style>
 </head>
 
@@ -136,6 +158,17 @@
       <span class="period" id="periodLabel"></span>
     </div>
   </header>
+
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <button class="tab active" data-tab="overview">Overview</button>
+    <button class="tab" data-tab="audiences">Audiences</button>
+    <button class="tab" data-tab="pillars">Pillars</button>
+    <button class="tab" data-tab="concepts">Concepts</button>
+  </div>
+
+  <!-- ── Overview tab ─────────────────────────────────────────── -->
+  <div class="tab-panel" id="panel-overview">
 
   <!-- KPI cards -->
   <div class="kpi-grid" id="kpiGrid"></div>
@@ -221,6 +254,44 @@
       <div id="studioConceptsWrap"></div>
     </div>
   </div>
+
+  </div><!-- /#panel-overview -->
+
+  <!-- ── Audiences tab ────────────────────────────────────────── -->
+  <div class="tab-panel hidden" id="panel-audiences">
+    <div class="card">
+      <h2 id="audiencesLineTitle">Leads by Audience — Daily (last 90 days)</h2>
+      <div class="chart-wrap h-daily"><canvas id="audiencesLineChart"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>Audiences — Summary <span id="audiencesWindowNote" class="period" style="font-weight:400;margin-left:8px;"></span></h2>
+      <div id="audiencesTableDailyWrap" style="overflow:auto;"></div>
+    </div>
+  </div>
+
+  <!-- ── Pillars tab ──────────────────────────────────────────── -->
+  <div class="tab-panel hidden" id="panel-pillars">
+    <div class="card">
+      <h2 id="pillarsLineTitle">Leads by Pillar — Daily (last 90 days)</h2>
+      <div class="chart-wrap h-daily"><canvas id="pillarsLineChart"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>Pillars — Summary <span id="pillarsWindowNote" class="period" style="font-weight:400;margin-left:8px;"></span></h2>
+      <div id="pillarsTableDailyWrap" style="overflow:auto;"></div>
+    </div>
+  </div>
+
+  <!-- ── Concepts tab ─────────────────────────────────────────── -->
+  <div class="tab-panel hidden" id="panel-concepts">
+    <div class="card">
+      <h2 id="conceptsLineTitle">Leads by Concept — Daily (top 12, last 90 days)</h2>
+      <div class="chart-wrap h-daily"><canvas id="conceptsLineChart"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>Concepts — Summary <span id="conceptsWindowNote" class="period" style="font-weight:400;margin-left:8px;"></span></h2>
+      <div id="conceptsTableDailyWrap" style="overflow:auto;"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -275,6 +346,26 @@ async function bootstrap() {
   sel.addEventListener("change", () => { currentKey = sel.value; render(); });
   currentKey = sel.value || DATA.active_campaign;
 
+  initTabs();
+  render();
+}
+
+function initTabs() {
+  document.querySelectorAll(".tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.tab;
+      document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
+      btn.classList.add("active");
+      const panel = document.getElementById("panel-" + target);
+      if (panel) panel.classList.remove("hidden");
+      // Chart.js a veces queda con tamaño 0 si el panel estaba hidden al crearse.
+      // Forzamos un resize de todos los charts visibles ahora.
+      Object.values(charts).forEach(ch => { if (ch) ch.resize(); });
+    });
+  });
+}
+
   render();
 }
 
@@ -295,6 +386,11 @@ function render() {
   renderAudiences(c.audiences, c.studios);
   renderConcepts(c.concepts);
   renderStudioDetail(c);
+
+  // Nuevos tabs: series de tiempo por dimensión (requieren daily_series del ETL nuevo)
+  renderTabAudiences(c);
+  renderTabPillars(c);
+  renderTabConcepts(c);
 }
 
 function renderKpis(t) {
@@ -583,6 +679,202 @@ function renderConcepts(concepts) {
             <td class="num">${c.leads ? fmtMoney(c.cpl) : "—"}</td>
           </tr>
         `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+// ─────────────────────────────────────────────────────────────
+//  Tabs: Audiences / Pillars / Concepts (time-series)
+// ─────────────────────────────────────────────────────────────
+function renderTabAudiences(c) {
+  renderLineTab({
+    rows:        (c.daily_series && c.daily_series.by_audience) || [],
+    window:      c.daily_series,
+    dimKey:      "audience",
+    chartId:     "audiencesLineChart",
+    chartName:   "audiencesLine",
+    tableId:     "audiencesTableDailyWrap",
+    windowNoteId:"audiencesWindowNote",
+    titleId:     "audiencesLineTitle",
+    label:       "Audience",
+    titleBase:   "Leads by Audience — Daily",
+    topN:        null,
+  });
+}
+
+function renderTabPillars(c) {
+  renderLineTab({
+    rows:        (c.daily_series && c.daily_series.by_pillar) || [],
+    window:      c.daily_series,
+    dimKey:      "pillar",
+    chartId:     "pillarsLineChart",
+    chartName:   "pillarsLine",
+    tableId:     "pillarsTableDailyWrap",
+    windowNoteId:"pillarsWindowNote",
+    titleId:     "pillarsLineTitle",
+    label:       "Pillar",
+    titleBase:   "Leads by Pillar — Daily",
+    topN:        null,
+  });
+}
+
+function renderTabConcepts(c) {
+  renderLineTab({
+    rows:        (c.daily_series && c.daily_series.by_concept) || [],
+    window:      c.daily_series,
+    dimKey:      "concept",
+    chartId:     "conceptsLineChart",
+    chartName:   "conceptsLine",
+    tableId:     "conceptsTableDailyWrap",
+    windowNoteId:"conceptsWindowNote",
+    titleId:     "conceptsLineTitle",
+    label:       "Concept",
+    titleBase:   "Leads by Concept — Daily",
+    topN:        12,  // top 12 por spend — más de eso hace ilegible el chart
+  });
+}
+
+/**
+ * Renderiza: título con rango, chart lineal (una línea por dim, Y=leads)
+ * y tabla resumen (agregada sobre la ventana daily).
+ *
+ * rows: [{<dimKey>, date, spend, leads, trials, purchases, impressions, clicks, ...}]
+ */
+function renderLineTab(opts) {
+  const {
+    rows, window, dimKey,
+    chartId, chartName, tableId, windowNoteId, titleId,
+    label, titleBase, topN,
+  } = opts;
+
+  const tableEl = document.getElementById(tableId);
+  const noteEl  = document.getElementById(windowNoteId);
+  const titleEl = document.getElementById(titleId);
+
+  // Header de rango + título con ventana real
+  const rangeTxt = window && window.window_start && window.window_end
+    ? `${window.window_start} → ${window.window_end}`
+    : "—";
+  if (noteEl)  noteEl.textContent = rangeTxt;
+  if (titleEl) titleEl.textContent = `${titleBase} (${rangeTxt})`;
+
+  if (charts[chartName]) { charts[chartName].destroy(); charts[chartName] = null; }
+
+  if (!rows.length) {
+    const ctx = document.getElementById(chartId);
+    if (ctx) {
+      // Limpia el canvas si no hay datos
+      const c2 = ctx.getContext("2d");
+      c2.clearRect(0, 0, ctx.width, ctx.height);
+    }
+    tableEl.innerHTML = `<div class='empty'>No daily series data for this campaign. Regenera <code>paid-ads-data.json</code> con el ETL nuevo (genera el bloque <code>daily_series</code>).</div>`;
+    return;
+  }
+
+  // ── Roll-up totales por dim (sumando sobre la ventana completa)
+  const totals = {};
+  rows.forEach(r => {
+    const dim = r[dimKey];
+    if (!totals[dim]) totals[dim] = {
+      dim, spend: 0, leads: 0, trials: 0, purchases: 0,
+      impressions: 0, clicks: 0,
+    };
+    totals[dim].spend       += r.spend       || 0;
+    totals[dim].leads       += r.leads       || 0;
+    totals[dim].trials      += r.trials      || 0;
+    totals[dim].purchases   += r.purchases   || 0;
+    totals[dim].impressions += r.impressions || 0;
+    totals[dim].clicks      += r.clicks      || 0;
+  });
+  let ordered = Object.values(totals).sort((a, b) => b.spend - a.spend);
+  if (topN) ordered = ordered.slice(0, topN);
+  const keptDims = new Set(ordered.map(o => o.dim));
+
+  // ── Matriz date × dim para el line chart
+  const byDimByDate = {};
+  const allDates = new Set();
+  rows.forEach(r => {
+    if (!keptDims.has(r[dimKey])) return;
+    allDates.add(r.date);
+    const k = r[dimKey];
+    if (!byDimByDate[k]) byDimByDate[k] = {};
+    byDimByDate[k][r.date] = (byDimByDate[k][r.date] || 0) + (r.leads || 0);
+  });
+  const dates = [...allDates].sort();
+
+  const datasets = ordered.map((o, i) => ({
+    label: o.dim,
+    data: dates.map(d => byDimByDate[o.dim][d] || 0),
+    borderColor:     BRAND.palette[i % BRAND.palette.length],
+    backgroundColor: BRAND.palette[i % BRAND.palette.length] + "22",
+    tension: .3,
+    pointRadius: 2,
+    spanGaps: true,
+  }));
+
+  const ctx = document.getElementById(chartId).getContext("2d");
+  charts[chartName] = new Chart(ctx, {
+    type: "line",
+    data: { labels: dates, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: "Leads" },
+        },
+        x: {
+          ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 14 },
+        },
+      },
+      plugins: {
+        legend: { position: "bottom" },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${fmtInt(ctx.parsed.y)}`,
+          },
+        },
+      },
+    },
+  });
+
+  // ── Tabla resumen
+  tableEl.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>${label}</th>
+        <th class="num">Spend</th>
+        <th class="num">Leads</th>
+        <th class="num">CPL</th>
+        <th class="num">Trials</th>
+        <th class="num">CPT</th>
+        <th class="num">Purch.</th>
+        <th class="num">CPP</th>
+        <th class="num">Impr.</th>
+        <th class="num">CTR%</th>
+      </tr></thead>
+      <tbody>
+        ${ordered.map(o => {
+          const cpl = o.leads      ? o.spend / o.leads      : 0;
+          const cpt = o.trials     ? o.spend / o.trials     : 0;
+          const cpp = o.purchases  ? o.spend / o.purchases  : 0;
+          const ctr = o.impressions ? o.clicks / o.impressions * 100 : 0;
+          return `<tr>
+            <td>${o.dim}</td>
+            <td class="num">${fmtMoney(o.spend)}</td>
+            <td class="num">${fmtInt(o.leads)}</td>
+            <td class="num">${o.leads     ? fmtMoney(cpl) : "—"}</td>
+            <td class="num">${fmtInt(o.trials)}</td>
+            <td class="num">${o.trials    ? fmtMoney(cpt) : "—"}</td>
+            <td class="num">${fmtInt(o.purchases)}</td>
+            <td class="num">${o.purchases ? fmtMoney(cpp) : "—"}</td>
+            <td class="num">${fmtInt(o.impressions)}</td>
+            <td class="num">${fmtPct(ctr)}</td>
+          </tr>`;
+        }).join("")}
       </tbody>
     </table>
   `;

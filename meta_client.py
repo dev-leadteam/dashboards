@@ -92,11 +92,15 @@ class MetaClient:
         date_start: str,
         date_end: str,
         breakdowns: str | None = None,
+        time_increment: int | str | None = None,
     ) -> list[dict]:
         params = {
             "level": level,
             "time_range": f'{{"since":"{date_start}","until":"{date_end}"}}',
             "fields": ",".join([
+                # date_start/date_stop sólo se llenan cuando time_increment
+                # está activo; cuando no, Meta simplemente los ignora.
+                "date_start", "date_stop",
                 "adset_id", "adset_name",
                 "ad_id", "ad_name",
                 "campaign_id", "campaign_name",
@@ -114,6 +118,9 @@ class MetaClient:
         }
         if breakdowns:
             params["breakdowns"] = breakdowns
+        if time_increment is not None:
+            # time_increment=1 → una fila por día por objeto (ad/adset/campaign).
+            params["time_increment"] = str(time_increment)
         return list(self._paginate(f"{object_id}/insights", params=params))
 
     def get_daily_insights(
