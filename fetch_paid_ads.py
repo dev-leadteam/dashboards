@@ -2,22 +2,6 @@
 fetch_paid_ads.py
 ─────────────────────────────────────────────────────────────
 ETL Meta Ads → paid-ads-data.json
-
-Diseñado para correr en GitHub Actions (vía refresh-paid-ads.yml).
-
-- Reutiliza MetaClient y los helpers (leads_of, purchases_of, trials_of)
-  del proyecto original (ver meta_client.py adjunto).
-- Lee la misma config.yaml.
-- NO escribe a Google Sheets. Emite un único JSON en la raíz del repo
-  (paid-ads-data.json) que consume paid-ads.html.
-
-Trials se leen desde el campo `conversions[]` (start_trial_total), que es
-donde Meta reporta las offline conversions que sube el CRM de SWEAT440.
-Esta es la cifra que coincide con la UI de Ads Manager.
-
-Variables de entorno requeridas (GitHub Secrets en prod):
-    META_ACCESS_TOKEN
-    META_API_VERSION   (opcional, default v21.0)
 """
 from __future__ import annotations
 import json
@@ -32,23 +16,16 @@ from pathlib import Path
 
 import yaml
 
-# local (mismo folder)
 from meta_client import MetaClient, leads_of, purchases_of, trials_of
 
 
-# ── paths ────────────────────────────────────────────────────────────
 REPO_ROOT = Path(__file__).resolve().parent
 CONFIG_PATH = REPO_ROOT / "config.yaml"
 OUT_PATH = REPO_ROOT / "paid-ads-data.json"
 
-# Ventana rolling para las series de tiempo diarias (por dimensión).
-# Los totales / tablas agregadas siguen usando el rango completo de la
-# campaña (config.yaml: date_start → date_end). Sólo el `daily_series`
-# queda acotado a esta ventana.
 DAILY_WINDOW_DAYS = 90
 
 
-# ── logging ──────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -57,7 +34,7 @@ logging.basicConfig(
 log = logging.getLogger("paid-ads-etl")
 
 
-# ── helpers de clasificación (copiados de meta_to_sheets.py) ─────────
+# ── helpers de clasificación ─────────────────────────────────────────
 def match_studio(name: str, studios: list[dict]) -> dict | None:
     n = (name or "").lower()
     for s in studios:
@@ -98,6 +75,100 @@ _STOPWORDS = {
     "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
     "ENE", "ABR", "AGO", "DIC",
 }
+
+_GENERIC_PREFIXES = {
+    "VIDEO", "REEL", "REELS", "IMAGE", "PHOTO", "STATIC",
+    "CAROUSEL", "GIF", "STORY", "STORIES",
+}
+
+# Fallback por nombre cuando Meta no devuelve creative info.
+_VIDEO_KEYWORDS = {"VIDEO", "REEL", "REELS", "GIF", "STORY", "STORIES"}
+_STATIC_KEYWORDS = {"STATIC", "IMAGE", "PHOTO", "CAROUSEL"}
+
+
+def _media_type_from_creative(creative: dict) -> str | None:
+    """
+    Determina Static vs Video usando el objeto `creative` de Meta.
+    Devuelve "Video", "Static" o None si no se puede decidir.
+
+    Para SWEAT440 la mayoría de ads son object_type=LINK con la info de
+    imagen/video DENTRO de object_story_spec, así que también miramos ahí.
+
+    Orden de prioridad:
+      1. object_type explícito ("VIDEO" / "PHOTO") → decide directo.
+      2. video_id / image_hash a nivel top.
+      3. object_story_spec.video_data → Video.
+      4. object_story_spec.link_data: video_id → Video, image_hash/picture → Static.
+      5. object_story_spec.photo_data → Static.
+      6. asset_feed_spec (si por alguna razón viene): videos → Video, images → Static.
+    """
+    if not creative:
+        return None
+
+    ot = (creative.get("object_type") or "").upper()
+    if ot == "VIDEO":
+        return "Video"
+    if ot == "PHOTO":
+        return "Static"
+
+    # Top-level
+    if creative.get("video_id"):
+        return "Video"
+    if creative.get("image_hash"):
+        return "Static"
+
+    # Anidado en object_story_spec — donde Meta esconde los datos cuando
+    # object_type es LINK / SHARE.
+    oss = creative.get("object_story_spec") or {}
+    if isinstance(oss, dict):
+        vd = oss.get("video_data") or {}
+        if isinstance(vd, dict) and (vd.get("video_id") or vd.get("image_url")):
+            return "Video"
+        ld = oss.get("link_data") or {}
+        if isinstance(ld, dict):
+            if ld.get("video_id"):
+                return "Video"
+            if ld.get("image_hash") or ld.get("picture"):
+                return "Static"
+        pd = oss.get("photo_data") or {}
+        if isinstance(pd, dict) and pd.get("image_hash"):
+            return "Static"
+
+    # Asset feed spec (dynamic creatives) — fallback histórico
+    afs = creative.get("asset_feed_spec") or {}
+    if isinstance(afs, dict):
+        videos = afs.get("videos") or []
+        images = afs.get("images") or []
+        if videos:
+            return "Video"
+        if images:
+            return "Static"
+
+    return None
+
+
+def _media_type_from_name(ad_name: str) -> str:
+    """Fallback por nombre — usado solo si no hay creative info."""
+    if not ad_name:
+        return "Other"
+    words = {w.upper() for w in re.findall(r"\w+", ad_name)}
+    if words & _VIDEO_KEYWORDS:
+        return "Video"
+    if words & _STATIC_KEYWORDS:
+        return "Static"
+    return "Other"
+
+
+def detect_media_type(ad_name: str, creative: dict | None = None) -> str:
+    """
+    Determina "Video" / "Static" / "Other".
+    Prioriza la info del creative de Meta (object_type / video_id / image_hash).
+    Cae al heurístico de nombre si Meta no devolvió esos campos.
+    """
+    via_creative = _media_type_from_creative(creative or {})
+    if via_creative:
+        return via_creative
+    return _media_type_from_name(ad_name)
 
 
 def detect_concept(
@@ -141,10 +212,24 @@ def detect_concept(
 
     if not words_out:
         return "(other)"
-    for w in words_out:
+
+    primary = None
+    primary_idx = 0
+    for i, w in enumerate(words_out):
         if w[0].isupper():
-            return w
-    return words_out[0]
+            primary = w
+            primary_idx = i
+            break
+    if primary is None:
+        primary = words_out[0]
+        primary_idx = 0
+
+    if primary.upper() in _GENERIC_PREFIXES:
+        for w in words_out[primary_idx + 1:]:
+            if len(w) >= 3 and w[0].isupper():
+                return f"{primary} - {w}"
+
+    return primary
 
 
 def safe_float(x, default=0.0):
@@ -156,11 +241,6 @@ def safe_float(x, default=0.0):
 
 # ── núcleo: procesar 1 campaña ───────────────────────────────────────
 def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
-    """
-    Extrae Meta Ads data de 1 campaña y devuelve un dict con TODA la
-    estructura que consumirá el HTML (totals, studios, audiences, pillars,
-    concepts, studio_pillars, studio_concepts, daily).
-    """
     log.info(f"── Campaign: {c['display_name']} ({c['period_label']}) [{campaign_key}]")
 
     ad_sets = meta.list_ad_sets(c["campaign_id"])
@@ -170,7 +250,37 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
     ads = meta.list_ads(c["campaign_id"])
     log.info(f"  {len(ads)} ads")
 
-    # Insights a nivel AD — pedimos por AD SET para evitar subcode=1504018
+    # Recolectar creative_ids únicos y traerlos en batch desde Meta.
+    # La expansión `creative{...}` desde el endpoint de ads dropea sub-fields
+    # silenciosamente — por eso fetcheamos los creatives por ID directamente.
+    cids_per_ad: dict[str, str] = {}
+    for ad in ads:
+        ad_id = ad.get("id")
+        if not ad_id:
+            continue
+        cr = ad.get("creative") or {}
+        cid = cr.get("id")
+        if cid:
+            cids_per_ad[ad_id] = cid
+    unique_cids = list({cid for cid in cids_per_ad.values()})
+    log.info(f"  fetching {len(unique_cids)} unique creatives in batch...")
+    cdetails = meta.get_creatives_by_ids(unique_cids)
+    log.info(f"  got detail for {len(cdetails)}/{len(unique_cids)} creatives")
+
+    # Mapa ad_id → creative DETALLADO (incluye asset_feed_spec.images/videos).
+    creative_by_ad: dict[str, dict] = {}
+    for ad_id, cid in cids_per_ad.items():
+        creative_by_ad[ad_id] = cdetails.get(cid) or {}
+
+    # Conteos para diagnosticar la cobertura
+    n_with_creative = sum(1 for cr in creative_by_ad.values() if cr)
+    n_without_creative = len(creative_by_ad) - n_with_creative
+    log.info(
+        f"  creative info: {n_with_creative}/{len(creative_by_ad)} ads "
+        f"con creative ({n_without_creative} sin info → fallback por nombre)"
+    )
+
+    # Insights a nivel AD
     ad_insights: list[dict] = []
     for adset in ad_sets:
         try:
@@ -202,25 +312,28 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
             "code": s["code"], "name": s["name"], "state": s["state"],
             "impressions": 0, "clicks": 0, "spend": 0.0, "reach": 0,
             "leads": 0, "purchases": 0, "trials": 0,
-            "_audiences": defaultdict(_empty_bucket),
-            "_pillars":   defaultdict(_empty_bucket),
-            "_concepts":  defaultdict(_empty_bucket),
+            "_audiences":   defaultdict(_empty_bucket),
+            "_pillars":     defaultdict(_empty_bucket),
+            "_concepts":    defaultdict(_empty_bucket),
+            "_media_types": defaultdict(_empty_bucket),
         } for s in studios_cfg
     }
 
-    global_aud:     dict[str, dict] = defaultdict(_empty_bucket)
-    global_pillar:  dict[str, dict] = defaultdict(_empty_bucket)
-    global_concept: dict[str, dict] = defaultdict(_empty_bucket)
+    global_aud:        dict[str, dict] = defaultdict(_empty_bucket)
+    global_pillar:     dict[str, dict] = defaultdict(_empty_bucket)
+    global_concept:    dict[str, dict] = defaultdict(_empty_bucket)
+    global_media_type: dict[str, dict] = defaultdict(_empty_bucket)
 
     aud_tokens_cfg    = c.get("audience_tokens", {}) or {}
     pillar_tokens_cfg = c.get("pillar_tokens", {}) or {}
     aud_flat    = {t for toks in aud_tokens_cfg.values() for t in toks}
     pillar_flat = {t for toks in pillar_tokens_cfg.values() for t in toks}
 
-    # Mapa ad_id → dimensiones (studio/audience/pillar/concept). Se llena
-    # en este loop y luego se reutiliza para rebanar los insights daily
-    # sin reclasificar ad por ad × día.
     ad_dims: dict[str, dict] = {}
+
+    # Diagnóstico de clasificación de media_type
+    mt_via_creative = 0
+    mt_via_name = 0
 
     for ins in ad_insights:
         adset = adset_by_id.get(ins.get("adset_id"), {})
@@ -238,6 +351,16 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
             pillar_tokens_flat=pillar_flat,
             state_code=studio.get("state"),
         )
+        # Clasificación de tipo de creatividad. Usamos creative (Meta API)
+        # como fuente primaria; ad_name es fallback.
+        creative = creative_by_ad.get(ins.get("ad_id")) or {}
+        via_creative = _media_type_from_creative(creative)
+        if via_creative:
+            media_type = via_creative
+            mt_via_creative += 1
+        else:
+            media_type = _media_type_from_name(ad_name)
+            mt_via_name += 1
 
         spend = safe_float(ins.get("spend"))
         impressions = int(safe_float(ins.get("impressions")))
@@ -272,6 +395,8 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
         if concept and concept != "(other)":
             _bump(agg["_concepts"][concept], ad_name)
             _bump(global_concept[concept], ad_name)
+        _bump(agg["_media_types"][media_type], ad_name)
+        _bump(global_media_type[media_type], ad_name)
 
         ad_id = ins.get("ad_id")
         if ad_id:
@@ -280,7 +405,13 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
                 "audience":    aud,
                 "pillar":      pillar,
                 "concept":     concept if concept and concept != "(other)" else None,
+                "media_type":  media_type,
             }
+
+    log.info(
+        f"  media_type breakdown: {mt_via_creative} via Meta creative API, "
+        f"{mt_via_name} via name fallback"
+    )
 
     # Totales
     totals = {k: 0 for k in ["impressions", "clicks", "reach", "leads", "purchases", "trials"]}
@@ -385,6 +516,31 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
                 "cpl": cpl,
             })
 
+    media_types_out = []
+    for mt, v in global_media_type.items():
+        cpl = round(v["spend"] / v["leads"], 2) if v["leads"] else 0
+        media_types_out.append({
+            "media_type": mt,
+            "spend": round(v["spend"], 2),
+            "impressions": v["impressions"],
+            "leads": v["leads"],
+            "cpl": cpl,
+            "ads": v["ads"][:20],
+        })
+
+    studio_media_types_out = []
+    for code, agg in studio_agg.items():
+        for mt, v in agg["_media_types"].items():
+            cpl = round(v["spend"] / v["leads"], 2) if v["leads"] else 0
+            studio_media_types_out.append({
+                "studio_code": code,
+                "media_type": mt,
+                "spend": round(v["spend"], 2),
+                "impressions": v["impressions"],
+                "leads": v["leads"],
+                "cpl": cpl,
+            })
+
     daily_out = []
     for d in daily:
         daily_out.append({
@@ -398,10 +554,6 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
             "trials": trials_of(d),
         })
 
-    # ── daily time series (rolling 90d por dimensión) ─────────────────
-    # Traemos ad-level × día en una ventana rolling y agregamos en Python
-    # por cada dimensión (studio / audience / pillar / concept y los
-    # cruces con studio). Reusamos ad_dims[] construido arriba.
     today = date.today()
     window_start = (today - timedelta(days=DAILY_WINDOW_DAYS)).isoformat()
     today_iso = today.isoformat()
@@ -412,26 +564,22 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
         "window_start": daily_start,
         "window_end":   daily_end,
         "window_days":  DAILY_WINDOW_DAYS,
-        "campaign":           [],
-        "by_studio":          [],
-        "by_audience":        [],
-        "by_pillar":          [],
-        "by_concept":         [],
-        "by_studio_audience": [],
-        "by_studio_pillar":   [],
-        "by_studio_concept":  [],
+        "campaign":             [],
+        "by_studio":            [],
+        "by_audience":          [],
+        "by_pillar":            [],
+        "by_concept":           [],
+        "by_media_type":        [],
+        "by_studio_audience":   [],
+        "by_studio_pillar":     [],
+        "by_studio_concept":    [],
+        "by_studio_media_type": [],
     }
 
     if daily_start > daily_end:
-        log.info(
-            f"  daily series: ventana vacía "
-            f"(start={daily_start} > end={daily_end}), skip."
-        )
+        log.info(f"  daily series: ventana vacía (start={daily_start} > end={daily_end}), skip.")
     else:
-        log.info(
-            f"  fetching daily ad×day insights "
-            f"[{daily_start} → {daily_end}] …"
-        )
+        log.info(f"  fetching daily ad×day insights [{daily_start} → {daily_end}] …")
         daily_ad_insights: list[dict] = []
         for adset in ad_sets:
             try:
@@ -444,24 +592,23 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
                 )
                 daily_ad_insights.extend(rows)
             except Exception as e:
-                log.warning(
-                    f"  daily ad-level failed for adset "
-                    f"{adset.get('name','?')} ({adset['id']}): {e}"
-                )
+                log.warning(f"  daily ad-level failed for adset {adset.get('name','?')} ({adset['id']}): {e}")
         log.info(f"  {len(daily_ad_insights)} ad×day rows")
 
         def _empty_d():
             return {"spend": 0.0, "impressions": 0, "clicks": 0,
                     "reach": 0, "leads": 0, "trials": 0, "purchases": 0}
 
-        camp_d        = defaultdict(_empty_d)   # key: date
-        d_studio      = defaultdict(_empty_d)   # (studio, date)
-        d_aud         = defaultdict(_empty_d)   # (aud, date)
-        d_pillar      = defaultdict(_empty_d)   # (pillar, date)
-        d_concept     = defaultdict(_empty_d)   # (concept, date)
-        d_stu_aud     = defaultdict(_empty_d)   # (studio, aud, date)
-        d_stu_pillar  = defaultdict(_empty_d)   # (studio, pillar, date)
-        d_stu_concept = defaultdict(_empty_d)   # (studio, concept, date)
+        camp_d         = defaultdict(_empty_d)
+        d_studio       = defaultdict(_empty_d)
+        d_aud          = defaultdict(_empty_d)
+        d_pillar       = defaultdict(_empty_d)
+        d_concept      = defaultdict(_empty_d)
+        d_media_type   = defaultdict(_empty_d)
+        d_stu_aud      = defaultdict(_empty_d)
+        d_stu_pillar   = defaultdict(_empty_d)
+        d_stu_concept  = defaultdict(_empty_d)
+        d_stu_media    = defaultdict(_empty_d)
 
         def _bump_d(bucket, spend, impressions, clicks, reach, leads, trials, purchases):
             bucket["spend"]       += spend
@@ -476,8 +623,6 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
             ad_id = row.get("ad_id")
             dims = ad_dims.get(ad_id)
             if not dims:
-                # Ads sin clasificar (no hacen match con ningún studio) se
-                # ignoran — igual que en la agregación principal.
                 continue
             d = row.get("date_start")
             if not d:
@@ -508,6 +653,9 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
                 co = dims["concept"]
                 _bump_d(d_concept[(co, d)],         spend, impressions, clicks, reach, leads, trials, purchases)
                 _bump_d(d_stu_concept[(sc, co, d)], spend, impressions, clicks, reach, leads, trials, purchases)
+            mt = dims.get("media_type") or "Other"
+            _bump_d(d_media_type[(mt, d)],     spend, impressions, clicks, reach, leads, trials, purchases)
+            _bump_d(d_stu_media[(sc, mt, d)],  spend, impressions, clicks, reach, leads, trials, purchases)
 
         def _row_metrics(b: dict) -> dict:
             return {
@@ -526,7 +674,6 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
             }
 
         def _emit(data_dict, key_names):
-            # key_names termina en "date"; los anteriores son las dimensiones.
             out = []
             for k in sorted(data_dict.keys()):
                 if not isinstance(k, tuple):
@@ -542,14 +689,16 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
         ]
 
         daily_series.update({
-            "campaign":           campaign_series,
-            "by_studio":          _emit(d_studio,      ["studio_code", "date"]),
-            "by_audience":        _emit(d_aud,         ["audience",    "date"]),
-            "by_pillar":          _emit(d_pillar,      ["pillar",      "date"]),
-            "by_concept":         _emit(d_concept,     ["concept",     "date"]),
-            "by_studio_audience": _emit(d_stu_aud,     ["studio_code", "audience", "date"]),
-            "by_studio_pillar":   _emit(d_stu_pillar,  ["studio_code", "pillar",   "date"]),
-            "by_studio_concept":  _emit(d_stu_concept, ["studio_code", "concept",  "date"]),
+            "campaign":             campaign_series,
+            "by_studio":            _emit(d_studio,      ["studio_code", "date"]),
+            "by_audience":          _emit(d_aud,         ["audience",    "date"]),
+            "by_pillar":            _emit(d_pillar,      ["pillar",      "date"]),
+            "by_concept":           _emit(d_concept,     ["concept",     "date"]),
+            "by_media_type":        _emit(d_media_type,  ["media_type",  "date"]),
+            "by_studio_audience":   _emit(d_stu_aud,     ["studio_code", "audience",   "date"]),
+            "by_studio_pillar":     _emit(d_stu_pillar,  ["studio_code", "pillar",     "date"]),
+            "by_studio_concept":    _emit(d_stu_concept, ["studio_code", "concept",    "date"]),
+            "by_studio_media_type": _emit(d_stu_media,   ["studio_code", "media_type", "date"]),
         })
 
         log.info(
@@ -558,7 +707,7 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
             f"{len(daily_series['by_audience'])} aud×day | "
             f"{len(daily_series['by_pillar'])} pillar×day | "
             f"{len(daily_series['by_concept'])} concept×day | "
-            f"{len(daily_series['by_studio_concept'])} studio×concept×day"
+            f"{len(daily_series['by_media_type'])} media×day"
         )
 
     return {
@@ -571,8 +720,10 @@ def run_one(meta: MetaClient, campaign_key: str, c: dict) -> dict:
         "audiences": audiences_out,
         "pillars": pillars_out,
         "concepts": concepts_out,
+        "media_types": media_types_out,
         "studio_pillars": studio_pillars_out,
         "studio_concepts": studio_concepts_out,
+        "studio_media_types": studio_media_types_out,
         "daily": daily_out,
         "daily_series": daily_series,
     }

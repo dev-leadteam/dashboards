@@ -42,8 +42,9 @@ jobs:
 
       - name: Run ETL (Meta → paid-ads-data.json)
         env:
-          # Convención del repo: META_TOKEN. meta_client.py acepta ambos nombres.
+          # meta_client.py acepta META_TOKEN o META_ACCESS_TOKEN.
           META_TOKEN:        ${{ secrets.META_TOKEN }}
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
           META_API_VERSION:  ${{ secrets.META_API_VERSION }}
         run: |
           python fetch_paid_ads.py
