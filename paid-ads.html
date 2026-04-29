@@ -118,6 +118,108 @@
     background: #EFF6FF; color: var(--brand-blue-deep); font-size: 11px;
     font-weight: 600; margin-right: 4px;
   }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex; gap: 2px; flex-wrap: wrap;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .tab {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 10px 18px; border: none; background: transparent;
+    color: var(--ink-soft); cursor: pointer;
+    text-transform: uppercase; letter-spacing: .5px;
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
+    transition: color .15s, border-color .15s;
+  }
+  .tab:hover:not(.active) { color: var(--ink); }
+  .tab.active {
+    color: var(--brand-blue-deep);
+    border-bottom-color: var(--brand-blue);
+  }
+  .tab-panel.hidden { display: none; }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .filter-bar > label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--ink-soft);
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  .preset-btn {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .preset-btn:hover { background: #F1F5F9; color: var(--ink); }
+  .preset-btn.active {
+    background: var(--brand-blue);
+    border-color: var(--brand-blue);
+    color: #fff;
+  }
+  .custom-range {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 6px;
+  }
+  .custom-range[hidden] { display: none; }
+  .custom-range input[type="date"] {
+    font-family: inherit;
+    font-size: 12px;
+    padding: 5px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fff;
+  }
+  .apply-btn {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border: none;
+    background: var(--brand-blue);
+    color: #fff;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  .apply-btn:hover { background: var(--brand-blue-deep); }
+  .studio-filter-select {
+    font-family: inherit;
+    font-size: 13px;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fff;
+    min-width: 200px;
+  }
+  .filter-bar .range-info {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
 </style>
 </head>
 
@@ -137,6 +239,39 @@
     </div>
   </header>
 
+  <!-- Filter bar (period + studio — afecta TODO el dashboard) -->
+  <div class="filter-bar">
+    <label>Period:</label>
+    <button class="preset-btn active" data-preset="all">Full campaign</button>
+    <button class="preset-btn" data-preset="7">Last 7 days</button>
+    <button class="preset-btn" data-preset="30">Last 30 days</button>
+    <button class="preset-btn" data-preset="90">Last 90 days</button>
+    <button class="preset-btn" data-preset="custom">Custom</button>
+    <div class="custom-range" hidden>
+      <input type="date" id="dateStart">
+      <span style="color:var(--ink-soft)">→</span>
+      <input type="date" id="dateEnd">
+      <button class="apply-btn" id="applyCustom">Apply</button>
+    </div>
+    <label style="margin-left:18px;">Studio:</label>
+    <select id="studioFilterSelect" class="studio-filter-select">
+      <option value="">All studios</option>
+    </select>
+    <span class="range-info" id="rangeInfo"></span>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <button class="tab active" data-tab="overview">Overview</button>
+    <button class="tab" data-tab="audiences">Audiences</button>
+    <button class="tab" data-tab="pillars">Pillars</button>
+    <button class="tab" data-tab="concepts">Ads</button>
+    <button class="tab" data-tab="mediatype">Static vs Video</button>
+  </div>
+
+  <!-- ── Overview tab ─────────────────────────────────────────── -->
+  <div class="tab-panel" id="panel-overview">
+
   <!-- KPI cards -->
   <div class="kpi-grid" id="kpiGrid"></div>
 
@@ -147,8 +282,8 @@
   </div>
 
   <!-- Studios + Pillars side by side -->
-  <div class="grid-2">
-    <div class="card">
+  <div class="grid-2" id="studiosPillarsRow">
+    <div class="card" id="studiosCard">
       <h2>Studios — Performance</h2>
       <div style="max-height: 500px; overflow:auto;">
         <table id="studiosTable">
@@ -173,7 +308,7 @@
     </div>
 
     <div class="card">
-      <h2>Pillars — Campaign-wide</h2>
+      <h2 id="pillarsOverviewTitle">Pillars — Campaign-wide</h2>
       <div class="chart-wrap h-small"><canvas id="pillarsChart"></canvas></div>
       <div id="pillarsTableWrap" style="margin-top: 12px; max-height:240px; overflow:auto;"></div>
     </div>
@@ -187,50 +322,111 @@
       <div id="audiencesTableWrap" style="margin-top: 12px; max-height:240px; overflow:auto;"></div>
     </div>
     <div class="card">
-      <h2>Top Concepts</h2>
+      <h2>Top Ads</h2>
       <div class="chart-wrap h-small"><canvas id="conceptsChart"></canvas></div>
       <div id="conceptsTableWrap" style="margin-top: 12px; max-height:240px; overflow:auto;"></div>
     </div>
   </div>
 
-  <!-- Studio Detail: deep dive en un studio específico -->
-  <div class="card">
-    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-      <h2 style="margin:0;">Studio Detail</h2>
-      <div>
-        <label for="studioSelect" style="font-weight:600;color:var(--ink-soft);margin-right:6px;">Studio:</label>
-        <select id="studioSelect" style="font-family:inherit;font-size:14px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;min-width:220px;"></select>
+  </div><!-- /#panel-overview -->
+
+  <!-- ── Audiences tab ────────────────────────────────────────── -->
+  <div class="tab-panel hidden" id="panel-audiences">
+    <div class="card">
+      <h2>Audiences — Summary <span id="audiencesWindowNote" class="period" style="font-weight:400;margin-left:8px;"></span></h2>
+      <div id="audiencesTableDailyWrap" style="overflow:auto;"></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h2>Leads &amp; Spend by Audience</h2>
+        <div class="chart-wrap h-daily"><canvas id="audiencesBarChart"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>Spend Share by Audience</h2>
+        <div class="chart-wrap h-daily"><canvas id="audiencesDoughnutChart"></canvas></div>
       </div>
     </div>
+    <div class="card">
+      <h2 id="audiencesLineTitle">Leads by Audience — Daily</h2>
+      <div class="chart-wrap h-daily"><canvas id="audiencesLineChart"></canvas></div>
+    </div>
+  </div>
 
-    <div id="studioSummary" style="margin-top:14px;"></div>
-
-    <div class="grid-2" style="margin-top:14px;">
-      <div>
-        <h3 style="margin:0 0 8px 0;font-size:13px;color:var(--ink-soft);text-transform:uppercase;">Audiences</h3>
-        <div id="studioAudiencesWrap"></div>
+  <!-- ── Pillars tab ──────────────────────────────────────────── -->
+  <div class="tab-panel hidden" id="panel-pillars">
+    <div class="card">
+      <h2>Pillars — Summary <span id="pillarsWindowNote" class="period" style="font-weight:400;margin-left:8px;"></span></h2>
+      <div id="pillarsTableDailyWrap" style="overflow:auto;"></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h2>Leads &amp; Spend by Pillar</h2>
+        <div class="chart-wrap h-daily"><canvas id="pillarsBarChart"></canvas></div>
       </div>
-      <div>
-        <h3 style="margin:0 0 8px 0;font-size:13px;color:var(--ink-soft);text-transform:uppercase;">Pillars</h3>
-        <div id="studioPillarsWrap"></div>
+      <div class="card">
+        <h2>Spend Share by Pillar</h2>
+        <div class="chart-wrap h-daily"><canvas id="pillarsDoughnutChart"></canvas></div>
       </div>
     </div>
+    <div class="card">
+      <h2 id="pillarsLineTitle">Leads by Pillar — Daily</h2>
+      <div class="chart-wrap h-daily"><canvas id="pillarsLineChart"></canvas></div>
+    </div>
+  </div>
 
-    <div style="margin-top:14px;">
-      <h3 style="margin:0 0 8px 0;font-size:13px;color:var(--ink-soft);text-transform:uppercase;">Top Concepts</h3>
-      <div id="studioConceptsWrap"></div>
+  <!-- ── Static vs Video tab ─────────────────────────────────── -->
+  <div class="tab-panel hidden" id="panel-mediatype">
+    <div class="card">
+      <h2>Static vs Video — Summary <span id="mediatypeWindowNote" class="period" style="font-weight:400;margin-left:8px;"></span></h2>
+      <div id="mediatypeTableDailyWrap" style="overflow:auto;"></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h2>Leads &amp; CPL by Type</h2>
+        <div class="chart-wrap h-daily"><canvas id="mediatypeBarChart"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>Leads Share by Type</h2>
+        <div class="chart-wrap h-daily"><canvas id="mediatypeDoughnutChart"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2 id="mediatypeLineTitle">Leads by Type — Daily</h2>
+      <div class="chart-wrap h-daily"><canvas id="mediatypeLineChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ── Ads tab (antes "Concepts") ──────────────────────────── -->
+  <div class="tab-panel hidden" id="panel-concepts">
+    <div class="card">
+      <h2>Ads — Summary <span id="conceptsWindowNote" class="period" style="font-weight:400;margin-left:8px;"></span></h2>
+      <div id="conceptsTableDailyWrap" style="overflow:auto;"></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h2>Leads &amp; Spend by Ad (top 12)</h2>
+        <div class="chart-wrap h-daily"><canvas id="conceptsBarChart"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>Spend Share by Ad (top 12)</h2>
+        <div class="chart-wrap h-daily"><canvas id="conceptsDoughnutChart"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2 id="conceptsLineTitle">Leads by Ad — Daily (top 12)</h2>
+      <div class="chart-wrap h-daily"><canvas id="conceptsLineChart"></canvas></div>
     </div>
   </div>
 </div>
 
 <script>
-// ─────────────────────────────────────────────────────────────
-//  State & fetch
-// ─────────────────────────────────────────────────────────────
-let DATA = null;                // full paid-ads-data.json
-let currentKey = null;          // selected campaign key
+let DATA = null;
+let currentKey = null;
 let studiosSort = { col: "spend", dir: "desc" };
-let charts = {};                // chart refs so we can destroy+rebuild
+let charts = {};
+
+let dateFilter = { type: "all", start: null, end: null };
+let studioFilter = null;
 
 const BRAND = {
   blue: "#00A3E0",
@@ -253,17 +449,14 @@ async function bootstrap() {
   } catch (e) {
     document.body.innerHTML = `<div class="container"><div class="card" style="color:var(--bad)">
       <h2>Could not load paid-ads-data.json</h2>
-      <p>Check that the GitHub Action has run at least once, and that the file exists at the repo root.</p>
       <pre style="color:var(--ink-soft);font-size:12px">${String(e)}</pre>
     </div></div>`;
     return;
   }
 
-  // Header
   document.getElementById("generatedAt").textContent =
     "Updated " + new Date(DATA.generated_at).toLocaleString();
 
-  // Campaign picker
   const sel = document.getElementById("campaignSelect");
   DATA.campaigns_index.forEach(ci => {
     const opt = document.createElement("option");
@@ -272,29 +465,310 @@ async function bootstrap() {
     if (ci.is_default) opt.selected = true;
     sel.appendChild(opt);
   });
-  sel.addEventListener("change", () => { currentKey = sel.value; render(); });
+  sel.addEventListener("change", () => {
+    currentKey = sel.value;
+    resetFilterToAll();
+    render();
+  });
   currentKey = sel.value || DATA.active_campaign;
 
+  initTabs();
+  initFilters();
+  populateStudioFilter();
   render();
 }
 
-// ─────────────────────────────────────────────────────────────
-//  Render
-// ─────────────────────────────────────────────────────────────
+function resetFilterToAll() {
+  dateFilter = { type: "all", start: null, end: null };
+  studioFilter = null;
+  document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+  const allBtn = document.querySelector('.preset-btn[data-preset="all"]');
+  if (allBtn) allBtn.classList.add("active");
+  const customWrap = document.querySelector(".custom-range");
+  if (customWrap) customWrap.hidden = true;
+  populateStudioFilter();
+}
+
+function populateStudioFilter() {
+  const sel = document.getElementById("studioFilterSelect");
+  if (!sel) return;
+  const c = DATA.campaigns[currentKey];
+  if (!c) return;
+  const active = (c.studios || []).filter(s => s.spend > 0)
+                                   .sort((a, b) => b.spend - a.spend);
+  sel.innerHTML = '<option value="">All studios</option>' +
+    active.map(s => `<option value="${s.code}">${s.name} (${s.state})</option>`).join("");
+  sel.value = "";
+}
+
+function initFilters() {
+  document.querySelectorAll(".preset-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const preset = btn.dataset.preset;
+      document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const customWrap = document.querySelector(".custom-range");
+
+      if (preset === "custom") {
+        const c = DATA.campaigns[currentKey];
+        const ds = (c && c.daily_series) || {};
+        const winStart = ds.window_start || (c && c.date_start) || "";
+        const winEnd   = ds.window_end   || (c && c.date_end)   || "";
+        document.getElementById("dateStart").value = winStart;
+        document.getElementById("dateEnd").value   = winEnd;
+        customWrap.hidden = false;
+      } else {
+        customWrap.hidden = true;
+        dateFilter = { type: preset, start: null, end: null };
+        render();
+      }
+    });
+  });
+
+  document.getElementById("applyCustom").addEventListener("click", () => {
+    const start = document.getElementById("dateStart").value;
+    const end   = document.getElementById("dateEnd").value;
+    if (!start || !end) { alert("Por favor selecciona ambas fechas."); return; }
+    if (start > end)    { alert("La fecha de inicio debe ser anterior o igual a la de fin."); return; }
+    dateFilter = { type: "custom", start, end };
+    render();
+  });
+
+  document.getElementById("studioFilterSelect").addEventListener("change", e => {
+    studioFilter = e.target.value || null;
+    render();
+  });
+}
+
+function initTabs() {
+  document.querySelectorAll(".tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.tab;
+      document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
+      btn.classList.add("active");
+      const panel = document.getElementById("panel-" + target);
+      if (panel) panel.classList.remove("hidden");
+      Object.values(charts).forEach(ch => { if (ch) ch.resize(); });
+    });
+  });
+}
+
+function inDateRange(dateStr, start, end) {
+  if (!dateStr) return false;
+  return dateStr >= start && dateStr <= end;
+}
+
+function resolveDateRange(c) {
+  const ds = c.daily_series || {};
+  const winStart = ds.window_start || c.date_start;
+  const winEnd   = ds.window_end   || c.date_end;
+
+  if (dateFilter.type === "all") return { start: c.date_start, end: c.date_end };
+  if (dateFilter.type === "custom") {
+    return { start: dateFilter.start || winStart, end: dateFilter.end || winEnd };
+  }
+  const days = parseInt(dateFilter.type, 10) || 30;
+  const endDate = new Date(winEnd + "T00:00:00Z");
+  const startDate = new Date(endDate);
+  startDate.setUTCDate(startDate.getUTCDate() - days + 1);
+  let computedStart = startDate.toISOString().slice(0, 10);
+  if (computedStart < winStart) computedStart = winStart;
+  return { start: computedStart, end: winEnd };
+}
+
+function sumTotalsFromDaily(rows) {
+  const t = { spend: 0, impressions: 0, clicks: 0, reach: 0, leads: 0, trials: 0, purchases: 0 };
+  rows.forEach(r => {
+    t.spend       += r.spend       || 0;
+    t.impressions += r.impressions || 0;
+    t.clicks      += r.clicks      || 0;
+    t.reach       += r.reach       || 0;
+    t.leads       += r.leads       || 0;
+    t.trials      += r.trials      || 0;
+    t.purchases   += r.purchases   || 0;
+  });
+  t.cpl = t.leads ? t.spend / t.leads : 0;
+  t.ctr = t.impressions ? (t.clicks / t.impressions) * 100 : 0;
+  t.cpm = t.impressions ? (t.spend / t.impressions) * 1000 : 0;
+  return t;
+}
+
+function aggregateGroup(rows, keys) {
+  const groups = {};
+  rows.forEach(r => {
+    const key = keys.map(k => String(r[k] ?? "")).join("__");
+    if (!groups[key]) {
+      groups[key] = {};
+      keys.forEach(k => { groups[key][k] = r[k]; });
+      Object.assign(groups[key], { spend: 0, impressions: 0, clicks: 0, reach: 0, leads: 0, trials: 0, purchases: 0 });
+    }
+    const g = groups[key];
+    g.spend       += r.spend       || 0;
+    g.impressions += r.impressions || 0;
+    g.clicks      += r.clicks      || 0;
+    g.reach       += r.reach       || 0;
+    g.leads       += r.leads       || 0;
+    g.trials      += r.trials      || 0;
+    g.purchases   += r.purchases   || 0;
+  });
+  return Object.values(groups).map(g => ({
+    ...g,
+    cpl: g.leads      ? g.spend / g.leads      : 0,
+    cpt: g.trials     ? g.spend / g.trials     : 0,
+    cpp: g.purchases  ? g.spend / g.purchases  : 0,
+    ctr: g.impressions ? (g.clicks / g.impressions) * 100 : 0,
+    cpm: g.impressions ? (g.spend / g.impressions) * 1000 : 0,
+  }));
+}
+
+function buildView(c) {
+  const range = resolveDateRange(c);
+  const sf = studioFilter;
+
+  if (dateFilter.type === "all" && !sf) {
+    return Object.assign({}, c, { _range: range, _filtered: false, _studio_filter: null });
+  }
+
+  const { start, end } = range;
+  const inR = r => inDateRange(r.date, start, end);
+  const ds = c.daily_series || {};
+
+  let fByStudio     = (ds.by_studio || []).filter(inR);
+  let fByStuAud     = (ds.by_studio_audience || []).filter(inR);
+  let fByStuPillar  = (ds.by_studio_pillar || []).filter(inR);
+  let fByStuConcept = (ds.by_studio_concept || []).filter(inR);
+  let fByStuMedia   = (ds.by_studio_media_type || []).filter(inR);
+
+  let fDaily, fByAudience, fByPillar, fByConcept, fByMedia;
+
+  if (sf) {
+    fByStudio     = fByStudio.filter(r => r.studio_code === sf);
+    fByStuAud     = fByStuAud.filter(r => r.studio_code === sf);
+    fByStuPillar  = fByStuPillar.filter(r => r.studio_code === sf);
+    fByStuConcept = fByStuConcept.filter(r => r.studio_code === sf);
+    fByStuMedia   = fByStuMedia.filter(r => r.studio_code === sf);
+
+    fDaily = fByStudio.map(r => ({
+      date:        r.date,
+      spend:       r.spend       || 0,
+      impressions: r.impressions || 0,
+      clicks:      r.clicks      || 0,
+      reach:       r.reach       || 0,
+      leads:       r.leads       || 0,
+      trials:      r.trials      || 0,
+      purchases:   r.purchases   || 0,
+    }));
+
+    const stripStudio = key => r => ({
+      [key]: r[key], date: r.date,
+      spend: r.spend || 0, impressions: r.impressions || 0,
+      clicks: r.clicks || 0, reach: r.reach || 0,
+      leads: r.leads || 0, trials: r.trials || 0, purchases: r.purchases || 0,
+    });
+    fByAudience = fByStuAud.map(stripStudio("audience"));
+    fByPillar   = fByStuPillar.map(stripStudio("pillar"));
+    fByConcept  = fByStuConcept.map(stripStudio("concept"));
+    fByMedia    = fByStuMedia.map(stripStudio("media_type"));
+  } else {
+    fDaily      = (c.daily || []).filter(inR);
+    fByAudience = (ds.by_audience || []).filter(inR);
+    fByPillar   = (ds.by_pillar || []).filter(inR);
+    fByConcept  = (ds.by_concept || []).filter(inR);
+    fByMedia    = (ds.by_media_type || []).filter(inR);
+  }
+
+  const studioMeta = {};
+  (c.studios || []).forEach(s => { studioMeta[s.code] = s; });
+  const studios = aggregateGroup(fByStudio, ["studio_code"]).map(a => {
+    const meta = studioMeta[a.studio_code] || {};
+    return Object.assign({
+      code:  a.studio_code,
+      name:  meta.name  || a.studio_code,
+      state: meta.state || "",
+    }, a);
+  });
+
+  return Object.assign({}, c, {
+    _range:             range,
+    _filtered:          true,
+    _studio_filter:     sf,
+    daily:              fDaily,
+    totals:             sumTotalsFromDaily(fDaily),
+    studios:            studios,
+    pillars:            aggregateGroup(fByPillar,   ["pillar"]),
+    audiences:          aggregateGroup(fByStuAud,   ["studio_code", "audience"]),
+    concepts:           aggregateGroup(fByConcept,  ["concept"]),
+    media_types:        aggregateGroup(fByMedia,    ["media_type"]),
+    studio_pillars:     aggregateGroup(fByStuPillar,  ["studio_code", "pillar"]),
+    studio_concepts:    aggregateGroup(fByStuConcept, ["studio_code", "concept"]),
+    studio_media_types: aggregateGroup(fByStuMedia,   ["studio_code", "media_type"]),
+    daily_series: Object.assign({}, ds, {
+      window_start:           start,
+      window_end:             end,
+      campaign:               fDaily,
+      by_studio:              fByStudio,
+      by_audience:            fByAudience,
+      by_pillar:              fByPillar,
+      by_concept:             fByConcept,
+      by_media_type:          fByMedia,
+      by_studio_audience:     fByStuAud,
+      by_studio_pillar:       fByStuPillar,
+      by_studio_concept:      fByStuConcept,
+      by_studio_media_type:   fByStuMedia,
+    }),
+  });
+}
+
 function render() {
   const c = DATA.campaigns[currentKey];
   if (!c) return;
 
-  document.getElementById("periodLabel").textContent =
-    c.period_label + "  ·  " + c.date_start + " → " + c.date_end;
+  const view = buildView(c);
 
-  renderKpis(c.totals);
-  renderDaily(c.daily);
-  renderStudios(c.studios);
-  renderPillars(c.pillars);
-  renderAudiences(c.audiences, c.studios);
-  renderConcepts(c.concepts);
-  renderStudioDetail(c);
+  document.getElementById("periodLabel").textContent =
+    c.period_label + "  ·  " + view._range.start + " → " + view._range.end;
+
+  const ri = document.getElementById("rangeInfo");
+  if (ri) {
+    ri.textContent = view._filtered
+      ? "Showing " + view._range.start + " → " + view._range.end + " (filtered from daily series)"
+      : "Showing full campaign window";
+  }
+
+  const studiosCard = document.getElementById("studiosCard");
+  const pillarsRow  = document.getElementById("studiosPillarsRow");
+  if (studiosCard && pillarsRow) {
+    if (view._studio_filter) {
+      studiosCard.style.display = "none";
+      pillarsRow.style.gridTemplateColumns = "1fr";
+    } else {
+      studiosCard.style.display = "";
+      pillarsRow.style.gridTemplateColumns = "";
+    }
+  }
+
+  const pTitle = document.getElementById("pillarsOverviewTitle");
+  if (pTitle) {
+    if (view._studio_filter) {
+      const meta = (c.studios || []).find(s => s.code === view._studio_filter);
+      pTitle.textContent = "Pillars — " + (meta ? meta.name : view._studio_filter);
+    } else {
+      pTitle.textContent = "Pillars — Campaign-wide";
+    }
+  }
+
+  renderKpis(view.totals);
+  renderDaily(view.daily);
+  renderStudios(view.studios);
+  renderPillars(view.pillars);
+  renderAudiences(view.audiences, view.studios);
+  renderConcepts(view.concepts);
+
+  renderTabAudiences(view);
+  renderTabPillars(view);
+  renderTabConcepts(view);
+  renderTabMediaType(view);
 }
 
 function renderKpis(t) {
@@ -321,7 +795,7 @@ function renderKpis(t) {
 
 function renderDaily(daily) {
   const labels = daily.map(d => d.date);
-  const spend = daily.map(d => d.spend);
+  const cpl   = daily.map(d => (d.leads && d.leads > 0) ? d.spend / d.leads : null);
   const leads = daily.map(d => d.leads);
 
   if (charts.daily) charts.daily.destroy();
@@ -332,9 +806,9 @@ function renderDaily(daily) {
       labels,
       datasets: [
         {
-          label: "Spend", data: spend, yAxisID: "y",
+          label: "CPL", data: cpl, yAxisID: "y",
           borderColor: BRAND.blue, backgroundColor: "rgba(0,163,224,.15)",
-          tension: .3, fill: true, pointRadius: 2,
+          tension: .3, fill: true, pointRadius: 2, spanGaps: true,
         },
         {
           label: "Leads", data: leads, yAxisID: "y1",
@@ -347,9 +821,8 @@ function renderDaily(daily) {
       responsive: true, maintainAspectRatio: false,
       interaction: { mode: "index", intersect: false },
       scales: {
-        y:  { position: "left",  title: { display: true, text: "Spend ($)" }, beginAtZero: true },
-        y1: { position: "right", title: { display: true, text: "Leads" },
-              beginAtZero: true, grid: { drawOnChartArea: false } },
+        y:  { position: "left",  title: { display: true, text: "CPL ($)" }, beginAtZero: true },
+        y1: { position: "right", title: { display: true, text: "Leads" }, beginAtZero: true, grid: { drawOnChartArea: false } },
       },
       plugins: {
         legend: { position: "bottom" },
@@ -357,8 +830,8 @@ function renderDaily(daily) {
           callbacks: {
             label: ctx => {
               const v = ctx.parsed.y;
-              return ctx.dataset.label + ": " +
-                (ctx.dataset.label === "Spend" ? fmtMoney(v) : fmtInt(v));
+              if (v === null || v === undefined) return ctx.dataset.label + ": —";
+              return ctx.dataset.label + ": " + (ctx.dataset.label === "CPL" ? fmtMoney(v) : fmtInt(v));
             },
           },
         },
@@ -369,22 +842,17 @@ function renderDaily(daily) {
 
 function renderStudios(studios) {
   const tbody = document.querySelector("#studiosTable tbody");
-  // enrich with computed cpt / cpp
   const enriched = studios.map(s => ({
     ...s,
     cpt: s.trials    ? s.spend / s.trials    : 0,
     cpp: s.purchases ? s.spend / s.purchases : 0,
   }));
-
   const rows = [...enriched].sort((a, b) => {
     const { col, dir } = studiosSort;
     const av = a[col], bv = b[col];
-    const cmp = (typeof av === "string")
-      ? String(av).localeCompare(String(bv))
-      : (Number(av) - Number(bv));
+    const cmp = (typeof av === "string") ? String(av).localeCompare(String(bv)) : (Number(av) - Number(bv));
     return dir === "asc" ? cmp : -cmp;
   });
-
   tbody.innerHTML = rows.map(s => `
     <tr>
       <td>${s.name}</td>
@@ -400,21 +868,13 @@ function renderStudios(studios) {
       <td class="num">${fmtPct(s.ctr)}</td>
     </tr>
   `).join("");
-
-  // Sort indicators
   document.querySelectorAll("#studiosTable th").forEach(th => {
     th.classList.remove("sort-asc", "sort-desc");
-    if (th.dataset.k === studiosSort.col) {
-      th.classList.add(studiosSort.dir === "asc" ? "sort-asc" : "sort-desc");
-    }
+    if (th.dataset.k === studiosSort.col) th.classList.add(studiosSort.dir === "asc" ? "sort-asc" : "sort-desc");
     th.onclick = () => {
       const k = th.dataset.k;
-      if (studiosSort.col === k) {
-        studiosSort.dir = studiosSort.dir === "asc" ? "desc" : "asc";
-      } else {
-        studiosSort.col = k;
-        studiosSort.dir = (typeof studios[0][k] === "string") ? "asc" : "desc";
-      }
+      if (studiosSort.col === k) studiosSort.dir = studiosSort.dir === "asc" ? "desc" : "asc";
+      else { studiosSort.col = k; studiosSort.dir = (typeof studios[0][k] === "string") ? "asc" : "desc"; }
       renderStudios(studios);
     };
   });
@@ -422,7 +882,6 @@ function renderStudios(studios) {
 
 function renderPillars(pillars) {
   pillars = [...pillars].sort((a, b) => b.spend - a.spend);
-
   if (charts.pillars) charts.pillars.destroy();
   const ctx = document.getElementById("pillarsChart").getContext("2d");
   if (pillars.length === 0) {
@@ -434,35 +893,22 @@ function renderPillars(pillars) {
     data: {
       labels: pillars.map(p => p.pillar),
       datasets: [
-        {
-          label: "Spend",
-          data: pillars.map(p => p.spend),
-          backgroundColor: BRAND.blue,
-        },
-        {
-          label: "Leads",
-          data: pillars.map(p => p.leads),
-          backgroundColor: "#F59E0B",
-          yAxisID: "y1",
-        },
+        { label: "Spend", data: pillars.map(p => p.spend), backgroundColor: BRAND.blue },
+        { label: "Leads", data: pillars.map(p => p.leads), backgroundColor: "#F59E0B", yAxisID: "y1" },
       ],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       scales: {
         y:  { beginAtZero: true, title: { display: true, text: "$" } },
-        y1: { beginAtZero: true, position: "right", grid: { drawOnChartArea: false },
-              title: { display: true, text: "Leads" } },
+        y1: { beginAtZero: true, position: "right", grid: { drawOnChartArea: false }, title: { display: true, text: "Leads" } },
       },
       plugins: { legend: { position: "bottom" } },
     },
   });
-
   document.getElementById("pillarsTableWrap").innerHTML = `
     <table>
-      <thead><tr>
-        <th>Pillar</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th>
-      </tr></thead>
+      <thead><tr><th>Pillar</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th></tr></thead>
       <tbody>
         ${pillars.map(p => `
           <tr>
@@ -473,12 +919,10 @@ function renderPillars(pillars) {
           </tr>
         `).join("")}
       </tbody>
-    </table>
-  `;
+    </table>`;
 }
 
 function renderAudiences(audiences, studios) {
-  // Roll up by audience (sum spend + leads across all studios)
   const roll = {};
   audiences.forEach(a => {
     if (!roll[a.audience]) roll[a.audience] = { audience: a.audience, spend: 0, impressions: 0, leads: 0, studios: new Set() };
@@ -492,7 +936,6 @@ function renderAudiences(audiences, studios) {
     cpl: r.leads ? r.spend / r.leads : 0,
     studios: r.studios.size,
   })).sort((a, b) => b.spend - a.spend);
-
   if (charts.audiences) charts.audiences.destroy();
   const ctx = document.getElementById("audiencesChart").getContext("2d");
   if (rows.length === 0) {
@@ -503,30 +946,19 @@ function renderAudiences(audiences, studios) {
     type: "doughnut",
     data: {
       labels: rows.map(r => r.audience),
-      datasets: [{
-        data: rows.map(r => r.spend),
-        backgroundColor: rows.map((_, i) => BRAND.palette[i % BRAND.palette.length]),
-      }],
+      datasets: [{ data: rows.map(r => r.spend), backgroundColor: rows.map((_, i) => BRAND.palette[i % BRAND.palette.length]) }],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { position: "right" },
-        tooltip: {
-          callbacks: {
-            label: ctx => `${ctx.label}: ${fmtMoney(ctx.parsed)}`,
-          },
-        },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${fmtMoney(ctx.parsed)}` } },
       },
     },
   });
-
   document.getElementById("audiencesTableWrap").innerHTML = `
     <table>
-      <thead><tr>
-        <th>Audience</th><th class="num">Spend</th><th class="num">Leads</th>
-        <th class="num">CPL</th><th class="num">Studios</th>
-      </tr></thead>
+      <thead><tr><th>Audience</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th><th class="num">Studios</th></tr></thead>
       <tbody>
         ${rows.map(r => `
           <tr>
@@ -538,42 +970,32 @@ function renderAudiences(audiences, studios) {
           </tr>
         `).join("")}
       </tbody>
-    </table>
-  `;
+    </table>`;
 }
 
 function renderConcepts(concepts) {
   const top = [...concepts].sort((a, b) => b.spend - a.spend).slice(0, 10);
-
   if (charts.concepts) charts.concepts.destroy();
   const ctx = document.getElementById("conceptsChart").getContext("2d");
   if (top.length === 0) {
-    document.getElementById("conceptsTableWrap").innerHTML = "<div class='empty'>No concepts detected.</div>";
+    document.getElementById("conceptsTableWrap").innerHTML = "<div class='empty'>No ads detected.</div>";
     return;
   }
   charts.concepts = new Chart(ctx, {
     type: "bar",
     data: {
       labels: top.map(c => c.concept),
-      datasets: [{
-        label: "Spend",
-        data: top.map(c => c.spend),
-        backgroundColor: BRAND.blueDeep,
-      }],
+      datasets: [{ label: "Spend", data: top.map(c => c.spend), backgroundColor: BRAND.blueDeep }],
     },
     options: {
-      indexAxis: "y",
-      responsive: true, maintainAspectRatio: false,
+      indexAxis: "y", responsive: true, maintainAspectRatio: false,
       scales: { x: { beginAtZero: true } },
       plugins: { legend: { display: false } },
     },
   });
-
   document.getElementById("conceptsTableWrap").innerHTML = `
     <table>
-      <thead><tr>
-        <th>Concept</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th>
-      </tr></thead>
+      <thead><tr><th>Ad</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th></tr></thead>
       <tbody>
         ${top.map(c => `
           <tr>
@@ -584,134 +1006,257 @@ function renderConcepts(concepts) {
           </tr>
         `).join("")}
       </tbody>
-    </table>
-  `;
+    </table>`;
 }
 
-// ─────────────────────────────────────────────────────────────
-//  Studio Detail — dropdown + audiences/pillars/concepts
-// ─────────────────────────────────────────────────────────────
-let studioSelected = null;   // código del studio seleccionado
+function renderTabAudiences(c) {
+  renderLineTab({
+    rows: (c.daily_series && c.daily_series.by_audience) || [],
+    window: c.daily_series, dimKey: "audience",
+    chartId: "audiencesLineChart", chartName: "audiencesLine",
+    barChartId: "audiencesBarChart", barChartName: "audiencesBar",
+    doughnutChartId: "audiencesDoughnutChart", doughnutChartName: "audiencesDoughnut",
+    tableId: "audiencesTableDailyWrap", windowNoteId: "audiencesWindowNote", titleId: "audiencesLineTitle",
+    label: "Audience", titleBase: "Leads by Audience — Daily", topN: null,
+  });
+}
 
-function renderStudioDetail(c) {
-  const sel = document.getElementById("studioSelect");
-  // Solo studios con algún spend > 0 (para no poblar con 25 studios vacíos)
-  const active = c.studios.filter(s => s.spend > 0)
-                          .sort((a, b) => b.spend - a.spend);
+function renderTabPillars(c) {
+  renderLineTab({
+    rows: (c.daily_series && c.daily_series.by_pillar) || [],
+    window: c.daily_series, dimKey: "pillar",
+    chartId: "pillarsLineChart", chartName: "pillarsLine",
+    barChartId: "pillarsBarChart", barChartName: "pillarsBar",
+    doughnutChartId: "pillarsDoughnutChart", doughnutChartName: "pillarsDoughnut",
+    tableId: "pillarsTableDailyWrap", windowNoteId: "pillarsWindowNote", titleId: "pillarsLineTitle",
+    label: "Pillar", titleBase: "Leads by Pillar — Daily", topN: null,
+  });
+}
 
-  if (active.length === 0) {
-    document.getElementById("studioSummary").innerHTML =
-      "<div class='empty'>No studio activity in this period.</div>";
-    document.getElementById("studioAudiencesWrap").innerHTML = "";
-    document.getElementById("studioPillarsWrap").innerHTML = "";
-    document.getElementById("studioConceptsWrap").innerHTML = "";
+function renderTabConcepts(c) {
+  renderLineTab({
+    rows: (c.daily_series && c.daily_series.by_concept) || [],
+    window: c.daily_series, dimKey: "concept",
+    chartId: "conceptsLineChart", chartName: "conceptsLine",
+    barChartId: "conceptsBarChart", barChartName: "conceptsBar",
+    doughnutChartId: "conceptsDoughnutChart", doughnutChartName: "conceptsDoughnut",
+    tableId: "conceptsTableDailyWrap", windowNoteId: "conceptsWindowNote", titleId: "conceptsLineTitle",
+    label: "Ad", titleBase: "Leads by Ad — Daily", topN: 12,
+  });
+}
+
+function renderTabMediaType(c) {
+  renderLineTab({
+    rows: (c.daily_series && c.daily_series.by_media_type) || [],
+    window: c.daily_series, dimKey: "media_type",
+    chartId: "mediatypeLineChart", chartName: "mediatypeLine",
+    barChartId: "mediatypeBarChart", barChartName: "mediatypeBar",
+    doughnutChartId: "mediatypeDoughnutChart", doughnutChartName: "mediatypeDoughnut",
+    tableId: "mediatypeTableDailyWrap", windowNoteId: "mediatypeWindowNote", titleId: "mediatypeLineTitle",
+    label: "Type", titleBase: "Leads by Type — Daily", topN: null,
+    barLeft:  { label: "Leads", color: "#F59E0B", value: o => o.leads || 0, title: "Leads", money: false },
+    barRight: { label: "CPL",   color: BRAND.blue, value: o => (o.leads ? o.spend / o.leads : 0), title: "CPL ($)", money: true },
+    pieValue: o => o.leads || 0,
+    pieIsMoney: false,
+  });
+}
+
+function renderLineTab(opts) {
+  const {
+    rows, window, dimKey,
+    chartId, chartName,
+    barChartId, barChartName,
+    doughnutChartId, doughnutChartName,
+    tableId, windowNoteId, titleId,
+    label, titleBase, topN,
+  } = opts;
+
+  const tableEl = document.getElementById(tableId);
+  const noteEl  = document.getElementById(windowNoteId);
+  const titleEl = document.getElementById(titleId);
+
+  const rangeTxt = window && window.window_start && window.window_end
+    ? `${window.window_start} → ${window.window_end}` : "—";
+  if (noteEl)  noteEl.textContent = rangeTxt;
+  if (titleEl) titleEl.textContent = `${titleBase} (${rangeTxt})`;
+
+  const killChart = name => { if (charts[name]) { charts[name].destroy(); charts[name] = null; } };
+  killChart(chartName); killChart(barChartName); killChart(doughnutChartName);
+
+  const clearCanvas = id => {
+    const ctx = document.getElementById(id);
+    if (ctx) { const c2 = ctx.getContext("2d"); c2.clearRect(0, 0, ctx.width, ctx.height); }
+  };
+
+  if (!rows.length) {
+    clearCanvas(chartId); clearCanvas(barChartId); clearCanvas(doughnutChartId);
+    tableEl.innerHTML = `<div class='empty'>No daily series data for this campaign / filter. Regenera <code>paid-ads-data.json</code> con el ETL nuevo, o ajusta el filtro de período.</div>`;
     return;
   }
 
-  // Poblar dropdown (re-poblamos siempre porque cambia con la campaña)
-  sel.innerHTML = active.map(s =>
-    `<option value="${s.code}">${s.name} (${s.state})</option>`
-  ).join("");
+  const totals = {};
+  rows.forEach(r => {
+    const dim = r[dimKey];
+    if (!totals[dim]) totals[dim] = { dim, spend: 0, leads: 0, trials: 0, purchases: 0, impressions: 0, clicks: 0 };
+    totals[dim].spend       += r.spend       || 0;
+    totals[dim].leads       += r.leads       || 0;
+    totals[dim].trials      += r.trials      || 0;
+    totals[dim].purchases   += r.purchases   || 0;
+    totals[dim].impressions += r.impressions || 0;
+    totals[dim].clicks      += r.clicks      || 0;
+  });
+  let ordered = Object.values(totals).sort((a, b) => b.spend - a.spend);
+  if (topN) ordered = ordered.slice(0, topN);
+  const keptDims = new Set(ordered.map(o => o.dim));
 
-  // Restaurar selección previa si sigue existiendo en esta campaña
-  if (studioSelected && active.some(s => s.code === studioSelected)) {
-    sel.value = studioSelected;
-  } else {
-    studioSelected = active[0].code;
-    sel.value = studioSelected;
-  }
-
-  sel.onchange = () => {
-    studioSelected = sel.value;
-    renderStudioInner(c);
-  };
-
-  renderStudioInner(c);
-}
-
-function renderStudioInner(c) {
-  const studio = c.studios.find(s => s.code === studioSelected);
-  if (!studio) return;
-
-  const cpt = studio.trials    ? studio.spend / studio.trials    : 0;
-  const cpp = studio.purchases ? studio.spend / studio.purchases : 0;
-
-  // Summary chips
-  document.getElementById("studioSummary").innerHTML = `
-    <span class="chip">Spend ${fmtMoney(studio.spend)}</span>
-    <span class="chip">Leads ${fmtInt(studio.leads)}</span>
-    <span class="chip">CPL ${studio.leads ? fmtMoney(studio.cpl) : "—"}</span>
-    <span class="chip">Trials ${fmtInt(studio.trials)}</span>
-    <span class="chip">CPT ${studio.trials ? fmtMoney(cpt) : "—"}</span>
-    <span class="chip">Purchases ${fmtInt(studio.purchases)}</span>
-    <span class="chip">CPP ${studio.purchases ? fmtMoney(cpp) : "—"}</span>
-    <span class="chip">Impr ${fmtInt(studio.impressions)}</span>
-    <span class="chip">CTR ${fmtPct(studio.ctr)}</span>
-  `;
-
-  // Audiences for this studio
-  const auds = (c.audiences || [])
-    .filter(a => a.studio_code === studioSelected)
-    .sort((a, b) => b.spend - a.spend);
-  document.getElementById("studioAudiencesWrap").innerHTML = auds.length ? `
+  // Tabla resumen (top)
+  tableEl.innerHTML = `
     <table>
       <thead><tr>
-        <th>Audience</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th>
+        <th>${label}</th>
+        <th class="num">Spend</th>
+        <th class="num">Leads</th>
+        <th class="num">CPL</th>
+        <th class="num">Trials</th>
+        <th class="num">CPT</th>
+        <th class="num">Purch.</th>
+        <th class="num">CPP</th>
+        <th class="num">Impr.</th>
+        <th class="num">CTR%</th>
       </tr></thead>
       <tbody>
-        ${auds.map(a => {
-          const cpl = a.leads ? a.spend / a.leads : 0;
+        ${ordered.map(o => {
+          const cpl = o.leads      ? o.spend / o.leads      : 0;
+          const cpt = o.trials     ? o.spend / o.trials     : 0;
+          const cpp = o.purchases  ? o.spend / o.purchases  : 0;
+          const ctr = o.impressions ? o.clicks / o.impressions * 100 : 0;
           return `<tr>
-            <td>${a.audience}</td>
-            <td class="num">${fmtMoney(a.spend)}</td>
-            <td class="num">${fmtInt(a.leads)}</td>
-            <td class="num">${a.leads ? fmtMoney(cpl) : "—"}</td>
+            <td>${o.dim}</td>
+            <td class="num">${fmtMoney(o.spend)}</td>
+            <td class="num">${fmtInt(o.leads)}</td>
+            <td class="num">${o.leads     ? fmtMoney(cpl) : "—"}</td>
+            <td class="num">${fmtInt(o.trials)}</td>
+            <td class="num">${o.trials    ? fmtMoney(cpt) : "—"}</td>
+            <td class="num">${fmtInt(o.purchases)}</td>
+            <td class="num">${o.purchases ? fmtMoney(cpp) : "—"}</td>
+            <td class="num">${fmtInt(o.impressions)}</td>
+            <td class="num">${fmtPct(ctr)}</td>
           </tr>`;
         }).join("")}
       </tbody>
-    </table>
-  ` : "<div class='empty'>No audience classification for this studio.</div>";
+    </table>`;
 
-  // Pillars for this studio
-  const pils = (c.studio_pillars || [])
-    .filter(p => p.studio_code === studioSelected)
-    .sort((a, b) => b.spend - a.spend);
-  document.getElementById("studioPillarsWrap").innerHTML = pils.length ? `
-    <table>
-      <thead><tr>
-        <th>Pillar</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th>
-      </tr></thead>
-      <tbody>
-        ${pils.map(p => `<tr>
-          <td>${p.pillar}</td>
-          <td class="num">${fmtMoney(p.spend)}</td>
-          <td class="num">${fmtInt(p.leads)}</td>
-          <td class="num">${p.leads ? fmtMoney(p.cpl) : "—"}</td>
-        </tr>`).join("")}
-      </tbody>
-    </table>
-  ` : "<div class='empty'>No pillar classification for this studio.</div>";
+  // Bar chart (defaults: Spend + Leads. opts.barLeft/barRight override.)
+  const barLeft = opts.barLeft || {
+    label: "Spend", color: BRAND.blue, value: o => o.spend || 0, title: "Spend ($)", money: true,
+  };
+  const barRight = opts.barRight || {
+    label: "Leads", color: "#F59E0B", value: o => o.leads || 0, title: "Leads", money: false,
+  };
 
-  // Concepts for this studio (top 10 por spend)
-  const cons = (c.studio_concepts || [])
-    .filter(c2 => c2.studio_code === studioSelected)
-    .sort((a, b) => b.spend - a.spend)
-    .slice(0, 10);
-  document.getElementById("studioConceptsWrap").innerHTML = cons.length ? `
-    <table>
-      <thead><tr>
-        <th>Concept</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th>
-      </tr></thead>
-      <tbody>
-        ${cons.map(c2 => `<tr>
-          <td>${c2.concept}</td>
-          <td class="num">${fmtMoney(c2.spend)}</td>
-          <td class="num">${fmtInt(c2.leads)}</td>
-          <td class="num">${c2.leads ? fmtMoney(c2.cpl) : "—"}</td>
-        </tr>`).join("")}
-      </tbody>
-    </table>
-  ` : "<div class='empty'>No concepts detected for this studio.</div>";
+  if (barChartId) {
+    const barCtx = document.getElementById(barChartId).getContext("2d");
+    charts[barChartName] = new Chart(barCtx, {
+      type: "bar",
+      data: {
+        labels: ordered.map(o => o.dim),
+        datasets: [
+          { label: barLeft.label,  data: ordered.map(barLeft.value),  backgroundColor: barLeft.color,  yAxisID: "y" },
+          { label: barRight.label, data: ordered.map(barRight.value), backgroundColor: barRight.color, yAxisID: "y1" },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        scales: {
+          y:  { beginAtZero: true, position: "left",  title: { display: true, text: barLeft.title } },
+          y1: { beginAtZero: true, position: "right", grid: { drawOnChartArea: false }, title: { display: true, text: barRight.title } },
+          x:  { ticks: { maxRotation: 30, minRotation: 0, autoSkip: false } },
+        },
+        plugins: {
+          legend: { position: "bottom" },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const cfg = ctx.datasetIndex === 0 ? barLeft : barRight;
+                const v = ctx.parsed.y;
+                return cfg.label + ": " + (cfg.money ? fmtMoney(v) : fmtInt(v));
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // Doughnut chart (default: Spend share. opts.pieValue/pieIsMoney override.)
+  const pieAccessor = opts.pieValue || (o => o.spend || 0);
+  const pieIsMoney  = opts.pieIsMoney === undefined ? true : opts.pieIsMoney;
+
+  if (doughnutChartId) {
+    const dCtx = document.getElementById(doughnutChartId).getContext("2d");
+    const totalPie = ordered.reduce((s, o) => s + (pieAccessor(o) || 0), 0);
+    charts[doughnutChartName] = new Chart(dCtx, {
+      type: "doughnut",
+      data: {
+        labels: ordered.map(o => o.dim),
+        datasets: [{ data: ordered.map(pieAccessor), backgroundColor: ordered.map((_, i) => BRAND.palette[i % BRAND.palette.length]) }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "right" },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const v = ctx.parsed;
+                const pct = totalPie ? (v / totalPie * 100).toFixed(1) : "0.0";
+                return `${ctx.label}: ${pieIsMoney ? fmtMoney(v) : fmtInt(v)} (${pct}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // Line chart (leads/día por dim)
+  const byDimByDate = {};
+  const allDates = new Set();
+  rows.forEach(r => {
+    if (!keptDims.has(r[dimKey])) return;
+    allDates.add(r.date);
+    const k = r[dimKey];
+    if (!byDimByDate[k]) byDimByDate[k] = {};
+    byDimByDate[k][r.date] = (byDimByDate[k][r.date] || 0) + (r.leads || 0);
+  });
+  const dates = [...allDates].sort();
+
+  const lineDatasets = ordered.map((o, i) => ({
+    label: o.dim,
+    data: dates.map(d => byDimByDate[o.dim][d] || 0),
+    borderColor:     BRAND.palette[i % BRAND.palette.length],
+    backgroundColor: BRAND.palette[i % BRAND.palette.length] + "22",
+    tension: .3, pointRadius: 2, spanGaps: true,
+  }));
+
+  const lineCtx = document.getElementById(chartId).getContext("2d");
+  charts[chartName] = new Chart(lineCtx, {
+    type: "line",
+    data: { labels: dates, datasets: lineDatasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: "Leads" } },
+        x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 14 } },
+      },
+      plugins: {
+        legend: { position: "bottom" },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${fmtInt(ctx.parsed.y)}` } },
+      },
+    },
+  });
 }
 
 bootstrap();
