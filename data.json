@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-29T09:55:55.636125Z",
+  "generated_at": "2026-04-30T09:56:40.643242Z",
   "studios": [
     "SWEAT440 Austin - Highland",
     "SWEAT440 Austin - Zilker",
@@ -8,6 +8,7 @@
     "SWEAT440 Coral Gables",
     "SWEAT440 Coral Springs",
     "SWEAT440 Dallas - Prestonwood",
+    "SWEAT440 Dallas - Uptown",
     "SWEAT440 Deerfield Beach",
     "SWEAT440 Doral",
     "SWEAT440 Eastchester",
@@ -2840,7 +2841,7 @@
       "signups": 3,
       "first_visits": 5,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-01-03",
@@ -4360,8 +4361,17 @@
       "source": "N/A",
       "signups": 1,
       "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-01-05",
+      "studio": "SWEAT440 Coral Springs",
+      "source": "SWEAT440 App",
+      "signups": 0,
+      "first_visits": 0,
       "first_activations": 1,
-      "first_sales": 2
+      "first_sales": 1
     },
     {
       "date": "2026-01-05",
@@ -13321,6 +13331,15 @@
     {
       "date": "2026-01-12",
       "studio": "SWEAT440 Miami - Coconut Grove",
+      "source": "Business Mode",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-01-12",
+      "studio": "SWEAT440 Miami - Coconut Grove",
       "source": "ClassPass / Platforms",
       "signups": 4,
       "first_visits": 0,
@@ -16826,7 +16845,7 @@
       "signups": 2,
       "first_visits": 1,
       "first_activations": 0,
-      "first_sales": 17
+      "first_sales": 18
     },
     {
       "date": "2026-01-15",
@@ -31532,7 +31551,7 @@
       "signups": 3,
       "first_visits": 2,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-01-27",
@@ -36481,7 +36500,7 @@
       "source": "N/A",
       "signups": 1,
       "first_visits": 10,
-      "first_activations": 105,
+      "first_activations": 104,
       "first_sales": 0
     },
     {
@@ -41418,15 +41437,6 @@
     },
     {
       "date": "2026-02-03",
-      "studio": "SWEAT440 Toms River",
-      "source": "SWEAT440 App",
-      "signups": 1,
-      "first_visits": 0,
-      "first_activations": 0,
-      "first_sales": 0
-    },
-    {
-      "date": "2026-02-03",
       "studio": "SWEAT440 Wall Township",
       "source": "Business Mode",
       "signups": 1,
@@ -41693,7 +41703,7 @@
       "signups": 0,
       "first_visits": 0,
       "first_activations": 1,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-02-04",
@@ -42683,7 +42693,7 @@
       "signups": 3,
       "first_visits": 0,
       "first_activations": 0,
-      "first_sales": 2
+      "first_sales": 1
     },
     {
       "date": "2026-02-04",
@@ -54257,7 +54267,7 @@
       "signups": 0,
       "first_visits": 1,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-02-14",
@@ -76379,7 +76389,7 @@
       "signups": 2,
       "first_visits": 3,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-03-03",
@@ -81534,7 +81544,7 @@
       "studio": "SWEAT440 South Miami",
       "source": "N/A",
       "signups": 1,
-      "first_visits": 1,
+      "first_visits": 0,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -81543,7 +81553,7 @@
       "studio": "SWEAT440 South Miami",
       "source": "SWEAT440 App",
       "signups": 0,
-      "first_visits": 1,
+      "first_visits": 2,
       "first_activations": 1,
       "first_sales": 0
     },
@@ -92647,15 +92657,6 @@
     {
       "date": "2026-03-17",
       "studio": "SWEAT440 Pinecrest - Palmetto Bay",
-      "source": "Google Ads",
-      "signups": 1,
-      "first_visits": 0,
-      "first_activations": 0,
-      "first_sales": 0
-    },
-    {
-      "date": "2026-03-17",
-      "studio": "SWEAT440 Pinecrest - Palmetto Bay",
       "source": "Grassroots",
       "signups": 1,
       "first_visits": 0,
@@ -94334,7 +94335,7 @@
       "signups": 4,
       "first_visits": 2,
       "first_activations": 1,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-03-19",
@@ -101417,7 +101418,7 @@
       "signups": 4,
       "first_visits": 2,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-03-25",
@@ -104396,7 +104397,7 @@
       "signups": 1,
       "first_visits": 0,
       "first_activations": 0,
-      "first_sales": 2
+      "first_sales": 1
     },
     {
       "date": "2026-03-27",
@@ -111485,7 +111486,16 @@
       "date": "2026-04-02",
       "studio": "SWEAT440 Herriman",
       "source": "Business Mode",
-      "signups": 5,
+      "signups": 4,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-02",
+      "studio": "SWEAT440 Herriman",
+      "source": "Grassroots",
+      "signups": 1,
       "first_visits": 0,
       "first_activations": 0,
       "first_sales": 0
@@ -113513,7 +113523,7 @@
       "signups": 3,
       "first_visits": 1,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-03",
@@ -116681,7 +116691,7 @@
       "signups": 3,
       "first_visits": 1,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-06",
@@ -117473,7 +117483,7 @@
       "signups": 1,
       "first_visits": 2,
       "first_activations": 1,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-06",
@@ -118976,7 +118986,7 @@
       "signups": 2,
       "first_visits": 2,
       "first_activations": 0,
-      "first_sales": 1
+      "first_sales": 2
     },
     {
       "date": "2026-04-07",
@@ -127031,7 +127041,7 @@
       "signups": 1,
       "first_visits": 3,
       "first_activations": 3,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-14",
@@ -129146,7 +129156,7 @@
       "signups": 1,
       "first_visits": 0,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-15",
@@ -131963,7 +131973,7 @@
       "signups": 7,
       "first_visits": 3,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 2
     },
     {
       "date": "2026-04-17",
@@ -132917,7 +132927,7 @@
       "signups": 7,
       "first_visits": 3,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-18",
@@ -133312,8 +133322,8 @@
       "source": "Google Ads",
       "signups": 0,
       "first_visits": 1,
-      "first_activations": 1,
-      "first_sales": 1
+      "first_activations": 0,
+      "first_sales": 0
     },
     {
       "date": "2026-04-19",
@@ -133922,10 +133932,10 @@
       "date": "2026-04-19",
       "studio": "SWEAT440 Miami Lakes",
       "source": "N/A",
-      "signups": 4,
+      "signups": 3,
       "first_visits": 1,
       "first_activations": 0,
-      "first_sales": 2
+      "first_sales": 1
     },
     {
       "date": "2026-04-19",
@@ -133944,6 +133954,15 @@
       "first_visits": 1,
       "first_activations": 0,
       "first_sales": 0
+    },
+    {
+      "date": "2026-04-19",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "Word of Mouth",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 1
     },
     {
       "date": "2026-04-19",
@@ -134832,7 +134851,7 @@
       "studio": "SWEAT440 Miami - Brickell",
       "source": "Business Mode",
       "signups": 1,
-      "first_visits": 1,
+      "first_visits": 0,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -135066,7 +135085,7 @@
       "studio": "SWEAT440 Miami Lakes",
       "source": "N/A",
       "signups": 0,
-      "first_visits": 1,
+      "first_visits": 0,
       "first_activations": 1,
       "first_sales": 0
     },
@@ -135087,6 +135106,15 @@
       "first_visits": 4,
       "first_activations": 0,
       "first_sales": 2
+    },
+    {
+      "date": "2026-04-20",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "Word of Mouth",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
     },
     {
       "date": "2026-04-20",
@@ -135257,7 +135285,7 @@
       "signups": 8,
       "first_visits": 11,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-20",
@@ -135338,7 +135366,7 @@
       "signups": 2,
       "first_visits": 1,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-20",
@@ -136345,7 +136373,7 @@
       "source": "N/A",
       "signups": 0,
       "first_visits": 0,
-      "first_activations": 3,
+      "first_activations": 2,
       "first_sales": 0
     },
     {
@@ -136355,6 +136383,15 @@
       "signups": 1,
       "first_visits": 0,
       "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-21",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "Word of Mouth",
+      "signups": 0,
+      "first_visits": 0,
+      "first_activations": 1,
       "first_sales": 0
     },
     {
@@ -136643,7 +136680,7 @@
       "signups": 2,
       "first_visits": 0,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-21",
@@ -137152,6 +137189,15 @@
     {
       "date": "2026-04-22",
       "studio": "SWEAT440 Coral Gables",
+      "source": "MindBody App",
+      "signups": 2,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-22",
+      "studio": "SWEAT440 Coral Gables",
       "source": "Website (unattributed)",
       "signups": 2,
       "first_visits": 0,
@@ -137404,6 +137450,15 @@
     {
       "date": "2026-04-22",
       "studio": "SWEAT440 Fort Lauderdale - Las Olas",
+      "source": "MindBody App",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-22",
+      "studio": "SWEAT440 Fort Lauderdale - Las Olas",
       "source": "N/A",
       "signups": 0,
       "first_visits": 1,
@@ -137469,7 +137524,7 @@
       "studio": "SWEAT440 Miami - Brickell",
       "source": "ClassPass / Platforms",
       "signups": 3,
-      "first_visits": 3,
+      "first_visits": 2,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -138182,7 +138237,7 @@
       "signups": 8,
       "first_visits": 8,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-22",
@@ -138650,7 +138705,7 @@
       "signups": 3,
       "first_visits": 2,
       "first_activations": 1,
-      "first_sales": 0
+      "first_sales": 2
     },
     {
       "date": "2026-04-23",
@@ -138755,8 +138810,8 @@
       "date": "2026-04-23",
       "studio": "SWEAT440 Miami - Brickell",
       "source": "ClassPass / Platforms",
-      "signups": 9,
-      "first_visits": 2,
+      "signups": 8,
+      "first_visits": 1,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -138785,7 +138840,7 @@
       "signups": 12,
       "first_visits": 4,
       "first_activations": 1,
-      "first_sales": 3
+      "first_sales": 2
     },
     {
       "date": "2026-04-23",
@@ -138884,7 +138939,7 @@
       "signups": 3,
       "first_visits": 2,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-23",
@@ -139181,7 +139236,7 @@
       "signups": 8,
       "first_visits": 4,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-23",
@@ -139475,7 +139530,7 @@
       "date": "2026-04-23",
       "studio": "SWEAT440 West Palm Beach",
       "source": "Business Mode",
-      "signups": 6,
+      "signups": 5,
       "first_visits": 6,
       "first_activations": 1,
       "first_sales": 0
@@ -140558,7 +140613,7 @@
       "signups": 3,
       "first_visits": 0,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-24",
@@ -140810,6 +140865,15 @@
       "signups": 1,
       "first_visits": 0,
       "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-25",
+      "studio": "SWEAT440 Boca Raton",
+      "source": "N/A",
+      "signups": 0,
+      "first_visits": 0,
+      "first_activations": 1,
       "first_sales": 0
     },
     {
@@ -141697,15 +141761,6 @@
     {
       "date": "2026-04-25",
       "studio": "SWEAT440 Ocean Township",
-      "source": "N/A",
-      "signups": 0,
-      "first_visits": 1,
-      "first_activations": 0,
-      "first_sales": 0
-    },
-    {
-      "date": "2026-04-25",
-      "studio": "SWEAT440 Ocean Township",
       "source": "SWEAT440 App",
       "signups": 1,
       "first_visits": 1,
@@ -141717,7 +141772,7 @@
       "studio": "SWEAT440 Ocean Township",
       "source": "Website (unattributed)",
       "signups": 2,
-      "first_visits": 1,
+      "first_visits": 2,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -142790,7 +142845,7 @@
       "signups": 6,
       "first_visits": 2,
       "first_activations": 0,
-      "first_sales": 1
+      "first_sales": 2
     },
     {
       "date": "2026-04-26",
@@ -142859,10 +142914,10 @@
       "date": "2026-04-26",
       "studio": "SWEAT440 Pembroke Pines",
       "source": "ClassPass / Platforms",
-      "signups": 3,
-      "first_visits": 1,
+      "signups": 2,
+      "first_visits": 0,
       "first_activations": 0,
-      "first_sales": 1
+      "first_sales": 0
     },
     {
       "date": "2026-04-26",
@@ -142886,10 +142941,10 @@
       "date": "2026-04-26",
       "studio": "SWEAT440 Pembroke Pines",
       "source": "SWEAT440 App",
-      "signups": 1,
-      "first_visits": 0,
+      "signups": 2,
+      "first_visits": 1,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-26",
@@ -143204,7 +143259,7 @@
       "signups": 2,
       "first_visits": 2,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-27",
@@ -143285,22 +143340,13 @@
       "signups": 2,
       "first_visits": 0,
       "first_activations": 0,
-      "first_sales": 0
-    },
-    {
-      "date": "2026-04-27",
-      "studio": "SWEAT440 Charlotte - Noda",
-      "source": "Business Mode",
-      "signups": 1,
-      "first_visits": 0,
-      "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-27",
       "studio": "SWEAT440 Charlotte - Noda",
       "source": "ClassPass / Platforms",
-      "signups": 5,
+      "signups": 4,
       "first_visits": 3,
       "first_activations": 0,
       "first_sales": 0
@@ -143321,7 +143367,7 @@
       "signups": 2,
       "first_visits": 1,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-27",
@@ -143399,8 +143445,8 @@
       "date": "2026-04-27",
       "studio": "SWEAT440 Coral Springs",
       "source": "SWEAT440 App",
-      "signups": 2,
-      "first_visits": 1,
+      "signups": 1,
+      "first_visits": 0,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -143582,7 +143628,7 @@
       "signups": 2,
       "first_visits": 1,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-27",
@@ -144194,7 +144240,7 @@
       "signups": 1,
       "first_visits": 1,
       "first_activations": 1,
-      "first_sales": 1
+      "first_sales": 0
     },
     {
       "date": "2026-04-27",
@@ -144202,7 +144248,7 @@
       "source": "ClassPass / Platforms",
       "signups": 8,
       "first_visits": 6,
-      "first_activations": 1,
+      "first_activations": 0,
       "first_sales": 0
     },
     {
@@ -144226,6 +144272,15 @@
     {
       "date": "2026-04-27",
       "studio": "SWEAT440 Pembroke Pines",
+      "source": "SWEAT440 App",
+      "signups": 0,
+      "first_visits": 0,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-27",
+      "studio": "SWEAT440 Pembroke Pines",
       "source": "Website (unattributed)",
       "signups": 1,
       "first_visits": 1,
@@ -144236,10 +144291,10 @@
       "date": "2026-04-27",
       "studio": "SWEAT440 Pinecrest - Palmetto Bay",
       "source": "Business Mode",
-      "signups": 8,
+      "signups": 7,
       "first_visits": 4,
       "first_activations": 1,
-      "first_sales": 4
+      "first_sales": 3
     },
     {
       "date": "2026-04-27",
@@ -144281,10 +144336,10 @@
       "date": "2026-04-27",
       "studio": "SWEAT440 Pinecrest - Palmetto Bay",
       "source": "Website (unattributed)",
-      "signups": 1,
+      "signups": 2,
       "first_visits": 0,
       "first_activations": 0,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-27",
@@ -144356,7 +144411,7 @@
       "signups": 4,
       "first_visits": 0,
       "first_activations": 1,
-      "first_sales": 0
+      "first_sales": 1
     },
     {
       "date": "2026-04-27",
@@ -144416,10 +144471,10 @@
       "date": "2026-04-27",
       "studio": "SWEAT440 West Palm Beach",
       "source": "Business Mode",
-      "signups": 17,
+      "signups": 18,
       "first_visits": 9,
-      "first_activations": 0,
-      "first_sales": 0
+      "first_activations": 1,
+      "first_sales": 1
     },
     {
       "date": "2026-04-27",
@@ -144476,18 +144531,495 @@
       "first_sales": 0
     },
     {
-      "date": "2026-04-27",
-      "studio": "SWEAT440 West Palm Beach",
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Austin - Highland",
+      "source": "Business Mode",
+      "signups": 2,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Austin - Highland",
+      "source": "Grassroots",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Austin - Highland",
+      "source": "N/A",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Austin - Highland",
+      "source": "Website (unattributed)",
+      "signups": 4,
+      "first_visits": 4,
+      "first_activations": 2,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Austin - Zilker",
+      "source": "Business Mode",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Austin - Zilker",
+      "source": "ClassPass / Platforms",
+      "signups": 9,
+      "first_visits": 6,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Austin - Zilker",
+      "source": "Grassroots",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Austin - Zilker",
+      "source": "Meta Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Austin - Zilker",
+      "source": "N/A",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Austin - Zilker",
+      "source": "Website (unattributed)",
+      "signups": 3,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Boca Raton",
+      "source": "ClassPass / Platforms",
+      "signups": 0,
+      "first_visits": 6,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Boca Raton",
+      "source": "Google Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Boca Raton",
+      "source": "Website (unattributed)",
+      "signups": 4,
+      "first_visits": 3,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Charlotte - Noda",
+      "source": "Business Mode",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Charlotte - Noda",
+      "source": "ClassPass / Platforms",
+      "signups": 3,
+      "first_visits": 3,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Charlotte - Noda",
+      "source": "Grassroots",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Charlotte - Noda",
+      "source": "Local Listings",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Charlotte - Noda",
+      "source": "N/A",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Charlotte - Noda",
       "source": "Website (unattributed)",
       "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Coral Gables",
+      "source": "Business Mode",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Coral Gables",
+      "source": "ClassPass / Platforms",
+      "signups": 6,
+      "first_visits": 3,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Coral Gables",
+      "source": "MindBody App",
+      "signups": 3,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Coral Gables",
+      "source": "N/A",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 1,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Coral Gables",
+      "source": "SWEAT440 App",
+      "signups": 2,
+      "first_visits": 1,
+      "first_activations": 1,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Coral Gables",
+      "source": "Website (unattributed)",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Coral Springs",
+      "source": "ClassPass / Platforms",
+      "signups": 4,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Coral Springs",
+      "source": "Meta Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Coral Springs",
+      "source": "SWEAT440 App",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Coral Springs",
+      "source": "Website (unattributed)",
+      "signups": 2,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Dallas - Prestonwood",
+      "source": "Meta Ads",
+      "signups": 2,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Dallas - Uptown",
+      "source": "Business Mode",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Dallas - Uptown",
+      "source": "SWEAT440 App",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Deerfield Beach",
+      "source": "ClassPass / Platforms",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Deerfield Beach",
+      "source": "Google Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Deerfield Beach",
+      "source": "Website (unattributed)",
+      "signups": 2,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Doral",
+      "source": "Business Mode",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Doral",
+      "source": "ClassPass / Platforms",
+      "signups": 4,
+      "first_visits": 7,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Doral",
+      "source": "Google Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Doral",
+      "source": "Local Listings",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Doral",
+      "source": "Meta Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Doral",
+      "source": "MindBody App",
+      "signups": 2,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Doral",
+      "source": "N/A",
+      "signups": 2,
       "first_visits": 0,
       "first_activations": 1,
       "first_sales": 1
     },
     {
       "date": "2026-04-28",
-      "studio": "SWEAT440 Coral Springs",
+      "studio": "SWEAT440 Doral",
+      "source": "SWEAT440 App",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Doral",
       "source": "Website (unattributed)",
+      "signups": 2,
+      "first_visits": 1,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Eastchester",
+      "source": "Business Mode",
+      "signups": 3,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Eastchester",
+      "source": "ClassPass / Platforms",
+      "signups": 2,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Eastchester",
+      "source": "Google Ads",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Eastchester",
+      "source": "MindBody App",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Eastchester",
+      "source": "N/A",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Eastchester",
+      "source": "SWEAT440 App",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Eastchester",
+      "source": "Website (unattributed)",
+      "signups": 1,
+      "first_visits": 3,
+      "first_activations": 3,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Fort Lauderdale - Las Olas",
+      "source": "Business Mode",
+      "signups": 2,
+      "first_visits": 2,
+      "first_activations": 1,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Fort Lauderdale - Las Olas",
+      "source": "ClassPass / Platforms",
+      "signups": 2,
+      "first_visits": 2,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Fort Lauderdale - Las Olas",
+      "source": "Local Listings",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Fort Lauderdale - Las Olas",
+      "source": "Meta Ads",
       "signups": 1,
       "first_visits": 0,
       "first_activations": 0,
@@ -144496,9 +145028,81 @@
     {
       "date": "2026-04-28",
       "studio": "SWEAT440 Fort Lauderdale - Las Olas",
-      "source": "ClassPass / Platforms",
+      "source": "N/A",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Fort Lauderdale - Las Olas",
+      "source": "SWEAT440 App",
+      "signups": 2,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Fort Lauderdale - Las Olas",
+      "source": "Website (unattributed)",
       "signups": 1,
       "first_visits": 0,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Herriman",
+      "source": "Business Mode",
+      "signups": 6,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Herriman",
+      "source": "Grassroots",
+      "signups": 0,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Brickell",
+      "source": "Business Mode",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Brickell",
+      "source": "ClassPass / Platforms",
+      "signups": 5,
+      "first_visits": 4,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Brickell",
+      "source": "Grassroots",
+      "signups": 2,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Brickell",
+      "source": "Local Listings",
+      "signups": 2,
+      "first_visits": 1,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -144507,14 +145111,293 @@
       "studio": "SWEAT440 Miami - Brickell",
       "source": "N/A",
       "signups": 0,
-      "first_visits": 0,
+      "first_visits": 1,
       "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Brickell",
+      "source": "Website (unattributed)",
+      "signups": 3,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Coconut Grove",
+      "source": "Business Mode",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Coconut Grove",
+      "source": "ClassPass / Platforms",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
       "first_sales": 0
     },
     {
       "date": "2026-04-28",
       "studio": "SWEAT440 Miami - Coconut Grove",
       "source": "N/A",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Coconut Grove",
+      "source": "Website (unattributed)",
+      "signups": 2,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Midtown",
+      "source": "Business Mode",
+      "signups": 2,
+      "first_visits": 5,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Midtown",
+      "source": "ClassPass / Platforms",
+      "signups": 8,
+      "first_visits": 5,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Midtown",
+      "source": "MindBody App",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Midtown",
+      "source": "N/A",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Midtown",
+      "source": "Website (unattributed)",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Upper East Side",
+      "source": "Business Mode",
+      "signups": 2,
+      "first_visits": 2,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Upper East Side",
+      "source": "ClassPass / Platforms",
+      "signups": 5,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Upper East Side",
+      "source": "MindBody App",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Upper East Side",
+      "source": "N/A",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Upper East Side",
+      "source": "SWEAT440 App",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami - Upper East Side",
+      "source": "Website (unattributed)",
+      "signups": 1,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami Beach",
+      "source": "Business Mode",
+      "signups": 2,
+      "first_visits": 3,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami Beach",
+      "source": "ClassPass / Platforms",
+      "signups": 2,
+      "first_visits": 5,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami Beach",
+      "source": "N/A",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 1,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami Beach",
+      "source": "Website (unattributed)",
+      "signups": 3,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "Business Mode",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "ClassPass / Platforms",
+      "signups": 5,
+      "first_visits": 5,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "Meta Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "N/A",
+      "signups": 4,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "Other",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miramar",
+      "source": "Business Mode",
+      "signups": 2,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miramar",
+      "source": "ClassPass / Platforms",
+      "signups": 4,
+      "first_visits": 4,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Miramar",
+      "source": "Website (unattributed)",
+      "signups": 1,
+      "first_visits": 3,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Chelsea",
+      "source": "Business Mode",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Chelsea",
+      "source": "ClassPass / Platforms",
+      "signups": 9,
+      "first_visits": 9,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Chelsea",
+      "source": "Google Ads",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Chelsea",
+      "source": "Local Listings",
       "signups": 1,
       "first_visits": 0,
       "first_activations": 0,
@@ -144523,7 +145406,88 @@
     {
       "date": "2026-04-28",
       "studio": "SWEAT440 NYC - Chelsea",
+      "source": "Meta Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Chelsea",
+      "source": "MindBody App",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Chelsea",
+      "source": "N/A",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Chelsea",
       "source": "Other",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Chelsea",
+      "source": "SWEAT440 App",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Chelsea",
+      "source": "Website (unattributed)",
+      "signups": 6,
+      "first_visits": 3,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - FiDi",
+      "source": "ClassPass / Platforms",
+      "signups": 8,
+      "first_visits": 8,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - FiDi",
+      "source": "Google Ads",
+      "signups": 3,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - FiDi",
+      "source": "SWEAT440 App",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - FiDi",
+      "source": "Social Media Organic",
       "signups": 1,
       "first_visits": 0,
       "first_activations": 0,
@@ -144532,7 +145496,43 @@
     {
       "date": "2026-04-28",
       "studio": "SWEAT440 NYC - FiDi",
+      "source": "Website (unattributed)",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Park Slope",
+      "source": "Business Mode",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Park Slope",
       "source": "ClassPass / Platforms",
+      "signups": 5,
+      "first_visits": 3,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Park Slope",
+      "source": "Google Ads",
+      "signups": 0,
+      "first_visits": 0,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Park Slope",
+      "source": "Meta Ads",
       "signups": 1,
       "first_visits": 0,
       "first_activations": 0,
@@ -144541,8 +145541,62 @@
     {
       "date": "2026-04-28",
       "studio": "SWEAT440 NYC - Park Slope",
+      "source": "N/A",
+      "signups": 1,
+      "first_visits": 3,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 NYC - Park Slope",
       "source": "Website (unattributed)",
+      "signups": 5,
+      "first_visits": 2,
+      "first_activations": 2,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Naples - Mercato",
+      "source": "Meta Ads",
+      "signups": 2,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Ocean Township",
+      "source": "Meta Ads",
+      "signups": 2,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Ocean Township",
+      "source": "MindBody App",
       "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Ocean Township",
+      "source": "SWEAT440 App",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Ocean Township",
+      "source": "Website (unattributed)",
+      "signups": 1,
       "first_visits": 0,
       "first_activations": 1,
       "first_sales": 0
@@ -144551,6 +145605,42 @@
       "date": "2026-04-28",
       "studio": "SWEAT440 Pembroke Pines",
       "source": "ClassPass / Platforms",
+      "signups": 2,
+      "first_visits": 2,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Pembroke Pines",
+      "source": "Local Listings",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Pembroke Pines",
+      "source": "Meta Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Pembroke Pines",
+      "source": "N/A",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Pembroke Pines",
+      "source": "SWEAT440 App",
       "signups": 1,
       "first_visits": 0,
       "first_activations": 0,
@@ -144560,8 +145650,530 @@
       "date": "2026-04-28",
       "studio": "SWEAT440 Pembroke Pines",
       "source": "Website (unattributed)",
+      "signups": 2,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Pinecrest - Palmetto Bay",
+      "source": "Business Mode",
+      "signups": 4,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 3
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Pinecrest - Palmetto Bay",
+      "source": "Grassroots",
+      "signups": 3,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Pinecrest - Palmetto Bay",
+      "source": "Meta Ads",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Pinecrest - Palmetto Bay",
+      "source": "N/A",
+      "signups": 0,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Pinecrest - Palmetto Bay",
+      "source": "Other",
+      "signups": 0,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Pinecrest - Palmetto Bay",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Reston",
+      "source": "Business Mode",
       "signups": 1,
       "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Reston",
+      "source": "Meta Ads",
+      "signups": 0,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 South Miami",
+      "source": "Business Mode",
+      "signups": 0,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 South Miami",
+      "source": "ClassPass / Platforms",
+      "signups": 4,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 South Miami",
+      "source": "Grassroots",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 South Miami",
+      "source": "Meta Ads",
+      "signups": 2,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 South Miami",
+      "source": "SWEAT440 App",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 South Miami",
+      "source": "Website (unattributed)",
+      "signups": 3,
+      "first_visits": 1,
+      "first_activations": 2,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Toms River",
+      "source": "Meta Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Toms River",
+      "source": "Website (unattributed)",
+      "signups": 3,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Wall Township",
+      "source": "ClassPass / Platforms",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Wall Township",
+      "source": "Google Ads",
+      "signups": 2,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 Wall Township",
+      "source": "Website (unattributed)",
+      "signups": 5,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 West Palm Beach",
+      "source": "Business Mode",
+      "signups": 4,
+      "first_visits": 1,
+      "first_activations": 1,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 West Palm Beach",
+      "source": "ClassPass / Platforms",
+      "signups": 3,
+      "first_visits": 1,
+      "first_activations": 2,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 West Palm Beach",
+      "source": "Grassroots",
+      "signups": 1,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 West Palm Beach",
+      "source": "Local Listings",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 West Palm Beach",
+      "source": "Meta Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 West Palm Beach",
+      "source": "MindBody App",
+      "signups": 0,
+      "first_visits": 0,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 West Palm Beach",
+      "source": "N/A",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 West Palm Beach",
+      "source": "SWEAT440 App",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-28",
+      "studio": "SWEAT440 West Palm Beach",
+      "source": "Website (unattributed)",
+      "signups": 2,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Austin - Highland",
+      "source": "Business Mode",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Austin - Highland",
+      "source": "ClassPass / Platforms",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Austin - Highland",
+      "source": "N/A",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Austin - Highland",
+      "source": "Website (unattributed)",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Austin - Zilker",
+      "source": "MindBody App",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Austin - Zilker",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Boca Raton",
+      "source": "ClassPass / Platforms",
+      "signups": 2,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Charlotte - Noda",
+      "source": "Business Mode",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Charlotte - Noda",
+      "source": "ClassPass / Platforms",
+      "signups": 2,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Charlotte - Noda",
+      "source": "N/A",
+      "signups": 0,
+      "first_visits": 0,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Charlotte - Noda",
+      "source": "SWEAT440 App",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Charlotte - Noda",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Coral Gables",
+      "source": "ClassPass / Platforms",
+      "signups": 1,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Coral Gables",
+      "source": "Grassroots",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Coral Gables",
+      "source": "SWEAT440 App",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Coral Springs",
+      "source": "ClassPass / Platforms",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Coral Springs",
+      "source": "Google Ads",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Coral Springs",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Deerfield Beach",
+      "source": "ClassPass / Platforms",
+      "signups": 1,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Deerfield Beach",
+      "source": "Local Listings",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Deerfield Beach",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Doral",
+      "source": "Business Mode",
+      "signups": 4,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Doral",
+      "source": "ClassPass / Platforms",
+      "signups": 2,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Eastchester",
+      "source": "ClassPass / Platforms",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Eastchester",
+      "source": "MindBody App",
+      "signups": 0,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Eastchester",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 4,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Fort Lauderdale - Las Olas",
+      "source": "Business Mode",
+      "signups": 1,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Fort Lauderdale - Las Olas",
+      "source": "MindBody App",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Fort Lauderdale - Las Olas",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miami - Brickell",
+      "source": "ClassPass / Platforms",
+      "signups": 2,
+      "first_visits": 2,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -144576,6 +146188,177 @@
     },
     {
       "date": "2026-04-29",
+      "studio": "SWEAT440 Miami - Brickell",
+      "source": "Website (unattributed)",
+      "signups": 2,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miami - Coconut Grove",
+      "source": "Business Mode",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miami - Coconut Grove",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miami - Midtown",
+      "source": "ClassPass / Platforms",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miami Beach",
+      "source": "N/A",
+      "signups": 1,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "Business Mode",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "ClassPass / Platforms",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "Google Ads",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "Local Listings",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "MindBody App",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miami Lakes",
+      "source": "SWEAT440 App",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miramar",
+      "source": "ClassPass / Platforms",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miramar",
+      "source": "Meta Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miramar",
+      "source": "MindBody App",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miramar",
+      "source": "N/A",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Miramar",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 NYC - Chelsea",
+      "source": "ClassPass / Platforms",
+      "signups": 1,
+      "first_visits": 3,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 NYC - Chelsea",
+      "source": "Google Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 NYC - FiDi",
+      "source": "ClassPass / Platforms",
+      "signups": 2,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
       "studio": "SWEAT440 NYC - FiDi",
       "source": "SWEAT440 App",
       "signups": 0,
@@ -144598,14 +146381,14 @@
       "source": "ClassPass / Platforms",
       "signups": 0,
       "first_visits": 0,
-      "first_activations": 1,
+      "first_activations": 3,
       "first_sales": 0
     },
     {
       "date": "2026-04-29",
       "studio": "SWEAT440 NYC - Park Slope",
       "source": "Google Ads",
-      "signups": 0,
+      "signups": 1,
       "first_visits": 0,
       "first_activations": 1,
       "first_sales": 0
@@ -144613,6 +146396,213 @@
     {
       "date": "2026-04-29",
       "studio": "SWEAT440 NYC - Park Slope",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 0,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Naples - Mercato",
+      "source": "Business Mode",
+      "signups": 18,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Naples - Mercato",
+      "source": "Meta Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Ocean Township",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Pembroke Pines",
+      "source": "ClassPass / Platforms",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Pembroke Pines",
+      "source": "Local Listings",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Pembroke Pines",
+      "source": "SWEAT440 App",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Pinecrest - Palmetto Bay",
+      "source": "Business Mode",
+      "signups": 1,
+      "first_visits": 6,
+      "first_activations": 0,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Pinecrest - Palmetto Bay",
+      "source": "Grassroots",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Pinecrest - Palmetto Bay",
+      "source": "Meta Ads",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Pinecrest - Palmetto Bay",
+      "source": "N/A",
+      "signups": 0,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Pinecrest - Palmetto Bay",
+      "source": "SWEAT440 App",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Pinecrest - Palmetto Bay",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Reston",
+      "source": "Business Mode",
+      "signups": 0,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 1
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 South Miami",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Toms River",
+      "source": "Business Mode",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Wall Township",
+      "source": "Meta Ads",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 Wall Township",
+      "source": "Website (unattributed)",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 West Palm Beach",
+      "source": "Business Mode",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 West Palm Beach",
+      "source": "ClassPass / Platforms",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 West Palm Beach",
+      "source": "Google Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-29",
+      "studio": "SWEAT440 West Palm Beach",
+      "source": "Meta Ads",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-30",
+      "studio": "SWEAT440 Miami - Coconut Grove",
+      "source": "Business Mode",
+      "signups": 0,
+      "first_visits": 0,
+      "first_activations": 1,
+      "first_sales": 0
+    },
+    {
+      "date": "2026-04-30",
+      "studio": "SWEAT440 NYC - FiDi",
       "source": "Website (unattributed)",
       "signups": 0,
       "first_visits": 0,
@@ -144625,17 +146615,8 @@
       "month": "2023-04-01",
       "studio": "SWEAT440 Austin - Highland",
       "source": "N/A",
-      "signups": 12,
-      "first_visits": 11,
-      "first_activations": 0,
-      "first_sales": 0
-    },
-    {
-      "month": "2023-04-01",
-      "studio": "SWEAT440 Austin - Zilker",
-      "source": "N/A",
-      "signups": 2,
-      "first_visits": 0,
+      "signups": 4,
+      "first_visits": 3,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -144643,7 +146624,7 @@
       "month": "2023-04-01",
       "studio": "SWEAT440 Charlotte - Noda",
       "source": "N/A",
-      "signups": 2,
+      "signups": 1,
       "first_visits": 0,
       "first_activations": 0,
       "first_sales": 0
@@ -144652,8 +146633,8 @@
       "month": "2023-04-01",
       "studio": "SWEAT440 Coral Gables",
       "source": "N/A",
-      "signups": 16,
-      "first_visits": 14,
+      "signups": 9,
+      "first_visits": 5,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -144661,8 +146642,8 @@
       "month": "2023-04-01",
       "studio": "SWEAT440 Coral Springs",
       "source": "N/A",
-      "signups": 9,
-      "first_visits": 6,
+      "signups": 4,
+      "first_visits": 3,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -144670,8 +146651,8 @@
       "month": "2023-04-01",
       "studio": "SWEAT440 Deerfield Beach",
       "source": "N/A",
-      "signups": 15,
-      "first_visits": 13,
+      "signups": 5,
+      "first_visits": 3,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -144688,14 +146669,23 @@
       "month": "2023-04-01",
       "studio": "SWEAT440 Doral",
       "source": "N/A",
-      "signups": 5,
+      "signups": 3,
+      "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "month": "2023-04-01",
+      "studio": "SWEAT440 Miami - Brickell",
+      "source": "N/A",
+      "signups": 3,
       "first_visits": 6,
       "first_activations": 0,
       "first_sales": 0
     },
     {
       "month": "2023-04-01",
-      "studio": "SWEAT440 Fort Lauderdale - Las Olas",
+      "studio": "SWEAT440 Miami - Midtown",
       "source": "N/A",
       "signups": 1,
       "first_visits": 0,
@@ -144704,37 +146694,10 @@
     },
     {
       "month": "2023-04-01",
-      "studio": "SWEAT440 Miami - Brickell",
-      "source": "ClassPass / Platforms",
-      "signups": 0,
-      "first_visits": 1,
-      "first_activations": 0,
-      "first_sales": 0
-    },
-    {
-      "month": "2023-04-01",
-      "studio": "SWEAT440 Miami - Brickell",
-      "source": "N/A",
-      "signups": 14,
-      "first_visits": 15,
-      "first_activations": 0,
-      "first_sales": 0
-    },
-    {
-      "month": "2023-04-01",
-      "studio": "SWEAT440 Miami - Midtown",
-      "source": "N/A",
-      "signups": 4,
-      "first_visits": 0,
-      "first_activations": 0,
-      "first_sales": 0
-    },
-    {
-      "month": "2023-04-01",
       "studio": "SWEAT440 Miami - Upper East Side",
       "source": "N/A",
-      "signups": 13,
-      "first_visits": 11,
+      "signups": 5,
+      "first_visits": 7,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -144742,8 +146705,8 @@
       "month": "2023-04-01",
       "studio": "SWEAT440 Miami Beach",
       "source": "N/A",
-      "signups": 11,
-      "first_visits": 12,
+      "signups": 6,
+      "first_visits": 5,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -144751,7 +146714,7 @@
       "month": "2023-04-01",
       "studio": "SWEAT440 Miami Lakes",
       "source": "N/A",
-      "signups": 8,
+      "signups": 5,
       "first_visits": 1,
       "first_activations": 0,
       "first_sales": 0
@@ -144760,8 +146723,8 @@
       "month": "2023-04-01",
       "studio": "SWEAT440 NYC - Chelsea",
       "source": "N/A",
-      "signups": 25,
-      "first_visits": 10,
+      "signups": 9,
+      "first_visits": 3,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -144769,8 +146732,8 @@
       "month": "2023-04-01",
       "studio": "SWEAT440 NYC - FiDi",
       "source": "N/A",
-      "signups": 18,
-      "first_visits": 6,
+      "signups": 9,
+      "first_visits": 3,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -144778,7 +146741,7 @@
       "month": "2023-04-01",
       "studio": "SWEAT440 Nashville - Capitol View",
       "source": "N/A",
-      "signups": 2,
+      "signups": 1,
       "first_visits": 0,
       "first_activations": 0,
       "first_sales": 0
@@ -144787,7 +146750,7 @@
       "month": "2023-04-01",
       "studio": "SWEAT440 Ocean Township",
       "source": "N/A",
-      "signups": 2,
+      "signups": 1,
       "first_visits": 0,
       "first_activations": 0,
       "first_sales": 0
@@ -144805,8 +146768,8 @@
       "month": "2023-04-01",
       "studio": "SWEAT440 Toms River",
       "source": "N/A",
-      "signups": 21,
-      "first_visits": 22,
+      "signups": 10,
+      "first_visits": 11,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -147028,7 +148991,7 @@
       "month": "2023-11-01",
       "studio": "SWEAT440 Miami - Brickell",
       "source": "Business Mode",
-      "signups": 2,
+      "signups": 1,
       "first_visits": 1,
       "first_activations": 0,
       "first_sales": 0
@@ -147198,9 +149161,18 @@
     {
       "month": "2023-11-01",
       "studio": "SWEAT440 South Miami",
+      "source": "Business Mode",
+      "signups": 0,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "month": "2023-11-01",
+      "studio": "SWEAT440 South Miami",
       "source": "N/A",
       "signups": 265,
-      "first_visits": 260,
+      "first_visits": 259,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -147217,7 +149189,7 @@
       "month": "2023-11-01",
       "studio": "SWEAT440 Toms River",
       "source": "N/A",
-      "signups": 182,
+      "signups": 181,
       "first_visits": 107,
       "first_activations": 0,
       "first_sales": 0
@@ -147228,6 +149200,15 @@
       "source": "SWEAT440 App",
       "signups": 0,
       "first_visits": 2,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "month": "2023-11-01",
+      "studio": "SWEAT440 Toms River",
+      "source": "Website (unattributed)",
+      "signups": 1,
+      "first_visits": 0,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -147649,7 +149630,7 @@
       "month": "2024-01-01",
       "studio": "SWEAT440 Coral Gables",
       "source": "N/A",
-      "signups": 284,
+      "signups": 285,
       "first_visits": 204,
       "first_activations": 1,
       "first_sales": 1
@@ -149269,7 +151250,7 @@
       "month": "2024-05-01",
       "studio": "SWEAT440 Austin - Zilker",
       "source": "Business Mode",
-      "signups": 1,
+      "signups": 2,
       "first_visits": 0,
       "first_activations": 0,
       "first_sales": 0
@@ -151510,8 +153491,17 @@
       "month": "2024-10-01",
       "studio": "SWEAT440 Doral",
       "source": "N/A",
-      "signups": 311,
-      "first_visits": 205,
+      "signups": 310,
+      "first_visits": 204,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "month": "2024-10-01",
+      "studio": "SWEAT440 Doral",
+      "source": "SWEAT440 App",
+      "signups": 1,
+      "first_visits": 1,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -152266,8 +154256,17 @@
       "month": "2024-11-01",
       "studio": "SWEAT440 South Miami",
       "source": "N/A",
-      "signups": 199,
+      "signups": 198,
       "first_visits": 144,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "month": "2024-11-01",
+      "studio": "SWEAT440 South Miami",
+      "source": "SWEAT440 App",
+      "signups": 1,
+      "first_visits": 0,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -152275,10 +154274,19 @@
       "month": "2024-11-01",
       "studio": "SWEAT440 Toms River",
       "source": "N/A",
-      "signups": 224,
+      "signups": 223,
       "first_visits": 78,
       "first_activations": 4,
       "first_sales": 6
+    },
+    {
+      "month": "2024-11-01",
+      "studio": "SWEAT440 Toms River",
+      "source": "SWEAT440 App",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
     },
     {
       "month": "2024-11-01",
@@ -154244,6 +156252,15 @@
     },
     {
       "month": "2025-04-01",
+      "studio": "SWEAT440 Eastchester",
+      "source": "N/A",
+      "signups": 1,
+      "first_visits": 0,
+      "first_activations": 0,
+      "first_sales": 0
+    },
+    {
+      "month": "2025-04-01",
       "studio": "SWEAT440 Fort Lauderdale - Las Olas",
       "source": "N/A",
       "signups": 248,
@@ -155065,7 +157082,7 @@
       "month": "2025-05-01",
       "studio": "SWEAT440 Pinecrest - Palmetto Bay",
       "source": "N/A",
-      "signups": 3,
+      "signups": 4,
       "first_visits": 0,
       "first_activations": 0,
       "first_sales": 0
@@ -155211,7 +157228,7 @@
       "source": "N/A",
       "signups": 137,
       "first_visits": 102,
-      "first_activations": 3,
+      "first_activations": 2,
       "first_sales": 3
     },
     {
@@ -155299,7 +157316,7 @@
       "month": "2025-06-01",
       "studio": "SWEAT440 Miami - Brickell",
       "source": "N/A",
-      "signups": 292,
+      "signups": 293,
       "first_visits": 180,
       "first_activations": 2,
       "first_sales": 2
@@ -155641,7 +157658,7 @@
       "month": "2025-07-01",
       "studio": "SWEAT440 Coral Gables",
       "source": "N/A",
-      "signups": 247,
+      "signups": 248,
       "first_visits": 195,
       "first_activations": 3,
       "first_sales": 3
@@ -155650,8 +157667,8 @@
       "month": "2025-07-01",
       "studio": "SWEAT440 Coral Springs",
       "source": "N/A",
-      "signups": 132,
-      "first_visits": 99,
+      "signups": 131,
+      "first_visits": 98,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -155659,8 +157676,8 @@
       "month": "2025-07-01",
       "studio": "SWEAT440 Coral Springs",
       "source": "SWEAT440 App",
-      "signups": 1,
-      "first_visits": 1,
+      "signups": 2,
+      "first_visits": 2,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -155947,8 +157964,8 @@
       "month": "2025-07-01",
       "studio": "SWEAT440 NYC - FiDi",
       "source": "N/A",
-      "signups": 240,
-      "first_visits": 134,
+      "signups": 239,
+      "first_visits": 133,
       "first_activations": 9,
       "first_sales": 8
     },
@@ -155960,6 +157977,15 @@
       "first_visits": 1,
       "first_activations": 0,
       "first_sales": 1
+    },
+    {
+      "month": "2025-07-01",
+      "studio": "SWEAT440 NYC - FiDi",
+      "source": "Website (unattributed)",
+      "signups": 1,
+      "first_visits": 1,
+      "first_activations": 0,
+      "first_sales": 0
     },
     {
       "month": "2025-07-01",
@@ -156218,7 +158244,7 @@
       "studio": "SWEAT440 Coral Gables",
       "source": "Business Mode",
       "signups": 0,
-      "first_visits": 1,
+      "first_visits": 2,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -156236,7 +158262,7 @@
       "studio": "SWEAT440 Coral Gables",
       "source": "N/A",
       "signups": 303,
-      "first_visits": 199,
+      "first_visits": 198,
       "first_activations": 4,
       "first_sales": 4
     },
@@ -156370,7 +158396,7 @@
       "month": "2025-08-01",
       "studio": "SWEAT440 Miami - Brickell",
       "source": "N/A",
-      "signups": 304,
+      "signups": 305,
       "first_visits": 225,
       "first_activations": 4,
       "first_sales": 4
@@ -157936,7 +159962,7 @@
       "month": "2025-10-01",
       "studio": "SWEAT440 Wall Township",
       "source": "N/A",
-      "signups": 98,
+      "signups": 97,
       "first_visits": 0,
       "first_activations": 0,
       "first_sales": 0
@@ -158620,7 +160646,7 @@
       "month": "2025-11-01",
       "studio": "SWEAT440 Ocean Township",
       "source": "N/A",
-      "signups": 202,
+      "signups": 201,
       "first_visits": 99,
       "first_activations": 8,
       "first_sales": 7
@@ -158747,7 +160773,7 @@
       "studio": "SWEAT440 Toms River",
       "source": "N/A",
       "signups": 128,
-      "first_visits": 57,
+      "first_visits": 56,
       "first_activations": 8,
       "first_sales": 6
     },
@@ -158756,7 +160782,7 @@
       "studio": "SWEAT440 Toms River",
       "source": "SWEAT440 App",
       "signups": 1,
-      "first_visits": 1,
+      "first_visits": 2,
       "first_activations": 0,
       "first_sales": 0
     },
@@ -159520,7 +161546,7 @@
       "month": "2025-12-01",
       "studio": "SWEAT440 Miami - Brickell",
       "source": "ClassPass / Platforms",
-      "signups": 173,
+      "signups": 172,
       "first_visits": 129,
       "first_activations": 2,
       "first_sales": 2
@@ -160584,8 +162610,8 @@
       "source": "N/A",
       "signups": 48,
       "first_visits": 49,
-      "first_activations": 408,
-      "first_sales": 423
+      "first_activations": 407,
+      "first_sales": 422
     },
     {
       "month": "2025-12-01",
@@ -160593,8 +162619,8 @@
       "source": "SWEAT440 App",
       "signups": 5,
       "first_visits": 0,
-      "first_activations": 10,
-      "first_sales": 10
+      "first_activations": 11,
+      "first_sales": 11
     },
     {
       "month": "2025-12-01",
